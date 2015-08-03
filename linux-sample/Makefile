@@ -1,5 +1,4 @@
-override CFLAGS = -std=gnu89 -Wall -pedantic -pthread
-#CFLAGS = -std=gnu89 -w -pedantic
+override CFLAGS += -std=gnu89 -Wall -pedantic -pthread
 ifdef DEBUG
 CFLAGS += -g -DDEBUG
 endif
@@ -13,7 +12,7 @@ LIBS = -lssl -lcrypto -lpthread -lkiiiotsdk
 LD_FLAGS = -L..
 SOURCES = $(wildcard *.c)
 TARGET = exampleapp
-INCLUDES = -I.. -I../v1-prototype/kii/kii -I../v1-prototype/kii/kii-core -I../v1-prototype/kii/kii_json/include -I../v1-prototype/kii/lib/jsmn
+INCLUDES = -I.. -I../kii/kii -I../kii/kii-core -I../kii/kii_json/include -I../kii/lib/jsmn
 
 IOTSDK = libkiiiotsdk.so
 
