@@ -84,8 +84,10 @@ paths:
         -
           name: authorization
           in: header
-          description: user/ thing access token.
-          required: true
+          description: user/ thing access token. If the onboarding is
+              initiated by Thing, this field can not be contained in the
+              request.
+          required: false
           type: string
         - name: appID
           in: path
