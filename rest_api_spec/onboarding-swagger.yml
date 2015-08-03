@@ -1,0 +1,122 @@
+swagger: '2.0'
+
+info:
+  version: "1.0.0"
+  title: IoT Cloud Onboarding
+
+definitions:
+  onboardingWithVendorThingID:
+    type: object
+    required:
+    - vendorThingID
+    - thingPassword
+    - owner
+    properties:
+      vendorThingID:
+        type: string
+        description: vendor thing id. must be included.
+      thingPassword:
+        type: string
+        description: |
+         password of the thing. must be included.
+      thingType:
+        type: string
+        description: type of the thing. can be omitted. If the thing is already registered, It will be ignored. (Affect only when the thing has not been registered yet.)
+      thingProperties:
+        type: object
+        description: properties of thing. can be omitted. I the thing is already registered, It will be ignored. (Affect only when the thing has not been registered yet.)
+      owner:
+        type: string
+        pattern: ^(user:.+|group:.+)$
+        description: |
+            ID of the owner. User ID or Group ID can be used.
+            If the onboarding is initiated by Thing, this field can not be
+            contained in the request.
+
+  onboardingWithThingID:
+    type: object
+    required:
+    - thingID
+    - thingPassword
+    properties:
+      thingID:
+        type: string
+        description: ID of the thing.
+      thingPassword:
+        type: string
+        description: |
+         password of the thing. must be included.
+      owner:
+        type: string
+        pattern: ^(user:.+|group:.+)$
+        description: |
+            ID of the owner. User ID or Group ID can be used.
+            If the onboarding is initiated by Thing, this field can not be
+            contained in the request.
+
+  onboardingRequest:
+    description: one of "#/definitions/onboardingWithVendorThingID", "#/definitions/onboardingWithThingID"
+    x-oneOf: # It should be oneOf but swagger doesn't support it :/
+    - $ref: "#/definitions/onboardingWithVendorThingID"
+    - $ref: "#/definitions/onboardingWithThingID"
+
+  onboardingResponse:
+    type: object
+    required:
+    - thingID
+    - accessToken
+    properties:
+      thingID:
+        type: string
+        description: ID of the thing published by IoT Cloud.
+      accessToken:
+        type: string
+        description: access token of the thing.
+
+paths:
+  /apps/${appID}/onboardings:
+    post:
+      description: |
+       Execute onboarding from Kii Cloud user.
+      # This is array of GET operation parameters:
+      parameters:
+        # An example parameter that is in query and is required
+        -
+          name: authorization
+          in: header
+          description: user/ thing access token.
+          required: true
+          type: string
+        - name: appID
+          in: path
+          description: id of the application
+          required: true
+          type: string
+        - name: bodyJson
+          in: body
+          description: onboarding information
+          schema:
+            $ref: "#/definitions/onboardingRequest"
+
+      consumes:
+      - application/vnd.kii.onboardingWithThingID+json
+      - application/vnd.kii.onboardingWithVendorThingID+json
+
+      responses:
+        200:
+          description: Onboarding successfully done.
+          schema:
+            $ref: "#/definitions/onboardingResponse"
+        403:
+          description: |
+           Onboarding failed due to access rights.
+           - user is not a member of the group specified by ownerGroupID
+           - thing specifies ownerGroupID in the request.
+        404:
+          description: |
+           Thing which has vendorThingID/thingID specified in the request not found.
+           (If vendorThingID and thingPasword is given, new thing will be created.)
+        500:
+          description: |
+           Onboarding failed due to temporal error.
+           Client can just resend same request later.

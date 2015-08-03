@@ -1,0 +1,597 @@
+swagger: '2.0'
+
+info:
+  version: "1.0.0"
+  title: Trigger API
+
+definitions:
+
+  statement:
+    type: object
+    description: statement evaluated as boolean
+    x-oneOf: # Should be oneOf! swagger doesn't support it :/
+    - $ref: '#/definitions/='
+    - $ref: '#/definitions/!='
+    - $ref: '#/definitions/>'
+    - $ref: '#/definitions/>='
+    - $ref: '#/definitions/<'
+    - $ref: '#/definitions/<='
+    - $ref: '#/definitions/and'
+    - $ref: '#/definitions/or'
+
+  '=':
+    type: object
+    description: equals statement
+    required:
+    - field
+    - value
+    properties:
+      field:
+        type: string
+        description: specify field of the states to be evaluated as left hand side
+      value:
+        type:
+        - string
+        - integer
+        - boolean
+        description: specify value as to be evaluated as right hand side
+
+  '!=':
+    type: object
+    description: not equals statement
+    required:
+    - field
+    - value
+    properties:
+      field:
+        type: string
+        description: specify field of the states to be evaluated as left hand side
+      value:
+        type:
+        - string
+        - integer
+        - boolean
+        description: specify value as to be evaluated as right hand side
+
+  '>':
+    type: object
+    description: greater than statement
+    required:
+    - field
+    - value
+    properties:
+      field:
+        type: string
+        description: specify field of the states to be evaluated as left hand side
+      value:
+        type:
+        - number
+        description: specify value as to be evaluated as right hand side
+
+  '>=':
+    type: object
+    description: greater than or equals statement
+    required:
+    - field
+    - value
+    properties:
+      field:
+        type: string
+        description: specify field of the states to be evaluated as left hand side
+      value:
+        type:
+        - number
+        description: specify value as to be evaluated as right hand side
+
+  '<':
+    type: object
+    description: less than statement
+    required:
+    - field
+    - value
+    properties:
+      field:
+        type: string
+        description: specify field of the states to be evaluated as left hand side
+      value:
+        type:
+        - number
+        description: specify value as to be evaluated as right hand side
+
+  '<=':
+    type: object
+    description: less than or equals statement
+    required:
+    - field
+    - value
+    properties:
+      field:
+        type: string
+        description: specify field of the states to be evaluated as left hand side
+      value:
+        type:
+        - number
+        description: specify value as to be evaluated as right hand side
+
+  and:
+    type: array
+    description: concatenate statements
+    items:
+      - $ref: "#/definitions/statement"
+
+  or:
+    type: array
+    description: concatenate statements
+    items:
+      - $ref: "#/definitions/statement"
+
+  scheduleTriggerPredicate:
+    type: object
+    required:
+    - eventSource
+    - schedule
+    properties:
+      eventSource:
+        type: string
+        description: Specify the source of event.
+        pattern: ^schedule$
+      schedule:
+        type: string
+        description: Specify the schedule with cron. ex.) /15 * * * *
+
+  scheduleTriggerPredicatePatch:
+    type: object
+    properties:
+      eventSource:
+        type: string
+        description: Specify the source of event.
+        pattern: ^schedule$
+      schedule:
+        type: string
+        description: Specify the schedule with cron. ex.) /15 * * * *
+
+  stateTriggerPredicate:
+    type: object
+    required:
+    - eventSource
+    - triggersWhen
+    - condition
+    properties:
+      eventSource:
+        type: string
+        description: Specify the source of event.
+        pattern: ^states$
+      triggersWhen:
+        type: string
+        description: |
+         Specify when the trigger is fired.
+         - CONDITION_TRUE: Always execute command when current state matches with the specified condition.
+         - CONDITION_FALSE_TO_TRUE: Execute command when the previous state doesn't matches with te specified condition and current state matches with.
+         - CONDITION_CHANGED: Execute command when the result of evaluation with the given condition is different between previous state and current state. (i.e. Evaluation result is changed from false to true or from true to false)
+        pattern: ^{CONDITION_TRUE|CONDITION_FALSE_TO_TRUE|CONDITION_CHANGED}
+      condition:
+        description: specify the statement to be evaluated when the states has been updated.
+        $ref: "#/definitions/statement"
+
+  stateTriggerPredicatePatch:
+    type: object
+    properties:
+      eventSource:
+        type: string
+        description: Specify the source of event.
+        pattern: ^states$
+      triggersWhen:
+        type: string
+        description: |
+         Specify when the trigger is fired.
+         - CONDITION_TRUE: Always execute command when current state matches with the specified condition.
+         - CONDITION_FALSE_TO_TRUE: Execute command when the previous state doesn't matches with te specified condition and current state matches with.
+         - CONDITION_CHANGED: Execute command when the result of evaluation with the given condition is different between previous state and current state. (i.e. Evaluation result is changed from false to true or from true to false)
+        pattern: ^{CONDITION_TRUE|CONDITION_FALSE_TO_TRUE|CONDITION_CHANGED}
+      condition:
+        description: specify the statement to be evaluated when the states has been updated.
+        $ref: "#/definitions/statement"
+
+  triggerPredicate:
+    x-anyOf:
+    - $ref: "#/definitions/stateTriggerPredicate"
+    - $ref: "#/definitions/scheduleTriggerPredicate"
+
+  triggerPredicatePatch:
+    x-anyOf:
+    - $ref: "#/definitions/stateTriggerPredicatePatch"
+    - $ref: "#/definitions/scheduleTriggerPredicatePatch"
+
+  triggerUpdateRequest:
+    type: object
+    description: Schema used to update existing trigger.
+    properties:
+      predicate:
+        $ref: "#/definitions/triggerPredicatePatch"
+      command:
+        $ref: "file://command.yml/definitions/command"
+
+  triggerCreationRequest:
+    type: object
+    description: Schema used to create new trigger.
+    properties:
+      predicate:
+        $ref: "#/definitions/triggerPredicate"
+      command:
+        $ref: "file://command.yml/definitions/command"
+
+  triggerCreationResponse:
+    type: object
+    description: Response of trigger creation request.
+    properties:
+      triggerID:
+        type: string
+        description: ID of the trigger.
+
+  triggerGetResponse:
+    type: object
+    description: Response of getting trigger request.
+    properties:
+      triggerID:
+        type: string
+        description: ID of the trigger.
+      predicate:
+        $ref: "#/definitions/triggerPredicate"
+      command:
+        $ref: "file://command.yml/definitions/command"
+      disabled:
+        type: boolean
+        description: indicate whether the trigger is disabled or not.
+
+paths:
+  /apps/${appId}/targets/${target}/triggers/${triggerId}/disable:
+    put:
+      description: |
+        Disable trigger
+      parameters:
+        -
+          name: appId
+          in: path
+          description: Id of the application.
+          required: true
+          type: string
+        -
+          name: target
+          in: path
+          description: Id of the target. Format is thing:.+
+          required: true
+          type: string
+        -
+          name: triggerId
+          in: path
+          description: Id of the trigger.
+          required: true
+          type: string
+        -
+          name: authorization
+          in: header
+          description: Authorization header. user access token or app admin access token.
+          required: true
+          type: string
+      responses:
+        204:
+          description: Succeeded to disable trigger. (Success if its already disabled)
+        403:
+          description: |
+           failed due to permission.
+           - User bound to access token does not owns the target or does not belongs to group owns target.
+        404:
+          description: |
+            - Specified target in the path not found.
+            - Specified trigger in the path not found.
+        503:
+          description: |
+            Temporal error. Client can just retry with the same request.
+
+  /apps/${appId}/targets/${target}/triggers/${triggerId}/enable:
+    put:
+      description: |
+        Enable trigger
+      parameters:
+        -
+          name: appId
+          in: path
+          description: Id of the application.
+          required: true
+          type: string
+        -
+          name: target
+          in: path
+          description: Id of the target. Format is thing:.+
+          required: true
+          type: string
+        -
+          name: triggerId
+          in: path
+          description: Id of the trigger.
+          required: true
+          type: string
+        -
+          name: authorization
+          in: header
+          description: Authorization header. user access token or app admin access token.
+          required: true
+          type: string
+      responses:
+        204:
+          description: Succeeded to enable trigger. (Success if its already enabled)
+        403:
+          description: |
+           failed due to permission.
+           - User bound to access token does not owns the target or does not belongs to group owns target.
+        404:
+          description: |
+            - Specified target in the path not found.
+            - Specified trigger in the path not found.
+        503:
+          description: |
+            Temporal error. Client can just retry with the same request.
+
+  /apps/${appId}/targets/${target}/triggers/${triggerId}:
+    delete:
+      description: |
+        Delete the specified trigger.
+      parameters:
+        -
+          name: appId
+          in: path
+          description: Id of the application.
+          required: true
+          type: string
+        -
+          name: target
+          in: path
+          description: Id of the target. Format is thing:.+
+          required: true
+          type: string
+        -
+          name: triggerId
+          in: path
+          description: Id of the trigger.
+          required: true
+          type: string
+        -
+          name: authorization
+          in: header
+          description: Authorization header. user access token or app admin access token.
+          required: true
+          type: string
+
+      responses:
+        204:
+          description: Succeeded to delete trigger.
+        403:
+          description: |
+           User bound to access token doesn't owns the target or doesn't belong to the group owns target.
+        404:
+          description: |
+            - Specified target in the path not found.
+            - Specified trigger in the path not found.
+        503:
+          description: |
+            Temporal error. Client can just retry with the same request.
+
+    patch:
+      description: |
+        Modify specified trigger.
+      parameters:
+        -
+          name: appId
+          in: path
+          description: Id of the application.
+          required: true
+          type: string
+        -
+          name: target
+          in: path
+          description: Id of the target. Format is thing:.+
+          required: true
+          type: string
+        -
+          name: triggerId
+          in: path
+          description: Id of the trigger.
+          required: true
+          type: string
+        -
+          name: authorization
+          in: header
+          description: Authorization header. user access token or app admin access token.
+          required: true
+          type: string
+        -
+          name: bodyJson
+          in: body
+          description: update content
+          required: true
+          schema:
+            $ref: "#/definitions/triggerUpdateRequest"
+
+      responses:
+        204:
+          description: Succeeded to update trigger.
+        403:
+          description: |
+           Failed due to permission.
+           - User doesn't have rights to modify command specified in path
+           - Specified issuer in command doesn't have rights to issue command to the target.
+        404:
+          description: |
+            - Specified target in the path not found.
+            - Specified trigger in the path not found.
+        503:
+          description: |
+            Temporal error. Client can just retry with the same request.
+
+    get:
+      description: |
+        Get specified trigger.
+      parameters:
+        -
+          name: appId
+          in: path
+          description: Id of the application.
+          required: true
+          type: string
+        -
+          name: target
+          in: path
+          description: Id of the target. Format is thing:.+
+          required: true
+          type: string
+        -
+          name: triggerId
+          in: path
+          description: Id of the trigger.
+          required: true
+          type: string
+        -
+          name: authorization
+          in: header
+          description: Authorization header. user access token or app admin access token.
+          required: true
+          type: string
+
+      responses:
+        200:
+          description: Succeeded to get trigger
+          schema:
+            $ref: "#/definitions/triggerGetResponse"
+        403:
+          description: |
+           user bound to the access token doens't have rights of getting trigger belongs to target.
+           (user is not a owner of the target or doesn't belong to the group owns the target.)
+        404:
+          description: |
+            - Specified target in the path not found.
+            - Specified trigger in the path not found.
+        503:
+          description: |
+            Temporal error. Client can just retry with the same request.
+
+  /apps/${appId}/targets/${target}/triggers:
+    get:
+      description: |
+       List triggers belongs to the target.
+
+      parameters:
+        -
+          name: appId
+          in: path
+          description: Id of the application.
+          required: true
+          type: string
+        -
+          name: target
+          in: path
+          description: Id of the target. Format is thing:.+
+          required: true
+          type: string
+        -
+          name: authorization
+          in: header
+          description: Authorization header. user access token or app admin access token.
+          required: true
+          type: string
+        -
+          name: bestEffortLimit
+          in: query
+          description: Specify maximum number of items in the response to limit the size.
+          required: false
+          type: integer
+          minimum: 0
+          exclusiveMinimum: true
+        -
+          name: paginationKey
+          in: query
+          description: |
+           paginationKey included in the previous query response.
+           would be used with bestEffortLimit.
+          required: false
+          type: string
+
+      responses:
+        200:
+          description: Success.
+          schema:
+            type: object
+            properties:
+              triggers:
+                type: array
+                items:
+                  - $ref: "#/definitions/triggerGetResponse"
+              paginationKey:
+                type: string
+                description: |
+                 if this field exists, there is remaining data in cloud. To get the remaining part,
+                 include this value in the next request in paginationKey query param.
+
+        400:
+          description: |
+           Failed due to bad request. Wrong paginationKey is specified.
+        403:
+          description: |
+           Failed due to permission. User access to this resource doesn't owns target or
+           Does not belongs to the group owns target.
+        404:
+          description: |
+            Specified target in the path not found.
+        503:
+          description: |
+            Temporal error. Client can just retry with the same request.
+
+    post:
+      description: |
+       Creates new trigger
+      parameters:
+        -
+          name: appId
+          in: path
+          description: Id of the application.
+          required: true
+          type: string
+        -
+          name: target
+          in: path
+          description: Id of the target. Format is thing:.+
+          required: true
+          type: string
+        -
+          name: authorization
+          in: header
+          description: Authorization header. user access token or app admin access token.
+          required: true
+          type: string
+        -
+          name: bodyJson
+          in: body
+          description: Body json
+          schema:
+            $ref: "#/definitions/triggerCreationRequest"
+
+      responses:
+        201:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/triggerCreationResponse"
+        403:
+          description: |
+           Failed due to permission.
+           - Command issuer doesn't have rights to issue command against the target specified
+           in the request.
+           - Can not create trigger by the specified acccess token.
+             - Issuer specified in the request and user bound to access token is different.
+             (Except for app admin.)
+             - Specified access token is bound to anonymous user.
+        404:
+          description: |
+            Specified target in the path not found.
+        503:
+          description: |
+            Temporal error. Client can just retry with the same request.
+
