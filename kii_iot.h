@@ -63,7 +63,7 @@ kii_bool_t onboard_with_vendor_thing_id(
         const char* vendor_thing_id,
         const char* password,
         const char* thing_type,
-        const char* thing_properties,
+        const char* thing_properties
         );
 
 /** On board to IoT Cloud with specified thing ID.
@@ -78,7 +78,7 @@ kii_bool_t onboard_with_vendor_thing_id(
 kii_bool_t onboard_with_thing_id(
         kii_iot_t* kii_iot,
         const char* thing_id,
-        const char* password,
+        const char* password
         );
 
 #ifdef __cplusplus
