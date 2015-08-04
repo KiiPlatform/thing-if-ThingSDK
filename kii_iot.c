@@ -16,6 +16,7 @@
 #define CONST_STRLEN(str) sizeof(str) - 1
 #define APP_PATH "iot-api/apps"
 #define ONBOARDING_PATH "onboardings"
+#define CONTENT_TYPE_VENDOR_THING_ID "application/vnd.kii.onboardingWithVendorThingIDByThing+json"
 
 #define M_KII_IOT_APPEND_CONST_STR(kii, str)  \
     { \
@@ -43,6 +44,62 @@
             return KII_FALSE; \
         } \
     }
+
+static kii_json_parse_result_t prv_kii_json_read_object(
+        kii_t* kii,
+        const char* json_string,
+        size_t json_string_size,
+        kii_json_field_t *fields)
+{
+    kii_json_t kii_json;
+    kii_json_parse_result_t retval;
+    char error_message[50];
+
+    memset(&kii_json, 0, sizeof(kii_json));
+    kii_json.error_string_buff = error_message;
+    kii_json.error_string_length =
+        sizeof(error_message) / sizeof(error_message[0]);
+
+    kii_json.resource = &(kii->kii_json_resource);
+    retval = kii_json_read_object(&kii_json, json_string, json_string_size,
+                fields);
+
+    if (retval != KII_JSON_PARSE_SUCCESS) {
+        M_KII_LOG(kii->kii_core.logger_cb(
+                "fail to parse json: result=%d, message=%s\n",
+                retval, kii_json.error_string_buff));
+    }
+    return retval;
+}
+
+
+static int prv_iot_parse_onboarding_response(kii_t* kii)
+{
+    kii_json_field_t fields[3];
+
+    M_KII_IOT_ASSERT(kii != NULL);
+
+    memset(fields, 0, sizeof(fields));
+    fields[0].name = "thingID";
+    fields[0].type = KII_JSON_FIELD_TYPE_STRING;
+    fields[0].field_copy.string = kii->kii_core.author.author_id;
+    fields[0].field_copy_buff_size = sizeof(kii->kii_core.author.author_id) /
+            sizeof(kii->kii_core.author.author_id[0]);
+    fields[1].name = "accessToken";
+    fields[1].type = KII_JSON_FIELD_TYPE_STRING;
+    fields[1].field_copy.string = kii->kii_core.author.access_token;
+    fields[1].field_copy_buff_size = sizeof(kii->kii_core.author.access_token) /
+            sizeof(kii->kii_core.author.access_token[0]);
+    fields[2].name = NULL;
+
+    if (prv_kii_json_read_object(kii, kii->kii_core.response_body,
+                    strlen(kii->kii_core.response_body), fields) !=
+            KII_JSON_PARSE_SUCCESS) {
+        return -1;
+    }
+
+    return 0;
+}
 
 kii_bool_t init_kii_iot(
         kii_iot_t* kii_iot,
@@ -109,13 +166,7 @@ kii_bool_t onboard_with_vendor_thing_id(
         )
 {
     kii_t* kii = &kii_iot->command_handler;
-    char* resource_path[64];
-
-    // authenticate
-    if (kii_thing_authenticate(
-            kii, vendor_thing_id, password) != 0) {
-        return KII_FALSE;
-    }
+    char resource_path[64];
 
     if (sizeof(resource_path) / sizeof(resource_path[0]) <=
             CONST_STRLEN(APP_PATH) + CONST_STRLEN("/") +
@@ -128,12 +179,11 @@ kii_bool_t onboard_with_vendor_thing_id(
             ONBOARDING_PATH);
 
     if (kii_api_call_start(kii, "POST", resource_path,
-                    "application/vnd.kii.onboardingWithVendorThingID+json",
-                    KII_TRUE) != 0) {
+                    CONTENT_TYPE_VENDOR_THING_ID, KII_FALSE) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb(
             "fail to start api call.\n"));
     }
-    M_KII_IOT_APPEND_CONST_STR(kii, "{\"bodyJson\":{\"vendorThingID\":\"");
+    M_KII_IOT_APPEND_CONST_STR(kii, "{\"vendorThingID\":\"");
     M_KII_IOT_APPEND_STR(kii, vendor_thing_id);
     M_KII_IOT_APPEND_CONST_STR(kii, "\",\"thingPassword\":\"");
     M_KII_IOT_APPEND_STR(kii, password);
@@ -148,15 +198,19 @@ kii_bool_t onboard_with_vendor_thing_id(
         M_KII_IOT_APPEND_STR(kii, thing_properties);
         M_KII_IOT_APPEND_CONST_STR(kii, "\"");
     }
-    M_KII_IOT_APPEND_CONST_STR(kii, "}}");
+    M_KII_IOT_APPEND_CONST_STR(kii, "}");
 
-    if (kii_api_call_run(&kii_iot->command_handler) != 0) {
+    if (kii_api_call_run(kii) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to run api.\n"));
         return KII_FALSE;
     }
 
-    if (kii_push_start_routine(kii, 0, 0,
-                    received_callback) != 0) {
+    if (prv_iot_parse_onboarding_response(kii) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("fail to parse resonse.\n"));
+        return KII_FALSE;
+    }
+
+    if (kii_push_start_routine(kii, 0, 0, received_callback) != 0) {
         return KII_FALSE;
     }
 
