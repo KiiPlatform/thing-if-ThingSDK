@@ -5,9 +5,9 @@
 extern 'C' {
 #endif
 
-const char EX_APP_ID[] = "a4c6c6a7";
-const char EX_APP_KEY[] = "1154dcfd901bf1fdf5606d3b3d92e095";
-const char EX_APP_SITE[] = "JP";
+const char EX_APP_ID[] = "00959619";
+const char EX_APP_KEY[] = "1ae0bcded44365e4f83c2daa2f4ca237";
+const char EX_APP_SITE[] = "api-development-jp.internal.kii.com";
 
 /* If two applications use same EX_AUTH_VENDOR_ID, receiving
  * notification does not work well. To avoid this situation, 3 vendor
