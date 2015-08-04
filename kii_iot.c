@@ -223,6 +223,43 @@ kii_bool_t onboard_with_thing_id(
         const char* password
         )
 {
-    // TODO: implement me.
-    return KII_FALSE;
+    kii_t* kii = &kii_iot->command_handler;
+    char resource_path[64];
+
+    if (sizeof(resource_path) / sizeof(resource_path[0]) <=
+            CONST_STRLEN(APP_PATH) + CONST_STRLEN("/") +
+            strlen(kii->kii_core.app_id) + CONST_STRLEN(ONBOARDING_PATH)) {
+        M_KII_LOG(kii->kii_core.logger_cb(
+                "resource path is longer than expected.\n"));
+        return KII_FALSE;
+    }
+    sprintf(resource_path, "%s/%s/%s", APP_PATH, kii->kii_core.app_id,
+            ONBOARDING_PATH);
+
+    if (kii_api_call_start(kii, "POST", resource_path,
+                    CONTENT_TYPE_VENDOR_THING_ID, KII_FALSE) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb(
+            "fail to start api call.\n"));
+    }
+    M_KII_IOT_APPEND_CONST_STR(kii, "{\"thingID\":\"");
+    M_KII_IOT_APPEND_STR(kii, thing_id);
+    M_KII_IOT_APPEND_CONST_STR(kii, "\",\"thingPassword\":\"");
+    M_KII_IOT_APPEND_STR(kii, password);
+    M_KII_IOT_APPEND_CONST_STR(kii, "\"}");
+
+    if (kii_api_call_run(kii) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("fail to run api.\n"));
+        return KII_FALSE;
+    }
+
+    if (prv_iot_parse_onboarding_response(kii) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("fail to parse resonse.\n"));
+        return KII_FALSE;
+    }
+
+    if (kii_push_start_routine(kii, 0, 0, received_callback) != 0) {
+        return KII_FALSE;
+    }
+
+    return KII_TRUE;
 }
