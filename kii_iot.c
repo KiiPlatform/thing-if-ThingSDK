@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
+
 /* If your environment does not have assert, you must set NOASSERT define. */
 #ifdef NOASSERT
   #define M_KII_IOT_ASSERT(s)
@@ -12,6 +13,11 @@
   #include <assert.h>
   #define M_KII_IOT_ASSERT(s) assert(s)
 #endif
+
+#define EVAL(f, v) f(v)
+#define TOSTR(s) #s
+#define ULONG_MAX_STR EVAL(TOSTR, ULONG_MAX)
+#define ULONGBUFSIZE (sizeof(ULONG_MAX_STR) / sizeof(char))
 
 #define CONST_STRLEN(str) sizeof(str) - 1
 #define APP_PATH "iot-api/apps"
@@ -45,7 +51,7 @@
         } \
     }
 
-static kii_json_parse_result_t prv_kii_json_read_object(
+static kii_json_parse_result_t prv_kii_iot_json_read_object(
         kii_t* kii,
         const char* json_string,
         size_t json_string_size,
@@ -92,7 +98,7 @@ static int prv_iot_parse_onboarding_response(kii_t* kii)
             sizeof(kii->kii_core.author.access_token[0]);
     fields[2].name = NULL;
 
-    if (prv_kii_json_read_object(kii, kii->kii_core.response_body,
+    if (prv_kii_iot_json_read_object(kii, kii->kii_core.response_body,
                     strlen(kii->kii_core.response_body), fields) !=
             KII_JSON_PARSE_SUCCESS) {
         return -1;
@@ -152,8 +158,118 @@ kii_bool_t init_kii_iot(
     return KII_TRUE;
 }
 
+static int prv_kii_iot_get_key_and_value_from_json(
+        kii_t* kii,
+        const char* json_string,
+        size_t json_string_len,
+        char** out_key,
+        char** out_value,
+        size_t* out_key_len,
+        size_t* out_value_len)
+{
+    return 0;
+}
+
 static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
-    // TODO: implement me.
+    kii_json_field_t fields[7];
+    kii_json_field_t action[2];
+    char* actions_str = NULL;
+    size_t actions_len = 0;
+    char index[ULONGBUFSIZE];
+    size_t i = 0;
+
+    memset(fields, 0x00, sizeof(fields));
+    fields[0].path = "/thingTypeSchema";
+    fields[0].type = KII_JSON_FIELD_TYPE_STRING;
+    fields[0].field_copy.string = NULL;
+    fields[1].path = "/thingTypeSchemaVersion";
+    fields[1].type = KII_JSON_FIELD_TYPE_STRING;
+    fields[1].field_copy.string = NULL;
+    fields[2].path = "/targetType";
+    fields[2].type = KII_JSON_FIELD_TYPE_STRING;
+    fields[2].field_copy.string = NULL;
+    fields[3].path = "/target";
+    fields[3].type = KII_JSON_FIELD_TYPE_STRING;
+    fields[3].field_copy.string = NULL;
+    fields[4].path = "/failIfOffline";
+    fields[4].type = KII_JSON_FIELD_TYPE_BOOLEAN;
+    fields[5].path = "/actions";
+    fields[5].type = KII_JSON_FIELD_TYPE_ARRAY;
+    fields[5].field_copy.string = NULL;
+    fields[6].path = NULL;
+
+    if (prv_kii_iot_json_read_object(kii, buffer, buffer_size, fields)
+            != KII_JSON_PARSE_SUCCESS) {
+        M_KII_LOG(kii->kii_core.logger_cb("fail to parse received message.\n"));
+        return;
+    }
+
+    // TODO: Check schema and schema version.
+    // TODO: What should I do if failIfOffline is true?
+
+    if (strncmp("thing", buffer + fields[2].start,
+                    fields[2].end - fields[2].start) != 0) {
+        *(buffer + fields[2].end) = '\0';
+        M_KII_LOG(kii->kii_core.logger_cb("target type mismatches: %s.\n",
+                        buffer + fields[2].start));
+        return;
+    }
+    if (strncmp(kii->kii_core.author.author_id, buffer + fields[3].start,
+                    fields[3].end - fields[3].start) != 0) {
+        *(buffer + fields[3].end) = '\0';
+        M_KII_LOG(kii->kii_core.logger_cb("target id mismatches: %s.\n",
+                        buffer + fields[3].start));
+        return;
+    }
+
+    actions_str = buffer + fields[5].start;
+    actions_len = fields[5].end - fields[5].start;
+    action[0].path = index;
+    for (i = 0; action[0].result == KII_JSON_PARSE_SUCCESS; ++i) {
+        sprintf(index, "/[%lu]", i);
+        switch (prv_kii_iot_json_read_object(kii, actions_str, actions_len,
+                        action)) {
+            case KII_JSON_PARSE_SUCCESS:
+            {
+                KII_IOT_ACTION_HANDLER handler =
+                    (KII_IOT_ACTION_HANDLER)kii->app_context;
+                char* key;
+                char* value;
+                size_t key_len, value_len;
+                char key_swap, value_swap;
+                char error[EMESSAGE_SIZE + 1];
+                if (prv_kii_iot_get_key_and_value_from_json(kii,
+                            actions_str + action[0].start,
+                            action[0].end - action[0].start, &key, &value,
+                            &key_len, &value_len) != 0) {
+                    *(actions_str + action[0].end) = '\0';
+                    M_KII_LOG(kii->kii_core.logger_cb(
+                            "fail to parse action: %s.\n",
+                            actions_str + action[0].start));
+                    return;
+                }
+                key_swap = key[key_len];
+                value_swap = value[value_len];
+                key[key_len] = '\0';
+                value[value_len] = '\0';
+                if ((*handler)(key, value, error) != KII_FALSE) {
+                    // TODO: construct message.
+                } else {
+                    // TODO: construct message.
+                }
+                key[key_len] = key_swap;
+                value[value_len] = value_swap;
+            }
+            case KII_JSON_PARSE_PARTIAL_SUCCESS:
+                // This must be end of array.
+                break;
+            case KII_JSON_PARSE_ROOT_TYPE_ERROR:
+            case KII_JSON_PARSE_INVALID_INPUT:
+            default:
+                M_KII_LOG(kii->kii_core.logger_cb("unexpected error.\n"));
+                return ;
+        }
+    }
     return;
 }
 
