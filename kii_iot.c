@@ -20,9 +20,11 @@
 #define ULONGBUFSIZE (sizeof(ULONG_MAX_STR) / sizeof(char))
 
 #define CONST_STRLEN(str) sizeof(str) - 1
-#define APP_PATH "iot-api/apps"
+#define APP_PATH "api/apps"
+#define OAUTH_PATH "oauth2/token"
+#define IOT_APP_PATH "iot-api/apps"
 #define ONBOARDING_PATH "onboardings"
-#define CONTENT_TYPE_VENDOR_THING_ID "application/vnd.kii.onboardingWithVendorThingIDByThing+json"
+#define CONTENT_TYPE_VENDOR_THING_ID "application/vnd.kii.OnboardingWithVendorThingIDByThing+json"
 
 #define M_KII_IOT_APPEND_CONST_STR(kii, str)  \
     { \
@@ -316,6 +318,58 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
     return;
 }
 
+static int prv_kii_iot_get_anonymous_token(kii_t* kii)
+{
+    char resource_path[64];
+    kii_json_field_t fields[2];
+
+    M_KII_IOT_ASSERT(kii);
+
+    if (sizeof(resource_path) / sizeof(resource_path[0]) <=
+            CONST_STRLEN(APP_PATH) + CONST_STRLEN("/") +
+            strlen(kii->kii_core.app_id) + CONST_STRLEN(OAUTH_PATH)) {
+        M_KII_LOG(kii->kii_core.logger_cb(
+                "resource path is longer than expected.\n"));
+        return -1;
+    }
+    sprintf(resource_path, "%s/%s/%s", APP_PATH, kii->kii_core.app_id,
+            OAUTH_PATH);
+
+    if (kii_api_call_start(kii, "POST", resource_path, "application/json",
+                    KII_FALSE) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("fail to start api call.\n"));
+    }
+
+    M_KII_IOT_APPEND_CONST_STR(kii,
+            "{\"grant_type\":\"client_credentials\",\"client_id\":\"");
+    M_KII_IOT_APPEND_STR(kii, kii->kii_core.app_id);
+    M_KII_IOT_APPEND_CONST_STR(kii, "\",\"client_secret\": \"");
+    M_KII_IOT_APPEND_STR(kii, kii->kii_core.app_key);
+    M_KII_IOT_APPEND_CONST_STR(kii, "\"}");
+
+    if (kii_api_call_run(kii) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("fail to run api.\n"));
+        return -1;
+    }
+
+    memset(fields, 0x00, sizeof(fields));
+    fields[0].path = "/access_token";
+    fields[0].type = KII_JSON_FIELD_TYPE_STRING;
+    fields[0].field_copy.string = kii->kii_core.author.access_token;
+    fields[0].field_copy_buff_size = sizeof(kii->kii_core.author.access_token) /
+            sizeof(kii->kii_core.author.access_token[0]);
+    fields[1].path = NULL;
+
+    if (prv_kii_iot_json_read_object(kii, kii->kii_core.response_body,
+                    strlen(kii->kii_core.response_body), fields)
+            != KII_JSON_PARSE_SUCCESS) {
+        M_KII_LOG(kii->kii_core.logger_cb("fail to parse received message.\n"));
+        return -1;
+    }
+
+    return 0;
+}
+
 kii_bool_t onboard_with_vendor_thing_id(
         kii_iot_t* kii_iot,
         const char* vendor_thing_id,
@@ -327,20 +381,24 @@ kii_bool_t onboard_with_vendor_thing_id(
     kii_t* kii = &kii_iot->command_handler;
     char resource_path[64];
 
+    if (prv_kii_iot_get_anonymous_token(kii) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("fail to get anonymous token.\n"));
+        return KII_FALSE;
+    }
+
     if (sizeof(resource_path) / sizeof(resource_path[0]) <=
-            CONST_STRLEN(APP_PATH) + CONST_STRLEN("/") +
+            CONST_STRLEN(IOT_APP_PATH) + CONST_STRLEN("/") +
             strlen(kii->kii_core.app_id) + CONST_STRLEN(ONBOARDING_PATH)) {
         M_KII_LOG(kii->kii_core.logger_cb(
                 "resource path is longer than expected.\n"));
         return KII_FALSE;
     }
-    sprintf(resource_path, "%s/%s/%s", APP_PATH, kii->kii_core.app_id,
+    sprintf(resource_path, "%s/%s/%s", IOT_APP_PATH, kii->kii_core.app_id,
             ONBOARDING_PATH);
 
     if (kii_api_call_start(kii, "POST", resource_path,
-                    CONTENT_TYPE_VENDOR_THING_ID, KII_FALSE) != 0) {
-        M_KII_LOG(kii->kii_core.logger_cb(
-            "fail to start api call.\n"));
+                    CONTENT_TYPE_VENDOR_THING_ID, KII_TRUE) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("fail to start api call.\n"));
     }
     M_KII_IOT_APPEND_CONST_STR(kii, "{\"vendorThingID\":\"");
     M_KII_IOT_APPEND_STR(kii, vendor_thing_id);
@@ -386,13 +444,13 @@ kii_bool_t onboard_with_thing_id(
     char resource_path[64];
 
     if (sizeof(resource_path) / sizeof(resource_path[0]) <=
-            CONST_STRLEN(APP_PATH) + CONST_STRLEN("/") +
+            CONST_STRLEN(IOT_APP_PATH) + CONST_STRLEN("/") +
             strlen(kii->kii_core.app_id) + CONST_STRLEN(ONBOARDING_PATH)) {
         M_KII_LOG(kii->kii_core.logger_cb(
                 "resource path is longer than expected.\n"));
         return KII_FALSE;
     }
-    sprintf(resource_path, "%s/%s/%s", APP_PATH, kii->kii_core.app_id,
+    sprintf(resource_path, "%s/%s/%s", IOT_APP_PATH, kii->kii_core.app_id,
             ONBOARDING_PATH);
 
     if (kii_api_call_start(kii, "POST", resource_path,
