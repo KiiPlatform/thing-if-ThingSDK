@@ -167,7 +167,50 @@ static int prv_kii_iot_get_key_and_value_from_json(
         size_t* out_key_len,
         size_t* out_value_len)
 {
-    return 0;
+    jsmn_parser parser;
+    int parse_result = JSMN_ERROR_NOMEM;
+#ifdef KII_JSON_FIXED_TOKEN_NUM
+    jsmntok_t tokens[KII_JSON_FIXED_TOKEN_NUM];
+    size_t tokens_num = sizeof(tokens) / sizeof(tokens[0]);
+#else
+    jsmntok_t* tokens = kii->kii_json_resource.tokens;
+    size_t tokens_num = kii->kii_json_resource.tokens_num;
+#endif
+
+    jsmn_init(&parser);
+
+    parse_result = jsmn_parse(&parser, json_string, json_string_len, tokens,
+            tokens_num);
+    if (parse_result >= 0) {
+        if (tokens[0].type != JSMN_OBJECT || tokens[0].size < 2) {
+            M_KII_LOG(kii->kii_core.logger_cb("action must be json object.\n"));
+            return -1;
+        }
+        if (tokens[1].type != JSMN_STRING) {
+            M_KII_LOG(kii->kii_core.logger_cb("invalid json object.\n"));
+            return -1;
+        }
+        *out_key = (char*)(json_string + tokens[1].start);
+        *out_key_len = tokens[1].end - tokens[1].start;
+        *out_value = (char*)(json_string + tokens[2].start);
+        *out_value_len = tokens[2].end - tokens[2].start;
+        return 0;
+    } else if (parse_result == JSMN_ERROR_NOMEM) {
+        M_KII_LOG(kii->kii_core.logger_cb(
+                "Not enough tokens were provided.\n"));
+        return -1;
+    } else if (parse_result == JSMN_ERROR_INVAL) {
+        M_KII_LOG(kii->kii_core.logger_cb(
+                "Invalid character inside JSON string.\n"));
+        return -1;
+    } else if (parse_result == JSMN_ERROR_PART) {
+        M_KII_LOG(kii->kii_core.logger_cb(
+                "The string is not a full JSON packet, more bytes expected.\n"));
+        return -1;
+    } else {
+        M_KII_LOG(kii->kii_core.logger_cb("Unexpected error.\n"));
+        return -1;
+    }
 }
 
 static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {

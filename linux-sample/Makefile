@@ -1,4 +1,4 @@
-override CFLAGS += -std=gnu89 -Wall -pedantic -pthread
+override CFLAGS += -std=gnu89 -Wall -pedantic -pthread -DKII_JSON_FIXED_TOKEN_NUM=256
 ifdef DEBUG
 CFLAGS += -g -DDEBUG
 endif
