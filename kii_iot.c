@@ -428,6 +428,7 @@ kii_bool_t onboard_with_vendor_thing_id(
     }
 
     if (kii_push_start_routine(kii, 0, 0, received_callback) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("fail to start routine.\n"));
         return KII_FALSE;
     }
 
