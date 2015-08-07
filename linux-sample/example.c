@@ -23,5 +23,6 @@ int main(int argc, char** argv)
     onboard_with_vendor_thing_id(&kii_iot, EX_AUTH_VENDOR_ID,
             EX_AUTH_VENDOR_PASS, NULL, NULL);
 
+    while (1) {}
     return 0;
 }
