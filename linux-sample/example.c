@@ -5,6 +5,15 @@
 #include <string.h>
 #include <stdio.h>
 
+static kii_bool_t handler(
+        const char* action_name,
+        const char* action_params,
+        char error[EMESSAGE_SIZE + 1])
+{
+    printf("action name=%s, action params=%s\n", action_name, action_params);
+    return KII_TRUE;
+}
+
 int main(int argc, char** argv)
 {
     char command_handler_buff[EX_COMMAND_HANDLER_BUFF_SIZE];
@@ -18,7 +27,8 @@ int main(int argc, char** argv)
             command_handler_buff,
             sizeof(command_handler_buff) / sizeof(command_handler_buff[0]),
             state_updater_buff,
-            sizeof(state_updater_buff) / sizeof(state_updater_buff[0]), NULL);
+            sizeof(state_updater_buff) / sizeof(state_updater_buff[0]),
+            handler);
 
     onboard_with_vendor_thing_id(&kii_iot, EX_AUTH_VENDOR_ID,
             EX_AUTH_VENDOR_PASS, NULL, NULL);
