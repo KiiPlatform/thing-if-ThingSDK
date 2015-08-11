@@ -29,33 +29,6 @@
 #define RESULTS_PART "/action-results"
 #define CONTENT_TYPE_VENDOR_THING_ID "application/vnd.kii.OnboardingWithVendorThingIDByThing+json"
 
-#define M_KII_IOT_APPEND_CONST_STR(kii, str)  \
-    { \
-        size_t size = CONST_STRLEN(str); \
-        if (kii_api_call_append_body(kii, str, size) != 0) {  \
-            M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n")); \
-            return KII_FALSE; \
-        } \
-    }
-
-#define M_KII_IOT_APPEND_STR(kii, str) \
-    { \
-        size_t size = strlen(str); \
-        if (kii_api_call_append_body(kii, str, size) != 0) {  \
-            M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n")); \
-            return KII_FALSE; \
-        } \
-    }
-
-
-#define M_KII_IOT_APPEND_STR_WITH_LEN(kii, str, size)   \
-    { \
-        if (kii_api_call_append_body(kii, str, size) != 0) {  \
-            M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n")); \
-            return KII_FALSE; \
-        } \
-    }
-
 static kii_json_parse_result_t prv_kii_iot_json_read_object(
         kii_t* kii,
         const char* json_string,
@@ -433,13 +406,33 @@ static int prv_kii_iot_get_anonymous_token(kii_t* kii)
         M_KII_LOG(kii->kii_core.logger_cb("fail to start api call.\n"));
     }
 
-    M_KII_IOT_APPEND_CONST_STR(kii,
-            "{\"grant_type\":\"client_credentials\",\"client_id\":\"");
-    M_KII_IOT_APPEND_STR(kii, kii->kii_core.app_id);
-    M_KII_IOT_APPEND_CONST_STR(kii, "\",\"client_secret\": \"");
-    M_KII_IOT_APPEND_STR(kii, kii->kii_core.app_key);
-    M_KII_IOT_APPEND_CONST_STR(kii, "\"}");
-
+    if (kii_api_call_append_body(kii,
+                    "{\"grant_type\":\"client_credentials\",\"client_id\":\"",
+                    CONST_STRLEN(
+                        "{\"grant_type\":\"client_credentials\",\"client_id\":\""))
+            != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+        return -1;
+    }
+    if (kii_api_call_append_body(kii, kii->kii_core.app_id,
+                    strlen(kii->kii_core.app_id)) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+        return -1;
+    }
+    if (kii_api_call_append_body(kii, "\",\"client_secret\": \"",
+                    CONST_STRLEN("\",\"client_secret\": \"")) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+        return -1;
+    }
+    if (kii_api_call_append_body(kii, kii->kii_core.app_key,
+                    strlen(kii->kii_core.app_key)) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+        return -1;
+    }
+    if (kii_api_call_append_body(kii, "\"}", CONST_STRLEN("\"}")) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+        return -1;
+    }
     if (kii_api_call_run(kii) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to run api.\n"));
         return -1;
@@ -493,22 +486,67 @@ kii_bool_t onboard_with_vendor_thing_id(
                     CONTENT_TYPE_VENDOR_THING_ID, KII_TRUE) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to start api call.\n"));
     }
-    M_KII_IOT_APPEND_CONST_STR(kii, "{\"vendorThingID\":\"");
-    M_KII_IOT_APPEND_STR(kii, vendor_thing_id);
-    M_KII_IOT_APPEND_CONST_STR(kii, "\",\"thingPassword\":\"");
-    M_KII_IOT_APPEND_STR(kii, password);
-    M_KII_IOT_APPEND_CONST_STR(kii, "\"");
+
+    if (kii_api_call_append_body(kii, "{\"vendorThingID\":\"",
+                    CONST_STRLEN("{\"vendorThingID\":\"")) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+        return KII_FALSE;
+    }
+    if (kii_api_call_append_body(kii, vendor_thing_id,
+                    strlen(vendor_thing_id)) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+        return KII_FALSE;
+    }
+    if (kii_api_call_append_body(kii, "\",\"thingPassword\":\"",
+                    CONST_STRLEN("\",\"thingPassword\":\"")) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+        return KII_FALSE;
+    }
+    if (kii_api_call_append_body(kii, password, strlen(password)) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+        return KII_FALSE;
+    }
+    if (kii_api_call_append_body(kii, "\"", CONST_STRLEN("\"")) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+        return KII_FALSE;
+    }
+
     if (thing_type != NULL) {
-        M_KII_IOT_APPEND_CONST_STR(kii, ",\"thingType\":\"");
-        M_KII_IOT_APPEND_STR(kii, thing_type);
-        M_KII_IOT_APPEND_CONST_STR(kii, "\"");
+        if (kii_api_call_append_body(kii, ",\"thingType\":\"",
+                        CONST_STRLEN(",\"thingType\":\"")) != 0) {
+            M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+            return KII_FALSE;
+        }
+        if (kii_api_call_append_body(kii, thing_type, strlen(thing_type))
+                != 0) {
+            M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+            return KII_FALSE;
+        }
+        if (kii_api_call_append_body(kii, "\"", CONST_STRLEN("\"")) != 0) {
+            M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+            return KII_FALSE;
+        }
     }
     if (thing_properties != NULL) {
-        M_KII_IOT_APPEND_CONST_STR(kii, ",\"thingProperties\":\"");
-        M_KII_IOT_APPEND_STR(kii, thing_properties);
-        M_KII_IOT_APPEND_CONST_STR(kii, "\"");
+        if (kii_api_call_append_body(kii, ",\"thingProperties\":\"",
+                        CONST_STRLEN(",\"thingProperties\":\"")) != 0) {
+            M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+            return KII_FALSE;
+        }
+        if (kii_api_call_append_body(kii, thing_properties,
+                        strlen(thing_properties)) != 0) {
+            M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+            return KII_FALSE;
+        }
+        if (kii_api_call_append_body(kii, "\"", CONST_STRLEN("\"")) != 0) {
+            M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+            return KII_FALSE;
+        }
     }
-    M_KII_IOT_APPEND_CONST_STR(kii, "}");
+    if (kii_api_call_append_body(kii, "}", CONST_STRLEN("}")) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+        return KII_FALSE;
+    }
 
     if (kii_api_call_run(kii) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to run api.\n"));
@@ -552,11 +590,29 @@ kii_bool_t onboard_with_thing_id(
         M_KII_LOG(kii->kii_core.logger_cb(
             "fail to start api call.\n"));
     }
-    M_KII_IOT_APPEND_CONST_STR(kii, "{\"thingID\":\"");
-    M_KII_IOT_APPEND_STR(kii, thing_id);
-    M_KII_IOT_APPEND_CONST_STR(kii, "\",\"thingPassword\":\"");
-    M_KII_IOT_APPEND_STR(kii, password);
-    M_KII_IOT_APPEND_CONST_STR(kii, "\"}");
+
+    if (kii_api_call_append_body(kii, "{\"thingID\":\"",
+                    CONST_STRLEN("{\"thingID\":\"")) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+        return KII_FALSE;
+    }
+    if (kii_api_call_append_body(kii, thing_id, strlen(thing_id)) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+        return KII_FALSE;
+    }
+    if (kii_api_call_append_body(kii, "\",\"thingPassword\":\"",
+                    CONST_STRLEN("\",\"thingPassword\":\"")) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+        return KII_FALSE;
+    }
+    if (kii_api_call_append_body(kii, password, strlen(password)) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+        return KII_FALSE;
+    }
+    if (kii_api_call_append_body(kii, "\"}", CONST_STRLEN("\"}")) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+        return KII_FALSE;
+    }
 
     if (kii_api_call_run(kii) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to run api.\n"));
