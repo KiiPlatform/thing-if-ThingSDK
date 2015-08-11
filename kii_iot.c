@@ -22,8 +22,11 @@
 #define CONST_STRLEN(str) sizeof(str) - 1
 #define APP_PATH "api/apps"
 #define OAUTH_PATH "oauth2/token"
-#define IOT_APP_PATH "iot-api/apps"
-#define ONBOARDING_PATH "onboardings"
+#define IOT_APP_PATH "iot-api/apps/"
+#define ONBOARDING_PATH "/onboardings"
+#define TARGET_PART "/targets/thing:"
+#define COMMAND_PART "/commands/"
+#define RESULTS_PART "/action-results"
 #define CONTENT_TYPE_VENDOR_THING_ID "application/vnd.kii.OnboardingWithVendorThingIDByThing+json"
 
 #define M_KII_IOT_APPEND_CONST_STR(kii, str)  \
@@ -221,12 +224,13 @@ static int prv_kii_iot_get_key_and_value_from_json(
 }
 
 static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
-    kii_json_field_t fields[13];
+    kii_json_field_t fields[6];
     kii_json_field_t action[2];
     char* actions_str = NULL;
     size_t actions_len = 0;
     char index[ULONGBUFSIZE];
     size_t i = 0;
+    char resource_path[512];
 
     memset(fields, 0x00, sizeof(fields));
     fields[0].path = "/schema";
@@ -235,36 +239,15 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
     fields[1].path = "/schemaVersion";
     fields[1].type = KII_JSON_FIELD_TYPE_INTEGER;
     fields[1].field_copy.string = NULL;
-    fields[2].path = "/sender";
+    fields[2].path = "/commandID";
     fields[2].type = KII_JSON_FIELD_TYPE_STRING;
     fields[2].field_copy.string = NULL;
-    fields[3].path = "/sourceURI";
-    fields[3].type = KII_JSON_FIELD_TYPE_STRING;
+    fields[3].path = "/actions";
+    fields[3].type = KII_JSON_FIELD_TYPE_ARRAY;
     fields[3].field_copy.string = NULL;
-    fields[4].path = "/objectScopeType";
-    fields[4].type = KII_JSON_FIELD_TYPE_STRING;
-    fields[4].field_copy.string = NULL;
-    fields[5].path = "/topic";
-    fields[5].type = KII_JSON_FIELD_TYPE_STRING;
-    fields[5].field_copy.string = NULL;
-    fields[6].path = "/objectScopeAppID";
-    fields[6].type = KII_JSON_FIELD_TYPE_STRING;
-    fields[6].field_copy.string = NULL;
-    fields[7].path = "/senderURI";
-    fields[7].type = KII_JSON_FIELD_TYPE_STRING;
-    fields[7].field_copy.string = NULL;
-    fields[8].path = "/commandID";
-    fields[8].type = KII_JSON_FIELD_TYPE_STRING;
-    fields[8].field_copy.string = NULL;
-    fields[9].path = "/actions";
-    fields[9].type = KII_JSON_FIELD_TYPE_ARRAY;
-    fields[9].field_copy.string = NULL;
-    fields[10].path = "/when";
-    fields[10].type = KII_JSON_FIELD_TYPE_LONG;
-    fields[11].path = "/objectScopeThingID";
-    fields[11].type = KII_JSON_FIELD_TYPE_STRING;
-    fields[11].field_copy.string = NULL;
-    fields[12].path = NULL;
+    fields[4].path = "/when";
+    fields[4].type = KII_JSON_FIELD_TYPE_LONG;
+    fields[5].path = NULL;
 
     switch(prv_kii_iot_json_read_object(kii, buffer, buffer_size, fields)) {
         case KII_JSON_PARSE_SUCCESS:
@@ -276,10 +259,42 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
             return;
     }
 
+    if (sizeof(resource_path) / sizeof(resource_path[0]) <=
+            CONST_STRLEN(IOT_APP_PATH) +
+            strlen(kii->kii_core.app_id) + CONST_STRLEN(TARGET_PART) +
+            strlen(kii->kii_core.author.author_id) +
+            CONST_STRLEN(COMMAND_PART) + (fields[2].end - fields[1].start - 1) +
+            CONST_STRLEN(RESULTS_PART)) {
+        M_KII_LOG(kii->kii_core.logger_cb(
+                "resource path is longer than expected.\n"));
+        return;
+    }
+
+    resource_path[0] = '\0';
+    strncat(resource_path, IOT_APP_PATH, CONST_STRLEN(IOT_APP_PATH));
+    strncat(resource_path, kii->kii_core.app_id, strlen(kii->kii_core.app_id));
+    strncat(resource_path, TARGET_PART, CONST_STRLEN(TARGET_PART));
+    strncat(resource_path, kii->kii_core.author.author_id,
+            strlen(kii->kii_core.author.author_id));
+    strncat(resource_path, COMMAND_PART, CONST_STRLEN(COMMAND_PART));
+    strncat(resource_path, buffer + fields[2].start,
+            fields[2].end - fields[2].start);
+    strncat(resource_path, RESULTS_PART, CONST_STRLEN(RESULTS_PART));
     // TODO: Check properties.
 
-    actions_str = buffer + fields[9].start;
-    actions_len = fields[9].end - fields[9].start;
+    printf("HERE AAAAAAAAAA: %s", resource_path);
+    if (kii_api_call_start(kii, "PUT", resource_path, "application/json",
+                    KII_TRUE) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("fail to start api call.\n"));
+        return;
+    }
+    if (kii_api_call_append_body(kii, "{\"actionResults\":[",
+                    sizeof("{\"actionResults\":[") - 1) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+    }
+
+    actions_str = buffer + fields[3].start;
+    actions_len = fields[3].end - fields[3].start;
     memset(action, 0x00, sizeof(action));
     action[0].path = index;
     action[0].type = KII_JSON_FIELD_TYPE_OBJECT;
@@ -299,6 +314,14 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
                 size_t key_len, value_len;
                 char key_swap, value_swap;
                 char error[EMESSAGE_SIZE + 1];
+                if (i >= 1) {
+                    if (kii_api_call_append_body(kii, ",", sizeof(",") - 1)
+                            != 0) {
+                        M_KII_LOG(kii->kii_core.logger_cb(
+                                "request size overflowed.\n"));
+                        return;
+                    }
+                }
                 if (prv_kii_iot_get_key_and_value_from_json(kii,
                             actions_str + action[0].start,
                             action[0].end - action[0].start, &key, &value,
@@ -314,9 +337,55 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
                 key[key_len] = '\0';
                 value[value_len] = '\0';
                 if ((*handler)(key, value, error) != KII_FALSE) {
-                    // TODO: construct message.
+                    if (kii_api_call_append_body(kii,
+                                    "{\"", sizeof("{\"") - 1) != 0) {
+                        M_KII_LOG(kii->kii_core.logger_cb(
+                                "request size overflowed.\n"));
+                        return;
+                    }
+                    if (kii_api_call_append_body(kii, key, strlen(key)) != 0) {
+                        M_KII_LOG(kii->kii_core.logger_cb(
+                                "request size overflowed.\n"));
+                        return;
+                    }
+                    if (kii_api_call_append_body(kii, "\":{\"result\":true}",
+                                    sizeof("\":{\"result\":true}") - 1) != 0) {
+                        M_KII_LOG(kii->kii_core.logger_cb(
+                                "request size overflowed.\n"));
+                        return;
+                    }
                 } else {
-                    // TODO: construct message.
+                    if (kii_api_call_append_body(kii,
+                                    "{\"", sizeof("{\"") - 1) != 0) {
+                        M_KII_LOG(kii->kii_core.logger_cb(
+                                "request size overflowed.\n"));
+                        return;
+                    }
+                    if (kii_api_call_append_body(kii, key, strlen(key)) != 0) {
+                        M_KII_LOG(kii->kii_core.logger_cb(
+                                "request size overflowed.\n"));
+                        return;
+                    }
+                    if (kii_api_call_append_body(kii,
+                                    "\":{\"result\":false}, \"errorMessage\":\"",
+                                    sizeof("\":{\"result\":false}, \"errorMessage\":\"") - 1)
+                            != 0) {
+                        M_KII_LOG(kii->kii_core.logger_cb(
+                                "request size overflowed.\n"));
+                        return;
+                    }
+                    if (kii_api_call_append_body(kii, error, strlen(error))
+                            != 0) {
+                        M_KII_LOG(kii->kii_core.logger_cb(
+                                "request size overflowed.\n"));
+                        return;
+                    }
+                    if (kii_api_call_append_body(kii,
+                                    "\"}", sizeof("\"}") - 1) != 0) {
+                        M_KII_LOG(kii->kii_core.logger_cb(
+                                "request size overflowed.\n"));
+                        return;
+                    }
                 }
                 key[key_len] = key_swap;
                 value[value_len] = value_swap;
@@ -331,6 +400,16 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
                 return ;
         }
     }
+
+    if (kii_api_call_append_body(kii, "}]}", sizeof("}]}") - 1) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+        return;
+    }
+    if (kii_api_call_run(kii) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("fail to run api.\n"));
+        return;
+    }
+
     return;
 }
 
@@ -403,13 +482,13 @@ kii_bool_t onboard_with_vendor_thing_id(
     }
 
     if (sizeof(resource_path) / sizeof(resource_path[0]) <=
-            CONST_STRLEN(IOT_APP_PATH) + CONST_STRLEN("/") +
+            CONST_STRLEN(IOT_APP_PATH) +
             strlen(kii->kii_core.app_id) + CONST_STRLEN(ONBOARDING_PATH)) {
         M_KII_LOG(kii->kii_core.logger_cb(
                 "resource path is longer than expected.\n"));
         return KII_FALSE;
     }
-    sprintf(resource_path, "%s/%s/%s", IOT_APP_PATH, kii->kii_core.app_id,
+    sprintf(resource_path, "%s%s%s", IOT_APP_PATH, kii->kii_core.app_id,
             ONBOARDING_PATH);
 
     if (kii_api_call_start(kii, "POST", resource_path,
@@ -461,13 +540,13 @@ kii_bool_t onboard_with_thing_id(
     char resource_path[64];
 
     if (sizeof(resource_path) / sizeof(resource_path[0]) <=
-            CONST_STRLEN(IOT_APP_PATH) + CONST_STRLEN("/") +
+            CONST_STRLEN(IOT_APP_PATH) +
             strlen(kii->kii_core.app_id) + CONST_STRLEN(ONBOARDING_PATH)) {
         M_KII_LOG(kii->kii_core.logger_cb(
                 "resource path is longer than expected.\n"));
         return KII_FALSE;
     }
-    sprintf(resource_path, "%s/%s/%s", IOT_APP_PATH, kii->kii_core.app_id,
+    sprintf(resource_path, "%s%s%s", IOT_APP_PATH, kii->kii_core.app_id,
             ONBOARDING_PATH);
 
     if (kii_api_call_start(kii, "POST", resource_path,
