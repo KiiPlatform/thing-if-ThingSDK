@@ -230,7 +230,7 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
     size_t actions_len = 0;
     char index[ULONGBUFSIZE];
     size_t i = 0;
-    char resource_path[512];
+    char resource_path[256];
 
     memset(fields, 0x00, sizeof(fields));
     fields[0].path = "/schema";
@@ -263,7 +263,7 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
             CONST_STRLEN(IOT_APP_PATH) +
             strlen(kii->kii_core.app_id) + CONST_STRLEN(TARGET_PART) +
             strlen(kii->kii_core.author.author_id) +
-            CONST_STRLEN(COMMAND_PART) + (fields[2].end - fields[1].start - 1) +
+            CONST_STRLEN(COMMAND_PART) + (fields[2].end - fields[2].start - 1) +
             CONST_STRLEN(RESULTS_PART)) {
         M_KII_LOG(kii->kii_core.logger_cb(
                 "resource path is longer than expected.\n"));
@@ -271,18 +271,16 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
     }
 
     resource_path[0] = '\0';
-    strncat(resource_path, IOT_APP_PATH, CONST_STRLEN(IOT_APP_PATH));
-    strncat(resource_path, kii->kii_core.app_id, strlen(kii->kii_core.app_id));
-    strncat(resource_path, TARGET_PART, CONST_STRLEN(TARGET_PART));
-    strncat(resource_path, kii->kii_core.author.author_id,
-            strlen(kii->kii_core.author.author_id));
-    strncat(resource_path, COMMAND_PART, CONST_STRLEN(COMMAND_PART));
+    strcat(resource_path, IOT_APP_PATH);
+    strcat(resource_path, kii->kii_core.app_id);
+    strcat(resource_path, TARGET_PART);
+    strcat(resource_path, kii->kii_core.author.author_id);
+    strcat(resource_path, COMMAND_PART);
     strncat(resource_path, buffer + fields[2].start,
             fields[2].end - fields[2].start);
-    strncat(resource_path, RESULTS_PART, CONST_STRLEN(RESULTS_PART));
+    strcat(resource_path, RESULTS_PART);
     // TODO: Check properties.
 
-    printf("HERE AAAAAAAAAA: %s", resource_path);
     if (kii_api_call_start(kii, "PUT", resource_path, "application/json",
                     KII_TRUE) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to start api call.\n"));
