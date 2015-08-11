@@ -28,6 +28,7 @@
 #define COMMAND_PART "/commands/"
 #define RESULTS_PART "/action-results"
 #define CONTENT_TYPE_VENDOR_THING_ID "application/vnd.kii.OnboardingWithVendorThingIDByThing+json"
+#define CONTENT_TYPE_THING_ID "application/vnd.kii.OnboardingWithThingIDByThing+json"
 
 static kii_json_parse_result_t prv_kii_iot_json_read_object(
         kii_t* kii,
@@ -575,6 +576,11 @@ kii_bool_t onboard_with_thing_id(
     kii_t* kii = &kii_iot->command_handler;
     char resource_path[64];
 
+    if (prv_kii_iot_get_anonymous_token(kii) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("fail to get anonymous token.\n"));
+        return KII_FALSE;
+    }
+
     if (sizeof(resource_path) / sizeof(resource_path[0]) <=
             CONST_STRLEN(IOT_APP_PATH) +
             strlen(kii->kii_core.app_id) + CONST_STRLEN(ONBOARDING_PATH)) {
@@ -585,8 +591,8 @@ kii_bool_t onboard_with_thing_id(
     sprintf(resource_path, "%s%s%s", IOT_APP_PATH, kii->kii_core.app_id,
             ONBOARDING_PATH);
 
-    if (kii_api_call_start(kii, "POST", resource_path,
-                    CONTENT_TYPE_VENDOR_THING_ID, KII_FALSE) != 0) {
+    if (kii_api_call_start(kii, "POST", resource_path, CONTENT_TYPE_THING_ID,
+                    KII_TRUE) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb(
             "fail to start api call.\n"));
     }
