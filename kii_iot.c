@@ -129,7 +129,9 @@ kii_bool_t init_kii_iot(
     kii_iot->command_handler.mqtt_buffer = mqtt_buff;
     kii_iot->command_handler.mqtt_buffer_size = mqtt_buff_size;
 
-    kii_iot->command_handler.app_context = (void*)action_handler;
+    kii_iot->action_handler = action_handler;
+
+    kii_iot->command_handler.app_context = (void*)kii_iot;
 
     // Initialize state_updater
     if (kii_init(&kii_iot->state_updater, app_host, app_id, app_key) != 0) {
@@ -280,7 +282,7 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
             case KII_JSON_PARSE_SUCCESS:
             {
                 KII_IOT_ACTION_HANDLER handler =
-                    (KII_IOT_ACTION_HANDLER)kii->app_context;
+                    ((kii_iot_t*)kii->app_context)->action_handler;
                 char* key;
                 char* value;
                 size_t key_len, value_len;
