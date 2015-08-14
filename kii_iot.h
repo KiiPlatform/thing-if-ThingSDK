@@ -105,8 +105,8 @@ typedef kii_bool_t
         (kii_t* kii,
          KII_IOT_WRITER writer);
 
-/** Data container for command handler. */
-typedef struct kii_iot_command_handler_data_t {
+/** Resource for command handler. */
+typedef struct kii_iot_command_handler_resource_t {
     /** HTTP request and response buffer for command handler. */
     char* buffer;
 
@@ -121,10 +121,10 @@ typedef struct kii_iot_command_handler_data_t {
 
     /** callback function to handle received action. */
     KII_IOT_ACTION_HANDLER action_handler;
-} kii_iot_command_handler_data_t;
+} kii_iot_command_handler_resource_t;
 
-/** Data container for state updater. */
-typedef struct kii_iot_state_updater_data_t {
+/** Resource for state updater. */
+typedef struct kii_iot_state_updater_resource_t {
     /** HTTP request and response buffer for state updater. */
     char* buffer;
 
@@ -136,7 +136,7 @@ typedef struct kii_iot_state_updater_data_t {
 
     /** callback function to write thing state. */
     KII_IOT_STATE_HANDLER state_handler;
-} kii_iot_state_updater_data_t;
+} kii_iot_state_updater_resource_t;
 
 typedef struct kii_iot_t {
     kii_t command_handler;
@@ -156,7 +156,7 @@ typedef struct kii_iot_t {
  * "SG"
  * @param [in] command_handler_data data container for command handler.
  * @param [in] state_updater_data data container for state updater.
- * @param [in] resouce_cb callback to resize to kii_json_resource
+ * @param [in] resource_cb callback to resize to kii_json_resource
  * contents. This is optional. If you build IoTCloud ThingSDK with
  * KII_JSON_FIXED_TOKEN_NUM macro, you can set NULL to this
  * argument. otherwise, you need to set kii_json_resource_t object to
@@ -167,9 +167,9 @@ kii_bool_t init_kii_iot(
         const char* app_id,
         const char* app_key,
         const char* app_host,
-        kii_iot_command_handler_data_t* command_handler_data,
-        kii_iot_state_updater_data_t* state_updater_data,
-        KII_JSON_RESOURCE_CB resouce_cb);
+        kii_iot_command_handler_resource_t* command_handler_resouce,
+        kii_iot_state_updater_resource_t* state_updater_resouce,
+        KII_JSON_RESOURCE_CB resource_cb);
 
 /** On board to IoT Cloud with specified vendor thing ID.
  * kii_iot_t#command_handler instance is used to call api.
