@@ -9,26 +9,21 @@
 extern "C" {
 #endif
 
-/** callback function for checking schema and schema version.
- * @param [in] schema name of schema.
- * @maram [in] version version of schema.
- * @return KII_TRUE if schema and schema version is valild, otherwise
- * KII_FALSE.
- */
-typedef kii_bool_t
-    (*KII_IOT_SCHEMA_CHECK_HANDLER)(const char* schema, const int version);
-
 /** callback function for handling action.
  * @param [in] action_name name of the action.
  * @param [in] action_params json object represents parameter of this action.
+ * @param [in] schema name of schema.
+ * @maram [in] schema_version version of schema.
  * @param [out] error error message if operation is failed.(optional)
  * @return KII_TRUE if succeeded, otherwise KII_FALSE.
  */
 typedef kii_bool_t
     (*KII_IOT_ACTION_HANDLER)
-    (const char* action_name,
-     const char* action_params,
-     char error[EMESSAGE_SIZE + 1]);
+        (const char* schema,
+         int schema_version,
+         const char* action_name,
+         const char* action_params,
+         char error[EMESSAGE_SIZE + 1]);
 
 /** a function pointer to write thing state.
  *
@@ -41,20 +36,17 @@ typedef kii_bool_t
  * @param [in] buff json string of thing state. must be null terminated.
  * @return KII_TRUE if succeeded. otherwise KII_FALSE.
  */
-typedef kii_bool_t
-    (*KII_IOT_STATE_WRITER)
-        (const state_handler_context_t* context,
-         const char* buff);
+typedef kii_bool_t(*KII_IOT_WRITER)(const kii_t* kii, const char* buff);
 
 /** callback function for writing state.
  *
  * This callback function should write current thing state with
- * KII_IOT_STATE_WRITER. for example:
+ * KII_IOT_WRITER. for example:
  *
  * @code
  * kii_bool_t state_handler(
  *         const state_handler_context_t* context,
- *         KII_IOT_STATE_WRITER writer)
+ *         KII_IOT_WRITER writer)
  * {
  *     return (*writer)(context, "{\"power\":true}")
  * }
@@ -67,14 +59,13 @@ typedef kii_bool_t
  */
 typedef kii_bool_t
     (*KII_IOT_STATE_HANDLER)
-        (const state_handler_context_t* context,
-         KII_IOT_STATE_WRITER writer);
+        (kii_t* kii,
+         KII_IOT_WRITER writer);
 
 typedef struct kii_iot_t {
     kii_t command_handler;
     kii_t state_updater;
     KII_IOT_ACTION_HANDLER action_handler;
-    KII_IOT_SCHEMA_CHECK_HANDLER schema_check_handler;
     KII_IOT_STATE_HANDLER state_handler;
     /** Specify the period of updating state in milliseconds. */
     int state_update_period;
@@ -91,7 +82,6 @@ kii_bool_t init_kii_iot(
         size_t command_handler_buff_size,
         char* state_updater_buff,
         size_t state_updater_buff_size,
-        KII_IOT_SCHEMA_CHECK_HANDLER schema_check_handler,
         KII_IOT_ACTION_HANDLER command_handler,
         KII_IOT_STATE_HANDLER state_handler);
 

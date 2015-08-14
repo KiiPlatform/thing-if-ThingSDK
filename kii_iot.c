@@ -102,7 +102,8 @@ kii_bool_t init_kii_iot(
         size_t command_handler_buff_size,
         char* state_updater_buff,
         size_t state_updater_buff_size,
-        KII_IOT_ACTION_HANDLER action_handler)
+        KII_IOT_ACTION_HANDLER action_handler,
+        KII_IOT_STATE_HANDLER state_handler)
 {
     M_KII_IOT_ASSERT(kii_iot != NULL);
     M_KII_IOT_ASSERT(app_id != NULL);
@@ -140,6 +141,10 @@ kii_bool_t init_kii_iot(
     kii_iot->state_updater.kii_core.http_context.buffer = state_updater_buff;
     kii_iot->state_updater.kii_core.http_context.buffer_size =
         state_updater_buff_size;
+
+    kii_iot->state_handler = state_handler;
+
+    kii_iot->state_updater.app_context = (void*)kii_iot;
 
     return KII_TRUE;
 }
@@ -202,6 +207,8 @@ static int prv_kii_iot_get_key_and_value_from_json(
 static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
     kii_json_field_t fields[6];
     kii_json_field_t action[2];
+    const char* schema = NULL;
+    int schema_version = 0;
     char* actions_str = NULL;
     size_t actions_len = 0;
     char index[ULONGBUFSIZE];
@@ -267,6 +274,9 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
         M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
     }
 
+    schema = buffer + fields[0].start;
+    buffer[fields[0].end] = '\0';
+    schema_version = fields[1].field_copy.int_value;
     actions_str = buffer + fields[3].start;
     actions_len = fields[3].end - fields[3].start;
     memset(action, 0x00, sizeof(action));
@@ -310,7 +320,8 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
                 value_swap = value[value_len];
                 key[key_len] = '\0';
                 value[value_len] = '\0';
-                if ((*handler)(key, value, error) != KII_FALSE) {
+                if ((*handler)(schema, schema_version, key, value, error)
+                        != KII_FALSE) {
                     if (kii_api_call_append_body(kii,
                                     "{\"", sizeof("{\"") - 1) != 0) {
                         M_KII_LOG(kii->kii_core.logger_cb(
