@@ -96,40 +96,42 @@ kii_bool_t init_kii_iot(
         const char* app_id,
         const char* app_key,
         const char* app_host,
-        char* mqtt_buff,
-        size_t mqtt_buff_size,
-        char* command_handler_buff,
-        size_t command_handler_buff_size,
-        char* state_updater_buff,
-        size_t state_updater_buff_size,
-        KII_IOT_ACTION_HANDLER action_handler)
+        kii_iot_command_handler_resource_t* command_handler_resource,
+        kii_iot_state_updater_resource_t* state_updater_resource,
+        KII_JSON_RESOURCE_CB resource_cb)
 {
     M_KII_IOT_ASSERT(kii_iot != NULL);
     M_KII_IOT_ASSERT(app_id != NULL);
     M_KII_IOT_ASSERT(app_key != NULL);
     M_KII_IOT_ASSERT(app_host != NULL);
-    M_KII_IOT_ASSERT(mqtt_buff != NULL);
-    M_KII_IOT_ASSERT(command_handler_buff != NULL);
-    M_KII_IOT_ASSERT(state_updater_buff != NULL);
+    M_KII_IOT_ASSERT(command_handler_resource != NULL);
+    M_KII_IOT_ASSERT(state_updater_resource != NULL);
 
     memset(kii_iot, 0x00, sizeof(kii_iot_t));
-    memset(mqtt_buff, 0x00, mqtt_buff_size);
-    memset(command_handler_buff, 0x00, command_handler_buff_size);
-    memset(state_updater_buff, 0x00, state_updater_buff_size);
+    memset(command_handler_resource->mqtt_buffer, 0x00,
+            command_handler_resource->mqtt_buffer_size);
+    memset(command_handler_resource->buffer, 0x00,
+            command_handler_resource->buffer_size);
+    memset(state_updater_resource->buffer, 0x00,
+            state_updater_resource->buffer_size);
 
     // Initialize command_handler
     if (kii_init(&kii_iot->command_handler, app_host, app_id, app_key) != 0) {
         return KII_FALSE;
     }
     kii_iot->command_handler.kii_core.http_context.buffer =
-        command_handler_buff;
+        command_handler_resource->buffer;
     kii_iot->command_handler.kii_core.http_context.buffer_size =
-        command_handler_buff_size;
+        command_handler_resource->buffer_size;
 
-    kii_iot->command_handler.mqtt_buffer = mqtt_buff;
-    kii_iot->command_handler.mqtt_buffer_size = mqtt_buff_size;
+    kii_iot->command_handler.mqtt_buffer =
+        command_handler_resource->mqtt_buffer;
+    kii_iot->command_handler.mqtt_buffer_size =
+        command_handler_resource->mqtt_buffer_size;
 
-    kii_iot->action_handler = action_handler;
+    kii_iot->command_handler.kii_json_resource_cb = resource_cb;
+
+    kii_iot->action_handler = command_handler_resource->action_handler;
 
     kii_iot->command_handler.app_context = (void*)kii_iot;
 
@@ -137,9 +139,16 @@ kii_bool_t init_kii_iot(
     if (kii_init(&kii_iot->state_updater, app_host, app_id, app_key) != 0) {
         return KII_FALSE;
     }
-    kii_iot->state_updater.kii_core.http_context.buffer = state_updater_buff;
+    kii_iot->state_updater.kii_core.http_context.buffer =
+        state_updater_resource->buffer;
     kii_iot->state_updater.kii_core.http_context.buffer_size =
-        state_updater_buff_size;
+        state_updater_resource->buffer_size;
+
+    kii_iot->state_updater.kii_json_resource_cb = resource_cb;
+
+    kii_iot->state_handler = state_updater_resource->state_handler;
+
+    kii_iot->state_updater.app_context = (void*)kii_iot;
 
     return KII_TRUE;
 }
@@ -202,6 +211,8 @@ static int prv_kii_iot_get_key_and_value_from_json(
 static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
     kii_json_field_t fields[6];
     kii_json_field_t action[2];
+    const char* schema = NULL;
+    int schema_version = 0;
     char* actions_str = NULL;
     size_t actions_len = 0;
     char index[ULONGBUFSIZE];
@@ -267,6 +278,9 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
         M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
     }
 
+    schema = buffer + fields[0].start;
+    buffer[fields[0].end] = '\0';
+    schema_version = fields[1].field_copy.int_value;
     actions_str = buffer + fields[3].start;
     actions_len = fields[3].end - fields[3].start;
     memset(action, 0x00, sizeof(action));
@@ -310,7 +324,8 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
                 value_swap = value[value_len];
                 key[key_len] = '\0';
                 value[value_len] = '\0';
-                if ((*handler)(key, value, error) != KII_FALSE) {
+                if ((*handler)(schema, schema_version, key, value, error)
+                        != KII_FALSE) {
                     if (kii_api_call_append_body(kii,
                                     "{\"", sizeof("{\"") - 1) != 0) {
                         M_KII_LOG(kii->kii_core.logger_cb(

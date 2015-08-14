@@ -10,37 +10,166 @@ extern "C" {
 #endif
 
 /** callback function for handling action.
+ * @param [in] schema name of schema.
+ * @maram [in] schema_version version of schema.
  * @param [in] action_name name of the action.
  * @param [in] action_params json object represents parameter of this action.
  * @param [out] error error message if operation is failed.(optional)
- * @return true if succeeded, otherwise false.
+ * @return KII_TRUE if succeeded, otherwise KII_FALSE.
  */
 typedef kii_bool_t
     (*KII_IOT_ACTION_HANDLER)
-    (const char* action_name,
-     const char* action_params,
-     char error[EMESSAGE_SIZE + 1]);
+        (const char* schema,
+         int schema_version,
+         const char* action_name,
+         const char* action_params,
+         char error[EMESSAGE_SIZE + 1]);
+
+/** a function pointer to write thing state.
+ *
+ * This function pointer is used at KII_IOT_STATE_HANDLER. This
+ * function pointer is passed as second argument of
+ * KII_IOT_STATE_HANDLER. Implementation of this function pointer is
+ * provided by this SDK.
+ *
+ * @param [in] context context of state handler.
+ * @param [in] buff json string of thing state. must be null terminated.
+ * @return KII_TRUE if succeeded. otherwise KII_FALSE.
+ */
+typedef kii_bool_t(*KII_IOT_WRITER)(const kii_t* kii, const char* buff);
+
+/** callback function for writing thing state.
+ *
+ * This callback function should write current thing state with
+ * KII_IOT_WRITER. for example:
+ *
+ * @code
+ * kii_bool_t state_handler(
+ *         kii_t* kii,
+ *         KII_IOT_WRITER writer)
+ * {
+ *     char buf[256];
+ *
+ *     if ((*writer)(kii, "{\"power\":") == KII_FALSE) {
+ *         return KII_FALSE;
+ *     }
+ *     if (get_power() != 0) {
+ *         if ((*writer)(kii, "true,") == KII_FALSE) {
+ *             return KII_FALSE;
+ *         }
+ *     } else {
+ *         if ((*writer)(kii, "false,") == KII_FALSE) {
+ *             return KII_FALSE;
+ *         }
+ *     }
+ *     if ((*writer)(kii, "\"brightness\":") == KII_FALSE) {
+ *         return KII_FALSE;
+ *     }
+ *     sprintf(buf, "%d,", get_brightness());
+ *     if ((*writer)(kii, buf) == KII_FALSE) {
+ *         return KII_FALSE;
+ *     }
+ *     if ((*writer)(kii, "\"color\":[") == KII_FALSE) {
+ *         return KII_FALSE;
+ *     }
+ *     sprintf(buf, "%d,", get_color(0));
+ *     if ((*writer)(kii, buf) == KII_FALSE) {
+ *         return KII_FALSE;
+ *     }
+ *     sprintf(buf, "%d,", get_color(1));
+ *     if ((*writer)(kii, buf) == KII_FALSE) {
+ *         return KII_FALSE;
+ *     }
+ *     sprintf(buf, "%d],", get_color(2));
+ *     if ((*writer)(kii, buf) == KII_FALSE) {
+ *         return KII_FALSE;
+ *     }
+ *     if ((*writer)(kii, "\"colorTemperature\":") == KII_FALSE) {
+ *         return KII_FALSE;
+ *     }
+ *     sprintf(buf, "%d}", get_colorTemperature());
+ *     if ((*writer)(kii, buf) == KII_FALSE) {
+ *         return KII_FALSE;
+ *     }
+ *     return KII_TRUE;
+ * }
+ * @code
+ *
+ * @param [in] kii state_updater object.
+ * @param [in] writer writer to write thing state. implementation of
+ * this writer is provided by this SDK.
+ * @return KII_TRUE if succeeded. otherwise KII_FALSE.
+ */
+typedef kii_bool_t
+    (*KII_IOT_STATE_HANDLER)
+        (kii_t* kii,
+         KII_IOT_WRITER writer);
+
+/** Resource for command handler. */
+typedef struct kii_iot_command_handler_resource_t {
+    /** HTTP request and response buffer for command handler. */
+    char* buffer;
+
+    /** HTTP request and response buffer size for command handler. */
+    size_t buffer_size;
+
+    /** buffer for MQTT. */
+    char* mqtt_buffer;
+
+    /** buffer size for MQTT. */
+    size_t mqtt_buffer_size;
+
+    /** callback function to handle received action. */
+    KII_IOT_ACTION_HANDLER action_handler;
+} kii_iot_command_handler_resource_t;
+
+/** Resource for state updater. */
+typedef struct kii_iot_state_updater_resource_t {
+    /** HTTP request and response buffer for state updater. */
+    char* buffer;
+
+    /** HTTP request and response buffer size for state updater. */
+    size_t buffer_size;
+
+    /** the period of updating state in milliseconds. */
+    int period;
+
+    /** callback function to write thing state. */
+    KII_IOT_STATE_HANDLER state_handler;
+} kii_iot_state_updater_resource_t;
 
 typedef struct kii_iot_t {
     kii_t command_handler;
     kii_t state_updater;
     KII_IOT_ACTION_HANDLER action_handler;
+    KII_IOT_STATE_HANDLER state_handler;
     /** Specify the period of updating state in milliseconds. */
     int state_update_period;
 } kii_iot_t;
 
+/** Initialize kii_iot_t object.
+ *
+ * @param [in] kii_iot kii_iot_t object to be initialized.
+ * @param [in] app_id the input of Application ID
+ * @param [in] app_key the input of Application Key
+ * @param [in] app_host host name. should be one of "CN", "JP", "US",
+ * "SG"
+ * @param [in] command_handler_data data container for command handler.
+ * @param [in] state_updater_data data container for state updater.
+ * @param [in] resource_cb callback to resize to kii_json_resource
+ * contents. This is optional. If you build IoTCloud ThingSDK with
+ * KII_JSON_FIXED_TOKEN_NUM macro, you can set NULL to this
+ * argument. otherwise, you need to set kii_json_resource_t object to
+ * this argument.
+ */
 kii_bool_t init_kii_iot(
         kii_iot_t* kii_iot,
         const char* app_id,
         const char* app_key,
         const char* app_host,
-        char* mqtt_buff,
-        size_t mqtt_buff_size,
-        char* command_handler_buff,
-        size_t command_handler_buff_size,
-        char* state_updater_buff,
-        size_t state_updater_buff_size,
-        KII_IOT_ACTION_HANDLER action_handler);
+        kii_iot_command_handler_resource_t* command_handler_resouce,
+        kii_iot_state_updater_resource_t* state_updater_resouce,
+        KII_JSON_RESOURCE_CB resource_cb);
 
 /** On board to IoT Cloud with specified vendor thing ID.
  * kii_iot_t#command_handler instance is used to call api.
