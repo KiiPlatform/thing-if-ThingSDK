@@ -96,45 +96,40 @@ kii_bool_t init_kii_iot(
         const char* app_id,
         const char* app_key,
         const char* app_host,
-        char* mqtt_buff,
-        size_t mqtt_buff_size,
-        char* command_handler_buff,
-        size_t command_handler_buff_size,
-        char* state_updater_buff,
-        size_t state_updater_buff_size,
-        int state_update_period,
-        KII_JSON_RESOURCE_CB resouce_cb,
-        KII_IOT_ACTION_HANDLER action_handler,
-        KII_IOT_STATE_HANDLER state_handler)
+        kii_iot_command_handler_data_t* command_handler_data,
+        kii_iot_state_updater_data_t* state_updater_data,
+        KII_JSON_RESOURCE_CB resouce_cb)
 {
     M_KII_IOT_ASSERT(kii_iot != NULL);
     M_KII_IOT_ASSERT(app_id != NULL);
     M_KII_IOT_ASSERT(app_key != NULL);
     M_KII_IOT_ASSERT(app_host != NULL);
-    M_KII_IOT_ASSERT(mqtt_buff != NULL);
-    M_KII_IOT_ASSERT(command_handler_buff != NULL);
-    M_KII_IOT_ASSERT(state_updater_buff != NULL);
+    M_KII_IOT_ASSERT(command_handler_data != NULL);
+    M_KII_IOT_ASSERT(state_updater_data != NULL);
 
     memset(kii_iot, 0x00, sizeof(kii_iot_t));
-    memset(mqtt_buff, 0x00, mqtt_buff_size);
-    memset(command_handler_buff, 0x00, command_handler_buff_size);
-    memset(state_updater_buff, 0x00, state_updater_buff_size);
+    memset(command_handler_data->mqtt_buffer, 0x00,
+            command_handler_data->mqtt_buffer_size);
+    memset(command_handler_data->buffer, 0x00,
+            command_handler_data->buffer_size);
+    memset(state_updater_data->buffer, 0x00, state_updater_data->buffer_size);
 
     // Initialize command_handler
     if (kii_init(&kii_iot->command_handler, app_host, app_id, app_key) != 0) {
         return KII_FALSE;
     }
     kii_iot->command_handler.kii_core.http_context.buffer =
-        command_handler_buff;
+        command_handler_data->buffer;
     kii_iot->command_handler.kii_core.http_context.buffer_size =
-        command_handler_buff_size;
+        command_handler_data->buffer_size;
 
-    kii_iot->command_handler.mqtt_buffer = mqtt_buff;
-    kii_iot->command_handler.mqtt_buffer_size = mqtt_buff_size;
+    kii_iot->command_handler.mqtt_buffer = command_handler_data->mqtt_buffer;
+    kii_iot->command_handler.mqtt_buffer_size =
+        command_handler_data->mqtt_buffer_size;
 
     kii_iot->command_handler.kii_json_resource_cb = resouce_cb;
 
-    kii_iot->action_handler = action_handler;
+    kii_iot->action_handler = command_handler_data->action_handler;
 
     kii_iot->command_handler.app_context = (void*)kii_iot;
 
@@ -142,13 +137,14 @@ kii_bool_t init_kii_iot(
     if (kii_init(&kii_iot->state_updater, app_host, app_id, app_key) != 0) {
         return KII_FALSE;
     }
-    kii_iot->state_updater.kii_core.http_context.buffer = state_updater_buff;
+    kii_iot->state_updater.kii_core.http_context.buffer =
+        state_updater_data->buffer;
     kii_iot->state_updater.kii_core.http_context.buffer_size =
-        state_updater_buff_size;
+        state_updater_data->buffer_size;
 
     kii_iot->state_updater.kii_json_resource_cb = resouce_cb;
 
-    kii_iot->state_handler = state_handler;
+    kii_iot->state_handler = state_updater_data->state_handler;
 
     kii_iot->state_updater.app_context = (void*)kii_iot;
 

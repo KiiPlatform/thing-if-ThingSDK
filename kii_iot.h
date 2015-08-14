@@ -105,6 +105,39 @@ typedef kii_bool_t
         (kii_t* kii,
          KII_IOT_WRITER writer);
 
+/** Data container for command handler. */
+typedef struct kii_iot_command_handler_data_t {
+    /** HTTP request and response buffer for command handler. */
+    char* buffer;
+
+    /** HTTP request and response buffer size for command handler. */
+    size_t buffer_size;
+
+    /** buffer for MQTT. */
+    char* mqtt_buffer;
+
+    /** buffer size for MQTT. */
+    size_t mqtt_buffer_size;
+
+    /** callback function to handle received action. */
+    KII_IOT_ACTION_HANDLER action_handler;
+} kii_iot_command_handler_data_t;
+
+/** Data container for state updater. */
+typedef struct kii_iot_state_updater_data_t {
+    /** HTTP request and response buffer for state updater. */
+    char* buffer;
+
+    /** HTTP request and response buffer size for state updater. */
+    size_t buffer_size;
+
+    /** the period of updating state in milliseconds. */
+    int period;
+
+    /** callback function to write thing state. */
+    KII_IOT_STATE_HANDLER state_handler;
+} kii_iot_state_updater_data_t;
+
 typedef struct kii_iot_t {
     kii_t command_handler;
     kii_t state_updater;
@@ -121,43 +154,22 @@ typedef struct kii_iot_t {
  * @param [in] app_key the input of Application Key
  * @param [in] app_host host name. should be one of "CN", "JP", "US",
  * "SG"
- * @param [in] mqtt_buff buffer for mqtt.
- * @param [in] mqtt_buff_size buffer_size for mqtt.
-
- * @param [in] command_handler_buff HTTP request and response buffer
- * for command handler
- * @param [in] command_handler_buff_size HTTP request and response
- * buffer size for command handler
- * @param [in] state_updater_buff HTTP request and response buffer for
- * state updater
- * @param [in] state_updater_buff_size HTTP request and response
- * buffer size for state updater
- * @param [in] state_update_period the period of updating state in
- * milliseconds
+ * @param [in] command_handler_data data container for command handler.
+ * @param [in] state_updater_data data container for state updater.
  * @param [in] resouce_cb callback to resize to kii_json_resource
  * contents. This is optional. If you build IoTCloud ThingSDK with
  * KII_JSON_FIXED_TOKEN_NUM macro, you can set NULL to this
  * argument. otherwise, you need to set kii_json_resource_t object to
  * this argument.
- * @param [in] action_handler callback function to handle received
- * action.
- * @param [in] state_updater callback function to write thing state.
  */
 kii_bool_t init_kii_iot(
         kii_iot_t* kii_iot,
         const char* app_id,
         const char* app_key,
         const char* app_host,
-        char* mqtt_buff,
-        size_t mqtt_buff_size,
-        char* command_handler_buff,
-        size_t command_handler_buff_size,
-        char* state_updater_buff,
-        size_t state_updater_buff_size,
-        int state_update_period,
-        KII_JSON_RESOURCE_CB resouce_cb,
-        KII_IOT_ACTION_HANDLER action_handler,
-        KII_IOT_STATE_HANDLER state_handler);
+        kii_iot_command_handler_data_t* command_handler_data,
+        kii_iot_state_updater_data_t* state_updater_data,
+        KII_JSON_RESOURCE_CB resouce_cb);
 
 /** On board to IoT Cloud with specified vendor thing ID.
  * kii_iot_t#command_handler instance is used to call api.
