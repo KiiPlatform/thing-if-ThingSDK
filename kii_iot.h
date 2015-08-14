@@ -10,16 +10,21 @@ extern "C" {
 #endif
 
 /** callback function for handling action.
- * @param [in] action_name name of the action.
- * @param [in] action_params json object represents parameter of this action.
+ * @param [in] app_context application context which is passed at
+ * init_kii_iot(kii_iot_t*, const char*, const char*, const char*,
+ * char*, size_t, char*, size_t, char*, size_t, int,
+ * KII_IOT_ACTION_HANDLER, KII_IOT_STATE_HANDLER, void*).
  * @param [in] schema name of schema.
  * @maram [in] schema_version version of schema.
+ * @param [in] action_name name of the action.
+ * @param [in] action_params json object represents parameter of this action.
  * @param [out] error error message if operation is failed.(optional)
  * @return KII_TRUE if succeeded, otherwise KII_FALSE.
  */
 typedef kii_bool_t
     (*KII_IOT_ACTION_HANDLER)
-        (const char* schema,
+        (void* app_context,
+         const char* schema,
          int schema_version,
          const char* action_name,
          const char* action_params,
@@ -38,21 +43,77 @@ typedef kii_bool_t
  */
 typedef kii_bool_t(*KII_IOT_WRITER)(const kii_t* kii, const char* buff);
 
-/** callback function for writing state.
+/** callback function for writing thing state.
  *
  * This callback function should write current thing state with
  * KII_IOT_WRITER. for example:
  *
  * @code
+ * typedef struct smart_light_t {
+ *     kii_bool_t power;
+ *     int brightness;
+ *     int color[3];
+ *     int colorTemperature;
+ * } smart_light_t;
+ *
  * kii_bool_t state_handler(
- *         const state_handler_context_t* context,
+ *         void* app_context,
+ *         kii_t* kii,
  *         KII_IOT_WRITER writer)
  * {
- *     return (*writer)(context, "{\"power\":true}")
+ *     smart_light_t* smart_light = (smart_light_t*)app_context;
+ *     char buf[256];
+ *
+ *     if ((*writer)(kii, "{\"power\":") == KII_FALSE) {
+ *         return KII_FALSE;
+ *     }
+ *     if (smart_light->power == KII_TRUE) {
+ *         if ((*writer)(kii, "true,") == KII_FALSE) {
+ *             return KII_FALSE;
+ *         }
+ *     } else {
+ *         if ((*writer)(kii, "false,") == KII_FALSE) {
+ *             return KII_FALSE;
+ *         }
+ *     }
+ *     if ((*writer)(kii, "\"brightness\":") == KII_FALSE) {
+ *         return KII_FALSE;
+ *     }
+ *     sprintf(buf, "%d,", smart_light->brightness);
+ *     if ((*writer)(kii, buf) == KII_FALSE) {
+ *         return KII_FALSE;
+ *     }
+ *     if ((*writer)(kii, "\"color\":[") == KII_FALSE) {
+ *         return KII_FALSE;
+ *     }
+ *     sprintf(buf, "%d,", smart_light->color[0]);
+ *     if ((*writer)(kii, buf) == KII_FALSE) {
+ *         return KII_FALSE;
+ *     }
+ *     sprintf(buf, "%d,", smart_light->color[1]);
+ *     if ((*writer)(kii, buf) == KII_FALSE) {
+ *         return KII_FALSE;
+ *     }
+ *     sprintf(buf, "%d],", smart_light->color[2]);
+ *     if ((*writer)(kii, buf) == KII_FALSE) {
+ *         return KII_FALSE;
+ *     }
+ *     if ((*writer)(kii, "\"colorTemperature\":") == KII_FALSE) {
+ *         return KII_FALSE;
+ *     }
+ *     sprintf(buf, "%d}", smart_light->colorTemperature);
+ *     if ((*writer)(kii, buf) == KII_FALSE) {
+ *         return KII_FALSE;
+ *     }
+ *     return KII_TRUE;
  * }
  * @code
  *
- * @param [in] context context of state handler.
+ * @param [in] kii state_updater object.
+ * @param [in] app_context application context which is passed at
+ * init_kii_iot(kii_iot_t*, const char*, const char*, const char*,
+ * char*, size_t, char*, size_t, char*, size_t, int,
+ * KII_IOT_ACTION_HANDLER, KII_IOT_STATE_HANDLER, void*).
  * @param [in] writer writer to write thing state. implementation of
  * this writer is provided by this SDK.
  * @return KII_TRUE if succeeded. otherwise KII_FALSE.
@@ -60,6 +121,7 @@ typedef kii_bool_t(*KII_IOT_WRITER)(const kii_t* kii, const char* buff);
 typedef kii_bool_t
     (*KII_IOT_STATE_HANDLER)
         (kii_t* kii,
+         void* app_context,
          KII_IOT_WRITER writer);
 
 typedef struct kii_iot_t {
@@ -69,6 +131,7 @@ typedef struct kii_iot_t {
     KII_IOT_STATE_HANDLER state_handler;
     /** Specify the period of updating state in milliseconds. */
     int state_update_period;
+    void* app_context;
 } kii_iot_t;
 
 kii_bool_t init_kii_iot(
@@ -82,8 +145,10 @@ kii_bool_t init_kii_iot(
         size_t command_handler_buff_size,
         char* state_updater_buff,
         size_t state_updater_buff_size,
+        int state_update_period,
         KII_IOT_ACTION_HANDLER command_handler,
-        KII_IOT_STATE_HANDLER state_handler);
+        KII_IOT_STATE_HANDLER state_handler,
+        void* app_context);
 
 /** On board to IoT Cloud with specified vendor thing ID.
  * kii_iot_t#command_handler instance is used to call api.

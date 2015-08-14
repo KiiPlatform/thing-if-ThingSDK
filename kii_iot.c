@@ -102,8 +102,10 @@ kii_bool_t init_kii_iot(
         size_t command_handler_buff_size,
         char* state_updater_buff,
         size_t state_updater_buff_size,
+        int state_update_period,
         KII_IOT_ACTION_HANDLER action_handler,
-        KII_IOT_STATE_HANDLER state_handler)
+        KII_IOT_STATE_HANDLER state_handler,
+        void* app_context)
 {
     M_KII_IOT_ASSERT(kii_iot != NULL);
     M_KII_IOT_ASSERT(app_id != NULL);
@@ -293,6 +295,7 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
             {
                 KII_IOT_ACTION_HANDLER handler =
                     ((kii_iot_t*)kii->app_context)->action_handler;
+                void* app_context = ((kii_iot_t*)kii->app_context)->app_context;
                 char* key;
                 char* value;
                 size_t key_len, value_len;
@@ -320,8 +323,8 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
                 value_swap = value[value_len];
                 key[key_len] = '\0';
                 value[value_len] = '\0';
-                if ((*handler)(schema, schema_version, key, value, error)
-                        != KII_FALSE) {
+                if ((*handler)(app_context, schema, schema_version, key, value,
+                                error) != KII_FALSE) {
                     if (kii_api_call_append_body(kii,
                                     "{\"", sizeof("{\"") - 1) != 0) {
                         M_KII_LOG(kii->kii_core.logger_cb(
