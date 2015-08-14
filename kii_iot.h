@@ -11,9 +11,10 @@ extern "C" {
 
 /** callback function for handling action.
  * @param [in] app_context application context which is passed at
- * init_kii_iot(kii_iot_t*, const char*, const char*, const char*,
- * char*, size_t, char*, size_t, char*, size_t, int,
- * KII_IOT_ACTION_HANDLER, KII_IOT_STATE_HANDLER, void*).
+ * kii_bool_t init_kii_iot(kii_iot_t*, constchar*, constchar*,
+ * constchar*, char*, size_t, char*, size_t, kii_json_resource_t*,
+ * char*, size_t, kii_json_resource_t*, int, KII_IOT_ACTION_HANDLER,
+ * KII_IOT_STATE_HANDLER, void*)
  * @param [in] schema name of schema.
  * @maram [in] schema_version version of schema.
  * @param [in] action_name name of the action.
@@ -111,9 +112,11 @@ typedef kii_bool_t(*KII_IOT_WRITER)(const kii_t* kii, const char* buff);
  *
  * @param [in] kii state_updater object.
  * @param [in] app_context application context which is passed at
- * init_kii_iot(kii_iot_t*, const char*, const char*, const char*,
- * char*, size_t, char*, size_t, char*, size_t, int,
- * KII_IOT_ACTION_HANDLER, KII_IOT_STATE_HANDLER, void*).
+ * @param [in] app_context application context which is passed at
+ * kii_bool_t init_kii_iot(kii_iot_t*, constchar*, constchar*,
+ * constchar*, char*, size_t, char*, size_t, kii_json_resource_t*,
+ * char*, size_t, kii_json_resource_t*, int, KII_IOT_ACTION_HANDLER,
+ * KII_IOT_STATE_HANDLER, void*)
  * @param [in] writer writer to write thing state. implementation of
  * this writer is provided by this SDK.
  * @return KII_TRUE if succeeded. otherwise KII_FALSE.
@@ -134,6 +137,43 @@ typedef struct kii_iot_t {
     void* app_context;
 } kii_iot_t;
 
+/** Initialize kii_iot_t object.
+ *
+ * @param [in] kii_iot kii_iot_t object to be initialized.
+ * @param [in] app_id the input of Application ID
+ * @param [in] app_key the input of Application Key
+ * @param [in] app_host host name. should be one of "CN", "JP", "US",
+ * "SG"
+ * @param [in] mqtt_buff buffer for mqtt.
+ * @param [in] mqtt_buff_size buffer_size for mqtt.
+
+ * @param [in] command_handler_buff HTTP request and response buffer
+ * for command handler
+ * @param [in] command_handler_buff_size HTTP request and response
+ * buffer size for command handler
+ * @param [in] command_handler_json_resource kii_json_resource_t
+ * object for command_handler. This is optional. If you build IoTCloud
+ * ThingSDK with KII_JSON_FIXED_TOKEN_NUM macro, you can set NULL to
+ * this argument. otherwise, you need to set kii_json_resource_t
+ * object to this argument.
+ * @param [in] state_updater_buff HTTP request and response buffer for
+ * state updater
+ * @param [in] state_updater_buff_size HTTP request and response
+ * buffer size for state updater
+ * @param [in] state_updater_json_resource kii_json_resource_t object
+ * for state_updater. This is optional. If you build IoTCloud ThingSDK
+ * with KII_JSON_FIXED_TOKEN_NUM macro, you can set NULL to this
+ * argument. otherwise, you need to set kii_json_resource_t object to
+ * this argument.
+ * @param [in] state_update_period the period of updating state in
+ * milliseconds
+ * @param [in] action_handler callback function to handle received
+ * action.
+ * @param [in] state_updater callback function to write thing state.
+ * @param [in] app_context application context. This is passed to
+ * KII_IOT_ACTION_HANDLER and KII_IOT_STATE_HANDLER.
+ * @return KII_TRUE if succeeded, otherwise KII_FALSE.
+ */
 kii_bool_t init_kii_iot(
         kii_iot_t* kii_iot,
         const char* app_id,
@@ -143,10 +183,12 @@ kii_bool_t init_kii_iot(
         size_t mqtt_buff_size,
         char* command_handler_buff,
         size_t command_handler_buff_size,
+        kii_json_resource_t* command_handler_json_resource,
         char* state_updater_buff,
         size_t state_updater_buff_size,
+        kii_json_resource_t* state_updater_json_resource,
         int state_update_period,
-        KII_IOT_ACTION_HANDLER command_handler,
+        KII_IOT_ACTION_HANDLER action_handler,
         KII_IOT_STATE_HANDLER state_handler,
         void* app_context);
 
