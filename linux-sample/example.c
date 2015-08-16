@@ -21,8 +21,8 @@ static kii_bool_t state_handler(
         kii_t* kii,
         KII_IOT_WRITER writer)
 {
-    // TODO: implement me.
-    return KII_TRUE;
+    return (*writer)(kii,
+            "{\"power\": true, \"brightness\":100,\"color\":[0,100,255]}");
 }
 
 int main(int argc, char** argv)
