@@ -2,3 +2,26 @@
 Thing SDK for Kii IoT Cloud.<br>
 The service is under development.<br>
 Documentation will be available after the service is ready.
+
+## Build
+
+When you build IoTCloud-ThingSDK for the first time, you need to
+execute following commands:
+
+```sh
+# git submodule init
+# git submodule update
+# cd kii
+# git submodule init
+# git submodule update
+# cd ../
+```
+
+These commands retrieve required modules for IoTCloud-ThingSDK. After
+that, execute following command:
+
+```sh
+# make
+```
+
+This makes libkiiiotsdk.so.
