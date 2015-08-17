@@ -153,7 +153,6 @@ kii_bool_t init_kii_iot(
     kii_iot->state_handler = state_updater_resource->state_handler;
     kii_iot->state_update_period = state_updater_resource->period;
 
-
     kii_iot->state_updater.app_context = (void*)kii_iot;
 
     return KII_TRUE;
