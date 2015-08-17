@@ -126,41 +126,54 @@ static kii_bool_t state_handler(
         kii_t* kii,
         KII_IOT_WRITER writer)
 {
-    char buf[256];
-    if ((*writer)(kii, "{\"power\":") == KII_FALSE) {
-        return KII_FALSE;
-    }
-    if ((*writer)(kii, m_smartlight.power == KII_JSON_TRUE
-                    ? "true," : "false,") == KII_FALSE) {
-        return KII_FALSE;
-    }
-    if ((*writer)(kii, "\"brightness\":") == KII_FALSE) {
-        return KII_FALSE;
-    }
+    FILE* fp = fopen("smartlight-state.json", "r");
+    if (fp != NULL) {
+        char buf[256];
+        kii_bool_t retval = KII_TRUE;
+        while (fgets(buf, sizeof(buf) / sizeof(buf[0]), fp) != NULL) {
+            if ((*writer)(kii, buf) == KII_FALSE) {
+                retval = KII_FALSE;
+                break;
+            }
+        }
+        fclose(fp);
+        return retval;
+    } else {
+        char buf[256];
+        if ((*writer)(kii, "{\"power\":") == KII_FALSE) {
+            return KII_FALSE;
+        }
+        if ((*writer)(kii, m_smartlight.power == KII_JSON_TRUE
+                        ? "true," : "false,") == KII_FALSE) {
+            return KII_FALSE;
+        }
+        if ((*writer)(kii, "\"brightness\":") == KII_FALSE) {
+            return KII_FALSE;
+        }
 
-    sprintf(buf, "%d,", m_smartlight.brightness);
-    if ((*writer)(kii, buf) == KII_FALSE) {
-        return KII_FALSE;
-    }
+        sprintf(buf, "%d,", m_smartlight.brightness);
+        if ((*writer)(kii, buf) == KII_FALSE) {
+            return KII_FALSE;
+        }
 
-    if ((*writer)(kii, "\"color\":") == KII_FALSE) {
-        return KII_FALSE;
-    }
-    sprintf(buf, "[%d,%d,%d],", m_smartlight.color[0], m_smartlight.color[1],
-            m_smartlight.color[2]);
-    if ((*writer)(kii, buf) == KII_FALSE) {
-        return KII_FALSE;
-    }
+        if ((*writer)(kii, "\"color\":") == KII_FALSE) {
+            return KII_FALSE;
+        }
+        sprintf(buf, "[%d,%d,%d],", m_smartlight.color[0],
+                m_smartlight.color[1], m_smartlight.color[2]);
+        if ((*writer)(kii, buf) == KII_FALSE) {
+            return KII_FALSE;
+        }
 
-    if ((*writer)(kii, "\"colorTemperature\":") == KII_FALSE) {
-        return KII_FALSE;
+        if ((*writer)(kii, "\"colorTemperature\":") == KII_FALSE) {
+            return KII_FALSE;
+        }
+        sprintf(buf, "%d}", m_smartlight.color_temperature);
+        if ((*writer)(kii, buf) == KII_FALSE) {
+            return KII_FALSE;
+        }
+        return KII_TRUE;
     }
-    sprintf(buf, "%d}", m_smartlight.color_temperature);
-    if ((*writer)(kii, buf) == KII_FALSE) {
-        return KII_FALSE;
-    }
-
-    return KII_TRUE;
 }
 
 int main(int argc, char** argv)
