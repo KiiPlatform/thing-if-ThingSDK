@@ -36,7 +36,7 @@ typedef kii_bool_t
  * @param [in] buff json string of thing state. must be null terminated.
  * @return KII_TRUE if succeeded. otherwise KII_FALSE.
  */
-typedef kii_bool_t(*KII_IOT_WRITER)(const kii_t* kii, const char* buff);
+typedef kii_bool_t (*KII_IOT_WRITER)(kii_t* kii, const char* buff);
 
 /** callback function for writing thing state.
  *
