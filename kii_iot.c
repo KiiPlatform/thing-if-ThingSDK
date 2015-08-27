@@ -640,6 +640,27 @@ static void* prv_update_status(void *sdata)
     }
 }
 
+static kii_bool_t prv_set_author(
+        kii_author_t* author,
+        const char* thing_id,
+        const char* access_token)
+{
+    if (sizeof(author->author_id) / sizeof(author->author_id[0]) <=
+            strlen(thing_id)) {
+        return KII_FALSE;
+    }
+    if (sizeof(author->access_token) / sizeof(author->access_token[0]) <=
+            strlen(access_token)) {
+        return KII_FALSE;
+    }
+
+    strncpy(author->author_id, thing_id,
+            sizeof(author->author_id) / sizeof(author->author_id[0]));
+    strncpy(author->access_token, access_token,
+            sizeof(author->access_token) / sizeof(author->access_token[0]));
+    return KII_TRUE;
+}
+
 kii_bool_t onboard_with_vendor_thing_id(
         kii_iot_t* kii_iot,
         const char* vendor_thing_id,
@@ -653,14 +674,12 @@ kii_bool_t onboard_with_vendor_thing_id(
         return KII_FALSE;
     }
 
-    memcpy(kii_iot->state_updater.kii_core.author.author_id,
-            kii_iot->command_handler.kii_core.author.author_id,
-            sizeof(kii_iot->state_updater.kii_core.author.author_id) /
-                sizeof(kii_iot->state_updater.kii_core.author.author_id[0]));
-    memcpy(kii_iot->state_updater.kii_core.author.access_token,
-            kii_iot->command_handler.kii_core.author.access_token,
-            sizeof(kii_iot->state_updater.kii_core.author.access_token) /
-                sizeof(kii_iot->state_updater.kii_core.author.access_token[0]));
+    if (prv_set_author(&(kii_iot->state_updater.kii_core.author),
+                    kii_iot->command_handler.kii_core.author.author_id,
+                    kii_iot->command_handler.kii_core.author.access_token)
+            == KII_FALSE) {
+        return KII_FALSE;
+    }
     kii_iot->state_updater.task_create_cb(NULL,
             prv_update_status, (void*)&kii_iot->state_updater,
             (void*)mIotStateUpdate_taskStk, sizeof(mIotStateUpdate_taskStk), 1);
@@ -746,18 +765,44 @@ kii_bool_t onboard_with_thing_id(
         return KII_FALSE;
     }
 
-    memcpy(kii_iot->state_updater.kii_core.author.author_id,
-            kii_iot->command_handler.kii_core.author.author_id,
-            sizeof(kii_iot->state_updater.kii_core.author.author_id) /
-                sizeof(kii_iot->state_updater.kii_core.author.author_id[0]));
-    memcpy(kii_iot->state_updater.kii_core.author.access_token,
-            kii_iot->command_handler.kii_core.author.access_token,
-            sizeof(kii_iot->state_updater.kii_core.author.access_token) /
-                sizeof(kii_iot->state_updater.kii_core.author.access_token[0]));
+    if (prv_set_author(&(kii_iot->state_updater.kii_core.author),
+                    kii_iot->command_handler.kii_core.author.author_id,
+                    kii_iot->command_handler.kii_core.author.access_token)
+            == KII_FALSE) {
+        return KII_FALSE;
+    }
     kii_iot->state_updater.task_create_cb(NULL,
             prv_update_status, (void*)&kii_iot->state_updater,
             (void*)mIotStateUpdate_taskStk, sizeof(mIotStateUpdate_taskStk), 1);
 
     return KII_TRUE;
 
+}
+
+kii_bool_t connect_to_iot_cloud(
+        kii_iot_t* kii_iot,
+        const char* thing_id,
+        const char* access_token)
+{
+    if (prv_set_author(&kii_iot->command_handler.kii_core.author,
+                    thing_id, access_token) == KII_FALSE) {
+        return KII_FALSE;
+    }
+
+    if (prv_set_author(&kii_iot->state_updater.kii_core.author,
+                    thing_id, access_token) == KII_FALSE) {
+        return KII_FALSE;
+    }
+
+    if (kii_push_start_routine(&kii_iot->command_handler, 0, 0,
+                    received_callback) != 0) {
+        return KII_FALSE;
+    }
+
+    kii_iot->state_updater.task_create_cb(NULL,
+            prv_update_status, (void*)&kii_iot->state_updater,
+            (void*)mIotStateUpdate_taskStk, sizeof(mIotStateUpdate_taskStk), 1);
+
+
+    return KII_TRUE;
 }
