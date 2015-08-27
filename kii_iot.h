@@ -149,6 +149,11 @@ typedef struct kii_iot_t {
 
 /** Initialize kii_iot_t object.
  *
+ * After this method is called, applications must call
+ * onboard_with_vendor_thing_id(kii_iot_t*, const char*, const char*,
+ * const char*, const char*) or onboard_with_thing_id(kii_iot_t*,
+ * const char*, const char*) to onboard from thing.
+ *
  * @param [in] kii_iot kii_iot_t object to be initialized.
  * @param [in] app_id the input of Application ID
  * @param [in] app_key the input of Application Key
@@ -161,6 +166,8 @@ typedef struct kii_iot_t {
  * KII_JSON_FIXED_TOKEN_NUM macro, you can set NULL to this
  * argument. otherwise, you need to set kii_json_resource_t object to
  * this argument.
+ *
+ * @return KII_TRUE when succeeded, KII_FALSE when failed.
  */
 kii_bool_t init_kii_iot(
         kii_iot_t* kii_iot,
@@ -171,7 +178,7 @@ kii_bool_t init_kii_iot(
         kii_iot_state_updater_resource_t* state_updater_resouce,
         KII_JSON_RESOURCE_CB resource_cb);
 
-/** On board to IoT Cloud with specified vendor thing ID.
+/** Onboard to IoT Cloud with specified vendor thing ID.
  * kii_iot_t#command_handler and kii_iot_t#state_updater instances are
  * used to call api.
  * @param [inout] kii_iot kii IoT SDK instance.
@@ -196,7 +203,7 @@ kii_bool_t onboard_with_vendor_thing_id(
         const char* thing_properties
         );
 
-/** On board to IoT Cloud with specified thing ID.
+/** Onboard to IoT Cloud with specified thing ID.
  * kii_iot_t#command_handler and kii_iot_t#state_updater instances are
  * used to call api.
  * @param [inout] kii_iot kii IoT SDK instance.
@@ -212,20 +219,45 @@ kii_bool_t onboard_with_thing_id(
         const char* password
         );
 
-/** Connect to Iot Cloud with specified thing ID and access token.
+/** Initialize kii_iot_t object with onboarded thing information.
+ *
+ * This api is used when onboard process has been done by controller
+ * application (typically a mobile apps.) and thing ID and access
+ * token is given by the controller application (via BLE, etc.) Since
+ * in this case onboard process is already completed, no need to call
+ * onboard_with_vendor_thing_id() or onboard_with_thing_id().
+ *
  * kii_iot_t#command_handler and kii_iot_t#state_updater instances are
  * used to call api.
- * @param [inout] kii_iot kii IoT SDK instance.
+ *
+ * @param [in] app_id the input of Application ID
+ * @param [in] app_key the input of Application Key
+ * @param [in] app_host host name. should be one of "CN", "JP", "US",
+ * "SG"
  * @param [in] thing_id thing id given by a controller application
  * NonNull, NonEmpty value must be specified.
  * @param [in] access_token access token of the thing given by a
- * controller application.  NonNull, NonEmpty value must be specified.
+ * controller application. NonNull, NonEmpty value must be specified.
+ * @param [in] command_handler_data data container for command handler.
+ * @param [in] state_updater_data data container for state updater.
+ * @param [in] resource_cb callback to resize to kii_json_resource
+ * contents. This is optional. If you build IoTCloud ThingSDK with
+ * KII_JSON_FIXED_TOKEN_NUM macro, you can set NULL to this
+ * argument. otherwise, you need to set kii_json_resource_t object to
+ * this argument.
+ *
  * @return KII_TRUE when succeeded, KII_FALSE when failed.
  */
-kii_bool_t connect_to_iot_cloud(
+kii_bool_t init_kii_iot_with_onboarded_thing(
         kii_iot_t* kii_iot,
+        const char* app_id,
+        const char* app_key,
+        const char* app_host,
         const char* thing_id,
-        const char* access_token);
+        const char* access_token,
+        kii_iot_command_handler_resource_t* command_handler_resouce,
+        kii_iot_state_updater_resource_t* state_updater_resouce,
+        KII_JSON_RESOURCE_CB resource_cb);
 
 #ifdef __cplusplus
 }
