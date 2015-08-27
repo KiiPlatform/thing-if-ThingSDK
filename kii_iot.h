@@ -172,7 +172,8 @@ kii_bool_t init_kii_iot(
         KII_JSON_RESOURCE_CB resource_cb);
 
 /** On board to IoT Cloud with specified vendor thing ID.
- * kii_iot_t#command_handler instance is used to call api.
+ * kii_iot_t#command_handler and kii_iot_t#state_updater instances are
+ * used to call api.
  * @param [inout] kii_iot kii IoT SDK instance.
  * @param [in] vendor_thing_id vendor thing id given by thing vendor.
  * NonNull, NonEmpty value must be specified.
@@ -196,9 +197,10 @@ kii_bool_t onboard_with_vendor_thing_id(
         );
 
 /** On board to IoT Cloud with specified thing ID.
- * kii_iot_t#command_handler instance is used to call api.
+ * kii_iot_t#command_handler and kii_iot_t#state_updater instances are
+ * used to call api.
  * @param [inout] kii_iot kii IoT SDK instance.
- * @param [in] thing_id vendor thing id given by thing vendor.
+ * @param [in] thing_id thing id issued by Kii Cloud.
  * NonNull, NonEmpty value must be specified.
  * @param [in] password password of the thing given by thing vendor.
  * NonNull, NonEmpty value must be specified.
@@ -209,6 +211,21 @@ kii_bool_t onboard_with_thing_id(
         const char* thing_id,
         const char* password
         );
+
+/** Connect to Iot Cloud with specified thing ID and access token.
+ * kii_iot_t#command_handler and kii_iot_t#state_updater instances are
+ * used to call api.
+ * @param [inout] kii_iot kii IoT SDK instance.
+ * @param [in] thing_id thing id given by a controller application
+ * NonNull, NonEmpty value must be specified.
+ * @param [in] access_token access token of the thing given by a
+ * controller application.  NonNull, NonEmpty value must be specified.
+ * @return KII_TRUE when succeeded, KII_FALSE when failed.
+ */
+kii_bool_t connect_to_iot_cloud(
+        kii_iot_t* kii_iot,
+        const char* thing_id,
+        const char* access_token);
 
 #ifdef __cplusplus
 }
