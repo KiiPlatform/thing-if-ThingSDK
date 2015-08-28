@@ -1,4 +1,5 @@
 #include "kii_iot.h"
+#include "kii_iot_application.h"
 
 #include <kii.h>
 
@@ -139,6 +140,8 @@ kii_bool_t init_kii_iot(
 
     kii_iot->command_handler.app_context = (void*)kii_iot;
 
+    setup_command_handler_callbacks(&kii_iot->command_handler);
+
     // Initialize state_updater
     if (kii_init(&kii_iot->state_updater, app_host, app_id, app_key) != 0) {
         return KII_FALSE;
@@ -154,6 +157,8 @@ kii_bool_t init_kii_iot(
     kii_iot->state_update_period = state_updater_resource->period;
 
     kii_iot->state_updater.app_context = (void*)kii_iot;
+
+    setup_state_update_callbacks(&kii_iot->state_updater);
 
     return KII_TRUE;
 }
