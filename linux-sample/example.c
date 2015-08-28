@@ -189,7 +189,7 @@ int main(int argc, char** argv)
     struct option long_options[] = {
         {"vendor-thing-id", no_argument, NULL, 0},
         {"thing-id", no_argument, NULL, 1},
-        {"connect", no_argument, NULL, 2},
+        {"onboarded", no_argument, NULL, 2},
         {"help", no_argument, NULL, 3},
         {0, 0, 0, 0}
     };
@@ -208,22 +208,25 @@ int main(int argc, char** argv)
     state_updater_resource.period = EX_STATE_UPDATE_PERIOD;
     state_updater_resource.state_handler = state_handler;
 
-    init_kii_iot(&kii_iot, EX_APP_ID, EX_APP_KEY, EX_APP_SITE,
-            &command_handler_resource, &state_updater_resource, NULL);
-
     switch (getopt_long(argc, argv, "", long_options, &option_index)) {
         case 0:
+            init_kii_iot(&kii_iot, EX_APP_ID, EX_APP_KEY, EX_APP_SITE,
+                    &command_handler_resource, &state_updater_resource, NULL);
             onboard_with_vendor_thing_id(&kii_iot, EX_AUTH_VENDOR_ID,
                     EX_AUTH_VENDOR_PASS, NULL, NULL);
             while (1) {}
             break;
         case 1:
+            init_kii_iot(&kii_iot, EX_APP_ID, EX_APP_KEY, EX_APP_SITE,
+                    &command_handler_resource, &state_updater_resource, NULL);
             onboard_with_thing_id(&kii_iot, EX_AUTH_THING_ID,
                     EX_AUTH_VENDOR_PASS);
             while (1) {}
             break;
         case 2:
-            connect_to_iot_cloud(&kii_iot, EX_AUTH_THING_ID, EX_ACCESS_TOKEN);
+            init_kii_iot_with_onboarded_thing(&kii_iot, EX_APP_ID, EX_APP_KEY,
+                    EX_APP_SITE, EX_AUTH_THING_ID, EX_ACCESS_TOKEN,
+                    &command_handler_resource, &state_updater_resource, NULL);
             while (1) {}
             break;
         case 3:
@@ -231,7 +234,7 @@ int main(int argc, char** argv)
             printf("commands: \n");
             printf("--vendor-thing-id\n onboard to iot cloud with vendor thing ID.\n");
             printf("--thing-id\n onboard to iot cloud with thing ID.\n");
-            printf("--connect\n connect to iot cloud with thing ID and access token.\n");
+            printf("--onboarded\n join to onboarded iot cloud with thing ID and access token.\n");
             printf("--help\n show this help.\n");
             break;
         default:
