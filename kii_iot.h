@@ -174,8 +174,8 @@ kii_bool_t init_kii_iot(
         const char* app_id,
         const char* app_key,
         const char* app_host,
-        kii_iot_command_handler_resource_t* command_handler_resouce,
-        kii_iot_state_updater_resource_t* state_updater_resouce,
+        kii_iot_command_handler_resource_t* command_handler_resource,
+        kii_iot_state_updater_resource_t* state_updater_resource,
         KII_JSON_RESOURCE_CB resource_cb);
 
 /** Onboard to IoT Cloud with specified vendor thing ID.
@@ -255,8 +255,8 @@ kii_bool_t init_kii_iot_with_onboarded_thing(
         const char* app_host,
         const char* thing_id,
         const char* access_token,
-        kii_iot_command_handler_resource_t* command_handler_resouce,
-        kii_iot_state_updater_resource_t* state_updater_resouce,
+        kii_iot_command_handler_resource_t* command_handler_resource,
+        kii_iot_state_updater_resource_t* state_updater_resource,
         KII_JSON_RESOURCE_CB resource_cb);
 
 #ifdef __cplusplus

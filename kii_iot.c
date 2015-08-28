@@ -95,7 +95,7 @@ static int prv_iot_parse_onboarding_response(kii_t* kii)
     return 0;
 }
 
-kii_bool_t init_kii_iot(
+static kii_bool_t prv_init_kii_iot(
         kii_iot_t* kii_iot,
         const char* app_id,
         const char* app_key,
@@ -156,6 +156,19 @@ kii_bool_t init_kii_iot(
     kii_iot->state_updater.app_context = (void*)kii_iot;
 
     return KII_TRUE;
+}
+
+kii_bool_t init_kii_iot(
+        kii_iot_t* kii_iot,
+        const char* app_id,
+        const char* app_key,
+        const char* app_host,
+        kii_iot_command_handler_resource_t* command_handler_resource,
+        kii_iot_state_updater_resource_t* state_updater_resource,
+        KII_JSON_RESOURCE_CB resource_cb)
+{
+    return prv_init_kii_iot(kii_iot, app_id, app_key, app_host,
+            command_handler_resource, state_updater_resource, resource_cb);
 }
 
 static int prv_kii_iot_get_key_and_value_from_json(
@@ -779,11 +792,23 @@ kii_bool_t onboard_with_thing_id(
 
 }
 
-kii_bool_t connect_to_iot_cloud(
+kii_bool_t init_kii_iot_with_onboarded_thing(
         kii_iot_t* kii_iot,
+        const char* app_id,
+        const char* app_key,
+        const char* app_host,
         const char* thing_id,
-        const char* access_token)
+        const char* access_token,
+        kii_iot_command_handler_resource_t* command_handler_resource,
+        kii_iot_state_updater_resource_t* state_updater_resource,
+        KII_JSON_RESOURCE_CB resource_cb)
 {
+    if (prv_init_kii_iot(kii_iot, app_id, app_key, app_host,
+                    command_handler_resource, state_updater_resource,
+                    resource_cb) == KII_FALSE) {
+        return KII_FALSE;
+    }
+
     if (prv_set_author(&kii_iot->command_handler.kii_core.author,
                     thing_id, access_token) == KII_FALSE) {
         return KII_FALSE;
