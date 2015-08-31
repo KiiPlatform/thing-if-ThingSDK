@@ -158,7 +158,7 @@ kii_bool_t init_kii_iot(
 
     kii_iot->state_updater.app_context = (void*)kii_iot;
 
-    setup_state_update_callbacks(&kii_iot->state_updater);
+    setup_state_updater_callbacks(&kii_iot->state_updater);
 
     return KII_TRUE;
 }

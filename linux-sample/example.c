@@ -212,7 +212,7 @@ void setup_command_handler_callbacks(kii_t *command_handler)
     command_handler->delay_ms_cb = delay_ms_cb;
 }
 
-void setup_state_update_callbacks(kii_t *state_updater)
+void setup_state_updater_callbacks(kii_t *state_updater)
 {
     /* setting http socket callbacks */
     state_updater->kii_core.http_context.connect_cb = s_connect_cb;

@@ -85,7 +85,7 @@ void setup_command_handler_callbacks(kii_t *command_handler);
  *
  * @param [inout] kii_t state updater object.
  */
-void setup_state_update_callbacks(kii_t *state_updater);
+void setup_state_updater_callbacks(kii_t *state_updater);
 
 #ifdef __cplusplus
 }
