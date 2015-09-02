@@ -5,6 +5,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <getopt.h>
 
 typedef struct prv_smartlight_t {
     kii_json_boolean_t power;
@@ -184,6 +185,14 @@ int main(int argc, char** argv)
     char state_updater_buff[EX_STATE_UPDATER_BUFF_SIZE];
     char mqtt_buff[EX_MQTT_BUFF_SIZE];
     kii_iot_t kii_iot;
+    int option_index = 0;
+    struct option long_options[] = {
+        {"vendor-thing-id", no_argument, NULL, 0},
+        {"thing-id", no_argument, NULL, 1},
+        {"onboarded", no_argument, NULL, 2},
+        {"help", no_argument, NULL, 3},
+        {0, 0, 0, 0}
+    };
 
     command_handler_resource.buffer = command_handler_buff;
     command_handler_resource.buffer_size =
@@ -199,12 +208,39 @@ int main(int argc, char** argv)
     state_updater_resource.period = EX_STATE_UPDATE_PERIOD;
     state_updater_resource.state_handler = state_handler;
 
-    init_kii_iot(&kii_iot, EX_APP_ID, EX_APP_KEY, EX_APP_SITE,
-            &command_handler_resource, &state_updater_resource, NULL);
+    switch (getopt_long(argc, argv, "", long_options, &option_index)) {
+        case 0:
+            init_kii_iot(&kii_iot, EX_APP_ID, EX_APP_KEY, EX_APP_SITE,
+                    &command_handler_resource, &state_updater_resource, NULL);
+            onboard_with_vendor_thing_id(&kii_iot, EX_AUTH_VENDOR_ID,
+                    EX_AUTH_VENDOR_PASS, NULL, NULL);
+            while (1) {}
+            break;
+        case 1:
+            init_kii_iot(&kii_iot, EX_APP_ID, EX_APP_KEY, EX_APP_SITE,
+                    &command_handler_resource, &state_updater_resource, NULL);
+            onboard_with_thing_id(&kii_iot, EX_AUTH_THING_ID,
+                    EX_AUTH_VENDOR_PASS);
+            while (1) {}
+            break;
+        case 2:
+            init_kii_iot_with_onboarded_thing(&kii_iot, EX_APP_ID, EX_APP_KEY,
+                    EX_APP_SITE, EX_AUTH_THING_ID, EX_ACCESS_TOKEN,
+                    &command_handler_resource, &state_updater_resource, NULL);
+            while (1) {}
+            break;
+        case 3:
+            printf("to configure parameters, edit example.h\n\n");
+            printf("commands: \n");
+            printf("--vendor-thing-id\n onboard to iot cloud with vendor thing ID.\n");
+            printf("--thing-id\n onboard to iot cloud with thing ID.\n");
+            printf("--onboarded\n join to onboarded iot cloud with thing ID and access token.\n");
+            printf("--help\n show this help.\n");
+            break;
+        default:
+            printf("unknown option: %s\n", argv[1]);
+            break;
+    }
 
-    onboard_with_vendor_thing_id(&kii_iot, EX_AUTH_VENDOR_ID,
-            EX_AUTH_VENDOR_PASS, NULL, NULL);
-
-    while (1) {}
     return 0;
 }
