@@ -119,7 +119,7 @@ static kii_bool_t prv_init_kii_iot(
     memset(state_updater_resource->buffer, 0x00,
             state_updater_resource->buffer_size);
 
-    // Initialize command_handler
+    /* Initialize command_handler */
     if (kii_init(&kii_iot->command_handler, app_host, app_id, app_key) != 0) {
         return KII_FALSE;
     }
@@ -139,7 +139,7 @@ static kii_bool_t prv_init_kii_iot(
 
     kii_iot->command_handler.app_context = (void*)kii_iot;
 
-    // Initialize state_updater
+    /* Initialize state_updater */
     if (kii_init(&kii_iot->state_updater, app_host, app_id, app_key) != 0) {
         return KII_FALSE;
     }
@@ -284,7 +284,7 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
     strncat(resource_path, buffer + fields[2].start,
             fields[2].end - fields[2].start);
     strcat(resource_path, RESULTS_PART);
-    // TODO: Check properties.
+    /* TODO: Check properties. */
 
     if (kii_api_call_start(kii, "PUT", resource_path, "application/json",
                     KII_TRUE) != 0) {
@@ -398,7 +398,7 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
                 value[value_len] = value_swap;
             }
             case KII_JSON_PARSE_PARTIAL_SUCCESS:
-                // This must be end of array.
+                /* This must be end of array. */
                 break;
             case KII_JSON_PARSE_ROOT_TYPE_ERROR:
             case KII_JSON_PARSE_INVALID_INPUT:
