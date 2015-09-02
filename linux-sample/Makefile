@@ -8,29 +8,28 @@ ifdef DEBUG
 IOTSDKPARAM += DEBUG=1
 endif
 
-LIBS = -lssl -lcrypto -lpthread -lkiiiotsdk
+LIBS = -lssl -lcrypto -lpthread
 LD_FLAGS = -L..
 SOURCES = $(wildcard *.c)
+SOURCES += $(wildcard ../*.c)
+SOURCES += $(wildcard ../kii/Linux/kii_*.c)
+SOURCES += $(wildcard ../kii/kii-core/*.c)
+SOURCES += $(wildcard ../kii/kii-core/linux/kii_core*.c)
+SOURCES += $(wildcard ../kii/kii/*.c)
+SOURCES += $(wildcard ../kii/kii_json/src/*.c)
+SOURCES += ../kii/lib/jsmn/jsmn.c
 TARGET = exampleapp
-INCLUDES = -I.. -I../kii/kii -I../kii/kii-core -I../kii/kii_json/include -I../kii/lib/jsmn
+INCLUDES = -I.. -I../kii/kii-core -I../kii/kii-core/linux -I../kii/kii -I../kii/kii_json/include -I../kii/lib/jsmn -I../kii/Linux
 
-IOTSDK = libkiiiotsdk.so
 
 all: clean $(TARGET) $(DOCTARGET)
 
-$(IOTSDK):
-	$(MAKE) -C .. $(IOTSDKPARAM) "CFLAGS+=-DKII_JSON_FIXED_TOKEN_NUM=256"
-	ln -s ../libkiiiotsdk.so libkiiiotsdk.so
-
-
-$(TARGET): $(IOTSDK)
+$(TARGET):
 	gcc $(CFLAGS) $(SOURCES) $(LIBS) $(LD_FLAGS) $(INCLUDES) -o $@
 
 clean:
 	touch $(TARGET)
 	rm $(TARGET)
 	rm -rf $(DOCTARGET)
-	touch $(IOTSDK)
-	rm -rf $(IOTSDK)
 
 .PHONY: all clean copy
