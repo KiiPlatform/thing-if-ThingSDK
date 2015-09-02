@@ -1,10 +1,16 @@
 #include "example.h"
 
 #include <kii_iot.h>
+#include <kii_iot_application.h>
 #include <kii_json.h>
 
 #include <string.h>
 #include <stdio.h>
+#include <stdarg.h>
+
+#include <kii_core_secure_socket.h>
+#include <kii_socket_impl.h>
+#include <kii_task_impl.h>
 
 typedef struct prv_smartlight_t {
     kii_json_boolean_t power;
@@ -14,6 +20,14 @@ typedef struct prv_smartlight_t {
 } prv_smartlight_t;
 
 static prv_smartlight_t m_smartlight;
+
+static void logger_cb(const char* format, ...)
+{
+    va_list list;
+    va_start(list, format);
+    vprintf(format, list);
+    va_end(list);
+}
 
 static prv_json_read_object(
         const char* json,
@@ -174,6 +188,44 @@ static kii_bool_t state_handler(
         }
         return KII_TRUE;
     }
+}
+
+void setup_command_handler_callbacks(kii_t *command_handler)
+{
+    /* setting http socket callbacks */
+    command_handler->kii_core.http_context.connect_cb = s_connect_cb;
+    command_handler->kii_core.http_context.send_cb = s_send_cb;
+    command_handler->kii_core.http_context.recv_cb = s_recv_cb;
+    command_handler->kii_core.http_context.close_cb = s_close_cb;
+
+    /* setting logger callbacks. */
+    command_handler->kii_core.logger_cb = logger_cb;
+
+    /* setting mqtt socket callbacks. */
+    command_handler->mqtt_socket_connect_cb = connect_cb;
+    command_handler->mqtt_socket_send_cb = send_cb;
+    command_handler->mqtt_socket_recv_cb = recv_cb;
+    command_handler->mqtt_socket_close_cb = close_cb;
+
+    /* setting task callbacks. */
+    command_handler->task_create_cb = task_create_cb;
+    command_handler->delay_ms_cb = delay_ms_cb;
+}
+
+void setup_state_updater_callbacks(kii_t *state_updater)
+{
+    /* setting http socket callbacks */
+    state_updater->kii_core.http_context.connect_cb = s_connect_cb;
+    state_updater->kii_core.http_context.send_cb = s_send_cb;
+    state_updater->kii_core.http_context.recv_cb = s_recv_cb;
+    state_updater->kii_core.http_context.close_cb = s_close_cb;
+
+    /* setting logger callbacks. */
+    state_updater->kii_core.logger_cb = logger_cb;
+
+    /* setting task callbacks. */
+    state_updater->task_create_cb = task_create_cb;
+    state_updater->delay_ms_cb = delay_ms_cb;
 }
 
 int main(int argc, char** argv)
