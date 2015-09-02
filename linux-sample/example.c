@@ -24,7 +24,7 @@ static prv_json_read_object(
 {
     kii_json_t kii_json;
     kii_json_resource_t* resource_pointer = NULL;
-#ifndef KII_JSON_FIELD_TYPE_BOOLEAN
+#ifndef KII_JSON_FIXED_TOKEN_NUM
     kii_json_resource_t resource;
     kii_json_token_t tokens[32];
     resource_pointer = &resource;

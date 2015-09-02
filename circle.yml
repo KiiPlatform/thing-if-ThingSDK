@@ -1,0 +1,19 @@
+general:
+  artifacts:
+    - "target"
+
+checkout:
+  post:
+    - git submodule sync
+    - git submodule update --init
+    - cd kii; git submodule sync
+    - cd kii; git submodule update --init
+
+dependencies:
+  override:
+    - sudo apt-get install doxygen
+
+test:
+  pre:
+    - make
+    - make doc
