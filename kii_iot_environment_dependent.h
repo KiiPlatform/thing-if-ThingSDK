@@ -1,3 +1,9 @@
+/**
+ * @file kii_iot_environment_dependent.h
+ * @brief This is a file defining environment dependent functions. Kii
+ * IoT ThingSDK requires to implement these functions in each target
+ * environment.
+ */
 #ifndef _KII_IOT_ENVIRONMENT_DEPENDENT_
 #define _KII_IOT_ENVIRONMENT_DEPENDENT_
 
@@ -8,8 +14,9 @@ extern "C" {
 #include <kii_socket_callback.h>
 #include <kii_task_callback.h>
 
-/** Callback for connecting socket to HTTP or HTTPS server.
- * Applications must implement this callback in the target enviroment.
+/** Function to connect socket to HTTP or HTTPS server.
+ * Kii IoT ThingSDK requirest to implement this function in each
+ * target environment.
  *
  * @param [in] socket_context context object.
  * @param [in] host host name.
@@ -24,8 +31,9 @@ kii_socket_code_t http_connect(
         const char* host,
         unsigned int port);
 
-/** Callback for sending data to HTTP or HTTPS server.
- * Applications must implement this callback in the target enviroment.
+/** Function to send data to HTTP or HTTPS server.
+ * Kii IoT ThingSDK requirest to implement this function in each
+ * target environment.
  *
  * @param [in] socket_context context object.
  * @param [in] buffer data to send server.
@@ -35,15 +43,16 @@ kii_socket_code_t http_connect(
  * return KII_SOCKETC_OK. If connection is failed. applications need
  * to return KII_SOCKETC__FAIL. If applications don't want to send
  * data, applications need to return KII_SOCKETC_AGAIN. In this case,
- * KiiThingSDK Embedded Core pass same data to this callback again.
+ * Kii IoT ThingSDK pass same data to this function again.
  */
 kii_socket_code_t http_send(
         kii_socket_context_t* socket_context,
         const char* buffer,
         size_t length);
 
-/** Callback for receiving data from HTTP or HTTPS server.
- * Applications must implement this callback in the target enviroment.
+/** Function for receive data from HTTP or HTTPS server.
+ * Kii IoT ThingSDK requirest to implement this function in each
+ * target environment.
  *
  * @param [in] socket_context context object.
  * @param [out] buffer buffer to set receiving data.
@@ -63,8 +72,9 @@ kii_socket_code_t http_recv(
         size_t length_to_read,
         size_t* out_actual_length);
 
-/** Callback for closing HTTP or HTTPS socket.
- * Applications must implement this callback in the target enviroment.
+/** Function to close HTTP or HTTPS socket.
+ * Kii IoT ThingSDK requirest to implement this function in each
+ * target environment.
  *
  * @param [in] socket_context context object.
  *
@@ -77,8 +87,9 @@ kii_socket_code_t http_recv(
 kii_socket_code_t http_close(
         kii_socket_context_t* socket_context);
 
-/** Callback for connecting MQTT socket to server.
- * Applications must implement this callback in the target enviroment.
+/** Function for connect MQTT socket to server.
+ * Kii IoT ThingSDK requirest to implement this function in each
+ * target environment.
  *
  * @param [in] socket_context context object.
  * @param [in] host host name.
@@ -93,8 +104,9 @@ kii_socket_code_t mqtt_connect(
         const char* host,
         unsigned int port);
 
-/** Callback for sending MQTT data to server.
- * Applications must implement this callback in the target enviroment.
+/** Function to send MQTT data to server.
+ * Kii IoT ThingSDK requirest to implement this function in each
+ * target environment.
  *
  * @param [in] socket_context context object.
  * @param [in] buffer data to send server.
@@ -104,15 +116,16 @@ kii_socket_code_t mqtt_connect(
  * return KII_SOCKETC_OK. If connection is failed. applications need
  * to return KII_SOCKETC__FAIL. If applications don't want to send
  * data, applications need to return KII_SOCKETC_AGAIN. In this case,
- * KiiThingSDK Embedded Core pass same data to this callback again.
+ * Kii IoT ThingSDK pass same data to this function again.
  */
 kii_socket_code_t mqtt_send(
         kii_socket_context_t* socket_context,
         const char* buffer,
         size_t length);
 
-/** Callback for receiving MQTT data from server.
- * Applications must implement this callback in the target enviroment.
+/** Function to receive MQTT data from server.
+ * Kii IoT ThingSDK requirest to implement this function in each
+ * target environment.
  *
  * @param [in] socket_context context object.
  * @param [out] buffer buffer to set receiving data.
@@ -132,8 +145,9 @@ kii_socket_code_t mqtt_recv(
         size_t length_to_read,
         size_t* out_actual_length);
 
-/** Callback for closing MQTT socket.
- * Applications must implement this callback in the target enviroment.
+/** Function to close MQTT socket.
+ * Kii IoT ThingSDK requirest to implement this function in each
+ * target environment.
  *
  * @param [in] socket_context context object.
  *
@@ -145,8 +159,9 @@ kii_socket_code_t mqtt_recv(
  */
 kii_socket_code_t mqtt_close(kii_socket_context_t* socket_context);
 
-/** Callback for creating task.
- * Applications must implement this callback in the target enviroment.
+/** Function to create task.
+ * Kii IoT ThingSDK requirest to implement this function in each
+ * target environment.
  *
  * @param [in] name name of task.
  * @param [in] entry entry of task.
@@ -164,15 +179,17 @@ kii_task_code_t task_create(
         unsigned int stk_size,
         unsigned int priority);
 
-/** Callback for delaying task.
- * Applications must implement this callback in the target enviroment.
+/** Function to delay task.
+ * Kii IoT ThingSDK requirest to implement this function in each
+ * target environment.
  *
  * @param[in] msec millisecond to delay.
  */
 void delay_ms(unsigned int msec);
 
-/** Callback for logging kii iot.
- * Applications must implement this callback in the target enviroment.
+/** Function to log kii iot.
+ * Kii IoT ThingSDK requirest to implement this function in each
+ * target environment.
  *
  * @param [in] format outputted string format.
  */
