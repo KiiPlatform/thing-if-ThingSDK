@@ -1,5 +1,5 @@
 #include "kii_iot.h"
-#include "kii_iot_callbacks.h"
+#include "kii_iot_environment_dependent.h"
 
 #include <kii.h>
 

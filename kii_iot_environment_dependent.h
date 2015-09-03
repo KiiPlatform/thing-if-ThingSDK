@@ -1,5 +1,5 @@
-#ifndef _KII_IOT_CALLBACKS_
-#define _KII_IOT_CALLBACKS_
+#ifndef _KII_IOT_ENVIRONMENT_DEPENDENT_
+#define _KII_IOT_ENVIRONMENT_DEPENDENT_
 
 #ifdef __cplusplus
 extern "C" {
@@ -182,4 +182,4 @@ void logger(const char* format, ...);
 }
 #endif
 
-#endif /* _KII_IOT_CALLBACKS_ */
+#endif /* _KII_IOT_ENVIRONMENT_DEPENDENT_ */
