@@ -157,26 +157,32 @@ static kii_bool_t prv_init_kii_iot(
     kii_iot->state_updater.app_context = (void*)kii_iot;
 
     /* setup command handler callbacks. */
-    kii_iot->command_handler.kii_core.http_context.connect_cb = http_connect;
-    kii_iot->command_handler.kii_core.http_context.send_cb = http_send;
-    kii_iot->command_handler.kii_core.http_context.recv_cb = http_recv;
-    kii_iot->command_handler.kii_core.http_context.close_cb = http_close;
-    kii_iot->command_handler.mqtt_socket_connect_cb = mqtt_connect;
-    kii_iot->command_handler.mqtt_socket_send_cb = mqtt_send;
-    kii_iot->command_handler.mqtt_socket_recv_cb = mqtt_recv;
-    kii_iot->command_handler.mqtt_socket_close_cb = mqtt_close;
-    kii_iot->command_handler.task_create_cb = task_create;
-    kii_iot->command_handler.delay_ms_cb = delay_ms;
-    kii_iot->command_handler.kii_core.logger_cb = logger;
+    kii_iot->command_handler.kii_core.http_context.connect_cb =
+        socket_connect_cb_impl;
+    kii_iot->command_handler.kii_core.http_context.send_cb =
+        socket_send_cb_impl;
+    kii_iot->command_handler.kii_core.http_context.recv_cb =
+        socket_recv_cb_impl;
+    kii_iot->command_handler.kii_core.http_context.close_cb =
+        socket_close_cb_impl;
+    kii_iot->command_handler.mqtt_socket_connect_cb = mqtt_connect_cb_impl;
+    kii_iot->command_handler.mqtt_socket_send_cb = mqtt_send_cb_impl;
+    kii_iot->command_handler.mqtt_socket_recv_cb = mqtt_recv_cb_impl;
+    kii_iot->command_handler.mqtt_socket_close_cb = mqtt_close_cb_impl;
+    kii_iot->command_handler.task_create_cb = task_create_cb_impl;
+    kii_iot->command_handler.delay_ms_cb = delay_ms_cb_impl;
+    kii_iot->command_handler.kii_core.logger_cb = logger_cb_impl;
 
     /* setup state updater callbacks. */
-    kii_iot->state_updater.kii_core.http_context.connect_cb = http_connect;
-    kii_iot->state_updater.kii_core.http_context.send_cb = http_send;
-    kii_iot->state_updater.kii_core.http_context.recv_cb = http_recv;
-    kii_iot->state_updater.kii_core.http_context.close_cb = http_close;
-    kii_iot->state_updater.task_create_cb = task_create;
-    kii_iot->state_updater.delay_ms_cb = delay_ms;
-    kii_iot->state_updater.kii_core.logger_cb = logger;
+    kii_iot->state_updater.kii_core.http_context.connect_cb =
+        socket_connect_cb_impl;
+    kii_iot->state_updater.kii_core.http_context.send_cb = socket_send_cb_impl;
+    kii_iot->state_updater.kii_core.http_context.recv_cb = socket_recv_cb_impl;
+    kii_iot->state_updater.kii_core.http_context.close_cb =
+        socket_close_cb_impl;
+    kii_iot->state_updater.task_create_cb = task_create_cb_impl;
+    kii_iot->state_updater.delay_ms_cb = delay_ms_cb_impl;
+    kii_iot->state_updater.kii_core.logger_cb = logger_cb_impl;
 
     return KII_TRUE;
 }

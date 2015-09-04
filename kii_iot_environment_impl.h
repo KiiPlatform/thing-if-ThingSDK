@@ -26,7 +26,7 @@ extern "C" {
  * return KII_SOCKETC_FAIL. If applications want to pend returning
  * success or fail, applications need to return KII_SOCKETC_AGAIN.
  */
-kii_socket_code_t http_connect(
+kii_socket_code_t socket_connect_cb_impl(
         kii_socket_context_t* socket_context,
         const char* host,
         unsigned int port);
@@ -45,7 +45,7 @@ kii_socket_code_t http_connect(
  * data, applications need to return KII_SOCKETC_AGAIN. In this case,
  * Kii IoT ThingSDK pass same data to this function again.
  */
-kii_socket_code_t http_send(
+kii_socket_code_t socket_send_cb_impl(
         kii_socket_context_t* socket_context,
         const char* buffer,
         size_t length);
@@ -66,7 +66,7 @@ kii_socket_code_t http_send(
  * KII_HTTPC_AGAIN. In this case, applications must not set receving
  * data to buffer if some data is received.
  */
-kii_socket_code_t http_recv(
+kii_socket_code_t socket_recv_cb_impl(
         kii_socket_context_t* socket_context,
         char* buffer,
         size_t length_to_read,
@@ -84,7 +84,7 @@ kii_socket_code_t http_recv(
  * to pend returning success or fail, applications need to return
  * KII_SOCKETC_AGAIN.
  */
-kii_socket_code_t http_close(
+kii_socket_code_t socket_close_cb_impl(
         kii_socket_context_t* socket_context);
 
 /** Function for connect MQTT socket to server.
@@ -99,7 +99,7 @@ kii_socket_code_t http_close(
  * return KII_SOCKETC_FAIL. If applications want to pend returning
  * success or fail, applications need to return KII_SOCKETC_AGAIN.
  */
-kii_socket_code_t mqtt_connect(
+kii_socket_code_t mqtt_connect_cb_impl(
         kii_socket_context_t* socket_context,
         const char* host,
         unsigned int port);
@@ -118,7 +118,7 @@ kii_socket_code_t mqtt_connect(
  * data, applications need to return KII_SOCKETC_AGAIN. In this case,
  * Kii IoT ThingSDK pass same data to this function again.
  */
-kii_socket_code_t mqtt_send(
+kii_socket_code_t mqtt_send_cb_impl(
         kii_socket_context_t* socket_context,
         const char* buffer,
         size_t length);
@@ -139,7 +139,7 @@ kii_socket_code_t mqtt_send(
  * KII_HTTPC_AGAIN. In this case, applications must not set receving
  * data to buffer if some data is received.
  */
-kii_socket_code_t mqtt_recv(
+kii_socket_code_t mqtt_recv_cb_impl(
         kii_socket_context_t* socket_context,
         char* buffer,
         size_t length_to_read,
@@ -157,7 +157,7 @@ kii_socket_code_t mqtt_recv(
  * to pend returning success or fail, applications need to return
  * KII_SOCKETC_AGAIN.
  */
-kii_socket_code_t mqtt_close(kii_socket_context_t* socket_context);
+kii_socket_code_t mqtt_close_cb_impl(kii_socket_context_t* socket_context);
 
 /** Function to create task.
  * Kii IoT ThingSDK requirest to implement this function in each
@@ -171,7 +171,7 @@ kii_socket_code_t mqtt_close(kii_socket_context_t* socket_context);
  *
  * @return KII_TASKC_OK if succeed to create task. otherwise KII_TASKC_FAIL.
  */
-kii_task_code_t task_create(
+kii_task_code_t task_create_cb_impl(
         const char* name,
         KII_TASK_ENTRY entry,
         void* param,
@@ -185,7 +185,7 @@ kii_task_code_t task_create(
  *
  * @param[in] msec millisecond to delay.
  */
-void delay_ms(unsigned int msec);
+void delay_ms_cb_impl(unsigned int msec);
 
 /** Function to log kii iot.
  * Kii IoT ThingSDK requirest to implement this function in each
@@ -193,7 +193,7 @@ void delay_ms(unsigned int msec);
  *
  * @param [in] format outputted string format.
  */
-void logger(const char* format, ...);
+void logger_cb_impl(const char* format, ...);
 
 #ifdef __cplusplus
 }
