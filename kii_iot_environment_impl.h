@@ -14,9 +14,13 @@ extern "C" {
 #include <kii_socket_callback.h>
 #include <kii_task_callback.h>
 
-/** Function to connect socket to HTTP or HTTPS server.
- * Kii IoT ThingSDK requirest to implement this function in each
- * target environment.
+/** Implementation of callback to connect socket to HTTP or HTTPS
+ * server. Kii IoT ThingSDK requirest to implement this function in
+ * each target environment.
+ *
+ * This function is assigned to fields
+ * kii_t#kii_core_t#kii_http_context_t#kii_http_context_t#connect_cb
+ * of command handler and state updater.
  *
  * @param [in] socket_context context object.
  * @param [in] host host name.
@@ -31,14 +35,17 @@ kii_socket_code_t socket_connect_cb_impl(
         const char* host,
         unsigned int port);
 
-/** Function to send data to HTTP or HTTPS server.
+/** Implementation of callback to send data to HTTP or HTTPS server.
  * Kii IoT ThingSDK requirest to implement this function in each
  * target environment.
+ *
+ * This function is assigned to fields
+ * kii_t#kii_core_t#kii_http_context_t#kii_http_context_t#send_cb of
+ * command handler and state updater.
  *
  * @param [in] socket_context context object.
  * @param [in] buffer data to send server.
  * @param [in] length length of buffer.
-
  * @return If applications succeed to send data, applications need to
  * return KII_SOCKETC_OK. If connection is failed. applications need
  * to return KII_SOCKETC__FAIL. If applications don't want to send
@@ -50,9 +57,13 @@ kii_socket_code_t socket_send_cb_impl(
         const char* buffer,
         size_t length);
 
-/** Function for receive data from HTTP or HTTPS server.
+/** Implementation of callback for receive data from HTTP or HTTPS server.
  * Kii IoT ThingSDK requirest to implement this function in each
  * target environment.
+ *
+ * This function is assigned to fields
+ * kii_t#kii_core_t#kii_http_context_t#kii_http_context_t#recv_cb of
+ * command handler and state updater.
  *
  * @param [in] socket_context context object.
  * @param [out] buffer buffer to set receiving data.
@@ -72,9 +83,13 @@ kii_socket_code_t socket_recv_cb_impl(
         size_t length_to_read,
         size_t* out_actual_length);
 
-/** Function to close HTTP or HTTPS socket.
+/** Implementation of callback to close HTTP or HTTPS socket.
  * Kii IoT ThingSDK requirest to implement this function in each
  * target environment.
+ *
+ * This function is assigned to fields
+ * kii_t#kii_core_t#kii_http_context_t#kii_http_context_t#close_cb of
+ * command handler and state updater.
  *
  * @param [in] socket_context context object.
  *
@@ -87,9 +102,13 @@ kii_socket_code_t socket_recv_cb_impl(
 kii_socket_code_t socket_close_cb_impl(
         kii_socket_context_t* socket_context);
 
-/** Function for connect MQTT socket to server.
+/** Implementation of callback for connect MQTT socket to server.
  * Kii IoT ThingSDK requirest to implement this function in each
  * target environment.
+ *
+ * This function is assigned to a field
+ * kii_t#kii_core_t#kii_http_context_t#kii_http_context_t#mqtt_socket_connect_cb
+ * of command handler.
  *
  * @param [in] socket_context context object.
  * @param [in] host host name.
@@ -104,14 +123,18 @@ kii_socket_code_t mqtt_connect_cb_impl(
         const char* host,
         unsigned int port);
 
-/** Function to send MQTT data to server.
+/** Implementation of callback to send MQTT data to server.
  * Kii IoT ThingSDK requirest to implement this function in each
  * target environment.
+ *
+ * This function is assigned to a field
+ * kii_t#kii_core_t#kii_http_context_t#kii_http_context_t#mqtt_socket_send_cb
+ * of command handler.
  *
  * @param [in] socket_context context object.
  * @param [in] buffer data to send server.
  * @param [in] length length of buffer.
-
+ *
  * @return If applications succeed to send data, applications need to
  * return KII_SOCKETC_OK. If connection is failed. applications need
  * to return KII_SOCKETC__FAIL. If applications don't want to send
@@ -123,9 +146,13 @@ kii_socket_code_t mqtt_send_cb_impl(
         const char* buffer,
         size_t length);
 
-/** Function to receive MQTT data from server.
+/** Implementation of callback to receive MQTT data from server.
  * Kii IoT ThingSDK requirest to implement this function in each
  * target environment.
+ *
+ * This function is assigned to a field
+ * kii_t#kii_core_t#kii_http_context_t#kii_http_context_t#mqtt_socket_recv_cb
+ * of command handler.
  *
  * @param [in] socket_context context object.
  * @param [out] buffer buffer to set receiving data.
@@ -145,9 +172,13 @@ kii_socket_code_t mqtt_recv_cb_impl(
         size_t length_to_read,
         size_t* out_actual_length);
 
-/** Function to close MQTT socket.
+/** Implementation of callback to close MQTT socket.
  * Kii IoT ThingSDK requirest to implement this function in each
  * target environment.
+ *
+ * This function is assigned to a field
+ * kii_t#kii_core_t#kii_http_context_t#kii_http_context_t#mqtt_socket_close_cb
+ * of command handler.
  *
  * @param [in] socket_context context object.
  *
@@ -159,9 +190,13 @@ kii_socket_code_t mqtt_recv_cb_impl(
  */
 kii_socket_code_t mqtt_close_cb_impl(kii_socket_context_t* socket_context);
 
-/** Function to create task.
+/** Implementation of callback to create task.
  * Kii IoT ThingSDK requirest to implement this function in each
  * target environment.
+ *
+ * This function is assigned to fields
+ * kii_t#kii_core_t#kii_http_context_t#kii_http_context_t#task_create_cb
+ * of command handler and state updater.
  *
  * @param [in] name name of task.
  * @param [in] entry entry of task.
@@ -179,17 +214,24 @@ kii_task_code_t task_create_cb_impl(
         unsigned int stk_size,
         unsigned int priority);
 
-/** Function to delay task.
+/** Implementation of callback to delay task.
  * Kii IoT ThingSDK requirest to implement this function in each
  * target environment.
+ *
+ * This function is assigned to fields
+ * kii_t#kii_core_t#kii_http_context_t#kii_http_context_t#delay_ms_cb
+ * of command handler and state updater.
  *
  * @param[in] msec millisecond to delay.
  */
 void delay_ms_cb_impl(unsigned int msec);
 
-/** Function to log kii iot.
+/** Implementation of callback to log kii iot.
  * Kii IoT ThingSDK requirest to implement this function in each
  * target environment.
+ *
+ * This function is assigned to fields kii_t#kii_core_t#logger_cb of
+ * command handler and state updater.
  *
  * @param [in] format outputted string format.
  */
