@@ -1,5 +1,5 @@
 override CFLAGS += -std=gnu89 -Wall -pedantic -pthread -fPIC -shared
- 
+
 ifdef DEBUG
 	CFLAGS += -g -DDEBUG
 endif
@@ -24,7 +24,7 @@ linux: clean
  clean:
 	touch $(TARGET)
 	rm -rf $(TARGET) html latex
- 
+
 doc:
 	doxygen Doxyfile
 
