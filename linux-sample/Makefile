@@ -11,7 +11,7 @@ endif
 LIBS = -lssl -lcrypto -lpthread
 LD_FLAGS = -L..
 SOURCES = $(wildcard *.c)
-SOURCES += $(wildcard ../*.c)
+SOURCES += ../kii_iot.c ../kii_iot_environment_linux.c
 SOURCES += $(wildcard ../kii/Linux/kii_*.c)
 SOURCES += $(wildcard ../kii/kii-core/*.c)
 SOURCES += $(wildcard ../kii/kii-core/linux/kii_core*.c)
