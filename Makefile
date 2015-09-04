@@ -20,8 +20,8 @@ all: linux
 
 linux: clean
 	gcc $(CFLAGS) $(SOURCES) kii_iot_environment_linux.c $(LIBS) $(INCLUDES) -o $(TARGET)
- 
- clean:
+
+clean:
 	touch $(TARGET)
 	rm -rf $(TARGET) html latex
 
