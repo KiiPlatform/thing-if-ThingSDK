@@ -131,7 +131,7 @@ typedef struct kii_iot_state_updater_resource_t {
     /** HTTP request and response buffer size for state updater. */
     size_t buffer_size;
 
-    /** the period of updating state in milliseconds. */
+    /** the period of updating state in seconds. */
     int period;
 
     /** callback function to write thing state. */
@@ -143,7 +143,7 @@ typedef struct kii_iot_t {
     kii_t state_updater;
     KII_IOT_ACTION_HANDLER action_handler;
     KII_IOT_STATE_HANDLER state_handler;
-    /** Specify the period of updating state in milliseconds. */
+    /** Specify the period of updating state in seconds. */
     int state_update_period;
 } kii_iot_t;
 
