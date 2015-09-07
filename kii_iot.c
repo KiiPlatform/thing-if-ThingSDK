@@ -6,8 +6,8 @@
 #include <string.h>
 
 
-/* If your environment does not have assert, you must set NOASSERT define. */
-#ifdef NOASSERT
+/* If your environment does not have assert, you must set KII_IOT_NOASSERT define. */
+#ifdef KII_IOT_NOASSERT
   #define M_KII_IOT_ASSERT(s)
 #else
   #include <assert.h>
