@@ -661,7 +661,8 @@ static void* prv_update_status(void *sdata)
     strcat(resource_path, STATES_PART);
 
     while(1) {
-        kii->delay_ms_cb(((kii_iot_t*)kii->app_context)->state_update_period);
+        kii->delay_ms_cb(
+            ((kii_iot_t*)kii->app_context)->state_update_period * 1000);
 
         if (kii_api_call_start(kii, "PUT", resource_path, CONTENT_TYPE_JSON,
                         KII_TRUE) != 0) {
