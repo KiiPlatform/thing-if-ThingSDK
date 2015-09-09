@@ -29,7 +29,7 @@ Execute folloging command on a terminal. Hereafter This terminal
 called termianl A.
 
 ```sh
-# ./exampleapp
+# ./exampleapp --vendor-thing-id
 ```
 
 After that, open another terminal, and execute following command in

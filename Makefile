@@ -5,7 +5,7 @@ ifdef DEBUG
 endif
 
 LIBS = -lssl -lcrypto -lpthread
-SOURCES = $(wildcard *.c)
+SOURCES = kii_iot.c
 SOURCES += $(wildcard kii/Linux/kii_*.c)
 SOURCES += $(wildcard kii/kii-core/*.c)
 SOURCES += $(wildcard kii/kii-core/linux/kii_core*.c)
@@ -16,10 +16,10 @@ INCLUDES = -Ikii/kii-core -Ikii/kii-core/linux -Ikii/kii -Ikii/kii_json/include 
 
 TARGET = libkiiiotsdk.so
 
-all: clean $(TARGET)
+all: linux
 
-$(TARGET):
-	gcc $(CFLAGS) $(SOURCES) $(LIBS) $(INCLUDES) -o $@
+linux: clean
+	gcc $(CFLAGS) $(SOURCES) kii_iot_environment_linux.c $(LIBS) $(INCLUDES) -o $(TARGET)
 
 clean:
 	touch $(TARGET)

@@ -1,3 +1,5 @@
+#!/bin/sh
+
 APP_ID=00959619
 APP_KEY=1ae0bcded44365e4f83c2daa2f4ca237
 APP_HOST=api-development-jp.internal.kii.com
