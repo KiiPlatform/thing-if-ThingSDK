@@ -10,7 +10,7 @@
 
 const char EX_APP_ID[] = "00959619";
 const char EX_APP_KEY[] = "1ae0bcded44365e4f83c2daa2f4ca237";
-const char EX_APP_SITE[] = "54.65.208.49";/*"api-development-jp.internal.kii.com";*/
+const char EX_APP_SITE[] = "api-development-jp.internal.kii.com";
 
 const char EX_AUTH_VENDOR_ID[] = "464939";
 const char EX_AUTH_VENDOR_PASS[] = "1234";
