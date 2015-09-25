@@ -52,6 +52,7 @@ static kii_json_parse_result_t prv_kii_thing_if_json_read_object(
         sizeof(error_message) / sizeof(error_message[0]);
 
     kii_json.resource = &(kii->kii_json_resource);
+    kii_json.resource_cb = kii->kii_json_resource_cb;
     retval = kii_json_read_object(&kii_json, json_string, json_string_size,
                 fields);
 
