@@ -7,12 +7,12 @@
 #include <string.h>
 
 
-/* If your environment does not have assert, you must set KII_IOT_NOASSERT define. */
-#ifdef KII_IOT_NOASSERT
-  #define M_KII_IOT_ASSERT(s)
+/* If your environment does not have assert, you must set KII_THING_IF_NOASSERT define. */
+#ifdef KII_THING_IF_NOASSERT
+  #define M_KII_THING_IF_ASSERT(s)
 #else
   #include <assert.h>
-  #define M_KII_IOT_ASSERT(s) assert(s)
+  #define M_KII_THING_IF_ASSERT(s) assert(s)
 #endif
 
 #define EVAL(f, v) f(v)
@@ -23,7 +23,7 @@
 #define CONST_STRLEN(str) sizeof(str) - 1
 #define APP_PATH "api/apps"
 #define OAUTH_PATH "oauth2/token"
-#define IOT_APP_PATH "thing-if/apps/"
+#define THING_IF_APP_PATH "thing-if/apps/"
 #define ONBOARDING_PATH "/onboardings"
 #define TARGET_PART "/targets/thing:"
 #define COMMAND_PART "/commands/"
@@ -33,9 +33,9 @@
 #define CONTENT_TYPE_THING_ID "application/vnd.kii.OnboardingWithThingIDByThing+json"
 #define CONTENT_TYPE_JSON "application/json"
 
-static unsigned char mIotStateUpdate_taskStk[8];
+static unsigned char mThingIFStateUpdate_taskStk[8];
 
-static kii_json_parse_result_t prv_kii_iot_json_read_object(
+static kii_json_parse_result_t prv_kii_thing_if_json_read_object(
         kii_t* kii,
         const char* json_string,
         size_t json_string_size,
@@ -68,11 +68,11 @@ static kii_json_parse_result_t prv_kii_iot_json_read_object(
 }
 
 
-static int prv_iot_parse_onboarding_response(kii_t* kii)
+static int prv_thing_if_parse_onboarding_response(kii_t* kii)
 {
     kii_json_field_t fields[3];
 
-    M_KII_IOT_ASSERT(kii != NULL);
+    M_KII_THING_IF_ASSERT(kii != NULL);
 
     memset(fields, 0, sizeof(fields));
     fields[0].name = "thingID";
@@ -87,7 +87,7 @@ static int prv_iot_parse_onboarding_response(kii_t* kii)
             sizeof(kii->kii_core.author.access_token[0]);
     fields[2].name = NULL;
 
-    if (prv_kii_iot_json_read_object(kii, kii->kii_core.response_body,
+    if (prv_kii_thing_if_json_read_object(kii, kii->kii_core.response_body,
                     strlen(kii->kii_core.response_body), fields) !=
             KII_JSON_PARSE_SUCCESS) {
         return -1;
@@ -96,23 +96,23 @@ static int prv_iot_parse_onboarding_response(kii_t* kii)
     return 0;
 }
 
-static kii_bool_t prv_init_kii_iot(
-        kii_iot_t* kii_iot,
+static kii_bool_t prv_init_kii_thing_if(
+        kii_thing_if_t* kii_thing_if,
         const char* app_id,
         const char* app_key,
         const char* app_host,
-        kii_iot_command_handler_resource_t* command_handler_resource,
-        kii_iot_state_updater_resource_t* state_updater_resource,
+        kii_thing_if_command_handler_resource_t* command_handler_resource,
+        kii_thing_if_state_updater_resource_t* state_updater_resource,
         KII_JSON_RESOURCE_CB resource_cb)
 {
-    M_KII_IOT_ASSERT(kii_iot != NULL);
-    M_KII_IOT_ASSERT(app_id != NULL);
-    M_KII_IOT_ASSERT(app_key != NULL);
-    M_KII_IOT_ASSERT(app_host != NULL);
-    M_KII_IOT_ASSERT(command_handler_resource != NULL);
-    M_KII_IOT_ASSERT(state_updater_resource != NULL);
+    M_KII_THING_IF_ASSERT(kii_thing_if != NULL);
+    M_KII_THING_IF_ASSERT(app_id != NULL);
+    M_KII_THING_IF_ASSERT(app_key != NULL);
+    M_KII_THING_IF_ASSERT(app_host != NULL);
+    M_KII_THING_IF_ASSERT(command_handler_resource != NULL);
+    M_KII_THING_IF_ASSERT(state_updater_resource != NULL);
 
-    memset(kii_iot, 0x00, sizeof(kii_iot_t));
+    memset(kii_thing_if, 0x00, sizeof(kii_thing_if_t));
     memset(command_handler_resource->mqtt_buffer, 0x00,
             command_handler_resource->mqtt_buffer_size);
     memset(command_handler_resource->buffer, 0x00,
@@ -121,86 +121,86 @@ static kii_bool_t prv_init_kii_iot(
             state_updater_resource->buffer_size);
 
     /* Initialize command_handler */
-    if (kii_init(&kii_iot->command_handler, app_host, app_id, app_key) != 0) {
+    if (kii_init(&kii_thing_if->command_handler, app_host, app_id, app_key) != 0) {
         return KII_FALSE;
     }
-    kii_iot->command_handler.kii_core.http_context.buffer =
+    kii_thing_if->command_handler.kii_core.http_context.buffer =
         command_handler_resource->buffer;
-    kii_iot->command_handler.kii_core.http_context.buffer_size =
+    kii_thing_if->command_handler.kii_core.http_context.buffer_size =
         command_handler_resource->buffer_size;
 
-    kii_iot->command_handler.mqtt_buffer =
+    kii_thing_if->command_handler.mqtt_buffer =
         command_handler_resource->mqtt_buffer;
-    kii_iot->command_handler.mqtt_buffer_size =
+    kii_thing_if->command_handler.mqtt_buffer_size =
         command_handler_resource->mqtt_buffer_size;
 
-    kii_iot->command_handler.kii_json_resource_cb = resource_cb;
+    kii_thing_if->command_handler.kii_json_resource_cb = resource_cb;
 
-    kii_iot->action_handler = command_handler_resource->action_handler;
+    kii_thing_if->action_handler = command_handler_resource->action_handler;
 
-    kii_iot->command_handler.app_context = (void*)kii_iot;
+    kii_thing_if->command_handler.app_context = (void*)kii_thing_if;
 
     /* Initialize state_updater */
-    if (kii_init(&kii_iot->state_updater, app_host, app_id, app_key) != 0) {
+    if (kii_init(&kii_thing_if->state_updater, app_host, app_id, app_key) != 0) {
         return KII_FALSE;
     }
-    kii_iot->state_updater.kii_core.http_context.buffer =
+    kii_thing_if->state_updater.kii_core.http_context.buffer =
         state_updater_resource->buffer;
-    kii_iot->state_updater.kii_core.http_context.buffer_size =
+    kii_thing_if->state_updater.kii_core.http_context.buffer_size =
         state_updater_resource->buffer_size;
 
-    kii_iot->state_updater.kii_json_resource_cb = resource_cb;
+    kii_thing_if->state_updater.kii_json_resource_cb = resource_cb;
 
-    kii_iot->state_handler = state_updater_resource->state_handler;
-    kii_iot->state_update_period = state_updater_resource->period;
+    kii_thing_if->state_handler = state_updater_resource->state_handler;
+    kii_thing_if->state_update_period = state_updater_resource->period;
 
-    kii_iot->state_updater.app_context = (void*)kii_iot;
+    kii_thing_if->state_updater.app_context = (void*)kii_thing_if;
 
     /* setup command handler callbacks. */
-    kii_iot->command_handler.kii_core.http_context.connect_cb =
+    kii_thing_if->command_handler.kii_core.http_context.connect_cb =
         socket_connect_cb_impl;
-    kii_iot->command_handler.kii_core.http_context.send_cb =
+    kii_thing_if->command_handler.kii_core.http_context.send_cb =
         socket_send_cb_impl;
-    kii_iot->command_handler.kii_core.http_context.recv_cb =
+    kii_thing_if->command_handler.kii_core.http_context.recv_cb =
         socket_recv_cb_impl;
-    kii_iot->command_handler.kii_core.http_context.close_cb =
+    kii_thing_if->command_handler.kii_core.http_context.close_cb =
         socket_close_cb_impl;
-    kii_iot->command_handler.mqtt_socket_connect_cb = mqtt_connect_cb_impl;
-    kii_iot->command_handler.mqtt_socket_send_cb = mqtt_send_cb_impl;
-    kii_iot->command_handler.mqtt_socket_recv_cb = mqtt_recv_cb_impl;
-    kii_iot->command_handler.mqtt_socket_close_cb = mqtt_close_cb_impl;
-    kii_iot->command_handler.task_create_cb = task_create_cb_impl;
-    kii_iot->command_handler.delay_ms_cb = delay_ms_cb_impl;
-    kii_iot->command_handler.kii_core.logger_cb = logger_cb_impl;
+    kii_thing_if->command_handler.mqtt_socket_connect_cb = mqtt_connect_cb_impl;
+    kii_thing_if->command_handler.mqtt_socket_send_cb = mqtt_send_cb_impl;
+    kii_thing_if->command_handler.mqtt_socket_recv_cb = mqtt_recv_cb_impl;
+    kii_thing_if->command_handler.mqtt_socket_close_cb = mqtt_close_cb_impl;
+    kii_thing_if->command_handler.task_create_cb = task_create_cb_impl;
+    kii_thing_if->command_handler.delay_ms_cb = delay_ms_cb_impl;
+    kii_thing_if->command_handler.kii_core.logger_cb = logger_cb_impl;
 
     /* setup state updater callbacks. */
-    kii_iot->state_updater.kii_core.http_context.connect_cb =
+    kii_thing_if->state_updater.kii_core.http_context.connect_cb =
         socket_connect_cb_impl;
-    kii_iot->state_updater.kii_core.http_context.send_cb = socket_send_cb_impl;
-    kii_iot->state_updater.kii_core.http_context.recv_cb = socket_recv_cb_impl;
-    kii_iot->state_updater.kii_core.http_context.close_cb =
+    kii_thing_if->state_updater.kii_core.http_context.send_cb = socket_send_cb_impl;
+    kii_thing_if->state_updater.kii_core.http_context.recv_cb = socket_recv_cb_impl;
+    kii_thing_if->state_updater.kii_core.http_context.close_cb =
         socket_close_cb_impl;
-    kii_iot->state_updater.task_create_cb = task_create_cb_impl;
-    kii_iot->state_updater.delay_ms_cb = delay_ms_cb_impl;
-    kii_iot->state_updater.kii_core.logger_cb = logger_cb_impl;
+    kii_thing_if->state_updater.task_create_cb = task_create_cb_impl;
+    kii_thing_if->state_updater.delay_ms_cb = delay_ms_cb_impl;
+    kii_thing_if->state_updater.kii_core.logger_cb = logger_cb_impl;
 
     return KII_TRUE;
 }
 
-kii_bool_t init_kii_iot(
-        kii_iot_t* kii_iot,
+kii_bool_t init_kii_thing_if(
+        kii_thing_if_t* kii_thing_if,
         const char* app_id,
         const char* app_key,
         const char* app_host,
-        kii_iot_command_handler_resource_t* command_handler_resource,
-        kii_iot_state_updater_resource_t* state_updater_resource,
+        kii_thing_if_command_handler_resource_t* command_handler_resource,
+        kii_thing_if_state_updater_resource_t* state_updater_resource,
         KII_JSON_RESOURCE_CB resource_cb)
 {
-    return prv_init_kii_iot(kii_iot, app_id, app_key, app_host,
+    return prv_init_kii_thing_if(kii_thing_if, app_id, app_key, app_host,
             command_handler_resource, state_updater_resource, resource_cb);
 }
 
-static int prv_kii_iot_get_key_and_value_from_json(
+static int prv_kii_thing_if_get_key_and_value_from_json(
         kii_t* kii,
         const char* json_string,
         size_t json_string_len,
@@ -283,7 +283,7 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
     fields[4].type = KII_JSON_FIELD_TYPE_LONG;
     fields[5].path = NULL;
 
-    switch(prv_kii_iot_json_read_object(kii, buffer, buffer_size, fields)) {
+    switch(prv_kii_thing_if_json_read_object(kii, buffer, buffer_size, fields)) {
         case KII_JSON_PARSE_SUCCESS:
         case KII_JSON_PARSE_PARTIAL_SUCCESS:
             break;
@@ -294,7 +294,7 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
     }
 
     if (sizeof(resource_path) / sizeof(resource_path[0]) <=
-            CONST_STRLEN(IOT_APP_PATH) +
+            CONST_STRLEN(THING_IF_APP_PATH) +
             strlen(kii->kii_core.app_id) + CONST_STRLEN(TARGET_PART) +
             strlen(kii->kii_core.author.author_id) +
             CONST_STRLEN(COMMAND_PART) + (fields[2].end - fields[2].start - 1) +
@@ -305,7 +305,7 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
     }
 
     resource_path[0] = '\0';
-    strcat(resource_path, IOT_APP_PATH);
+    strcat(resource_path, THING_IF_APP_PATH);
     strcat(resource_path, kii->kii_core.app_id);
     strcat(resource_path, TARGET_PART);
     strcat(resource_path, kii->kii_core.author.author_id);
@@ -338,12 +338,12 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
     action[1].path = NULL;
     for (i = 0; action[0].result == KII_JSON_FIELD_PARSE_SUCCESS; ++i) {
         sprintf(index, "/[%lu]", i);
-        switch (prv_kii_iot_json_read_object(kii, actions_str, actions_len,
+        switch (prv_kii_thing_if_json_read_object(kii, actions_str, actions_len,
                         action)) {
             case KII_JSON_PARSE_SUCCESS:
             {
-                KII_IOT_ACTION_HANDLER handler =
-                    ((kii_iot_t*)kii->app_context)->action_handler;
+                KII_THING_IF_ACTION_HANDLER handler =
+                    ((kii_thing_if_t*)kii->app_context)->action_handler;
                 char* key;
                 char* value;
                 size_t key_len, value_len;
@@ -357,7 +357,7 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
                         return;
                     }
                 }
-                if (prv_kii_iot_get_key_and_value_from_json(kii,
+                if (prv_kii_thing_if_get_key_and_value_from_json(kii,
                             actions_str + action[0].start,
                             action[0].end - action[0].start, &key, &value,
                             &key_len, &value_len) != 0) {
@@ -449,12 +449,12 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
     return;
 }
 
-static int prv_kii_iot_get_anonymous_token(kii_t* kii)
+static int prv_kii_thing_if_get_anonymous_token(kii_t* kii)
 {
     char resource_path[64];
     kii_json_field_t fields[2];
 
-    M_KII_IOT_ASSERT(kii);
+    M_KII_THING_IF_ASSERT(kii);
 
     if (sizeof(resource_path) / sizeof(resource_path[0]) <=
             CONST_STRLEN(APP_PATH) + CONST_STRLEN("/") +
@@ -511,7 +511,7 @@ static int prv_kii_iot_get_anonymous_token(kii_t* kii)
             sizeof(kii->kii_core.author.access_token[0]);
     fields[1].path = NULL;
 
-    if (prv_kii_iot_json_read_object(kii, kii->kii_core.response_body,
+    if (prv_kii_thing_if_json_read_object(kii, kii->kii_core.response_body,
                     strlen(kii->kii_core.response_body), fields)
             != KII_JSON_PARSE_SUCCESS) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to parse received message.\n"));
@@ -530,19 +530,19 @@ static kii_bool_t prv_onboard_with_vendor_thing_id(
 {
     char resource_path[64];
 
-    if (prv_kii_iot_get_anonymous_token(kii) != 0) {
+    if (prv_kii_thing_if_get_anonymous_token(kii) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to get anonymous token.\n"));
         return KII_FALSE;
     }
 
     if (sizeof(resource_path) / sizeof(resource_path[0]) <=
-            CONST_STRLEN(IOT_APP_PATH) +
+            CONST_STRLEN(THING_IF_APP_PATH) +
             strlen(kii->kii_core.app_id) + CONST_STRLEN(ONBOARDING_PATH)) {
         M_KII_LOG(kii->kii_core.logger_cb(
                 "resource path is longer than expected.\n"));
         return KII_FALSE;
     }
-    sprintf(resource_path, "%s%s%s", IOT_APP_PATH, kii->kii_core.app_id,
+    sprintf(resource_path, "%s%s%s", THING_IF_APP_PATH, kii->kii_core.app_id,
             ONBOARDING_PATH);
 
     if (kii_api_call_start(kii, "POST", resource_path,
@@ -616,7 +616,7 @@ static kii_bool_t prv_onboard_with_vendor_thing_id(
         return KII_FALSE;
     }
 
-    if (prv_iot_parse_onboarding_response(kii) != 0) {
+    if (prv_thing_if_parse_onboarding_response(kii) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to parse resonse.\n"));
         return KII_FALSE;
     }
@@ -644,7 +644,7 @@ static void* prv_update_status(void *sdata)
     char resource_path[256];
 
     if (sizeof(resource_path) / sizeof(resource_path[0]) <=
-            CONST_STRLEN(IOT_APP_PATH) +
+            CONST_STRLEN(THING_IF_APP_PATH) +
             strlen(kii->kii_core.app_id) + CONST_STRLEN(TARGET_PART) +
             strlen(kii->kii_core.author.author_id) +
             CONST_STRLEN(STATES_PART)) {
@@ -654,7 +654,7 @@ static void* prv_update_status(void *sdata)
     }
 
     resource_path[0] = '\0';
-    strcat(resource_path, IOT_APP_PATH);
+    strcat(resource_path, THING_IF_APP_PATH);
     strcat(resource_path, kii->kii_core.app_id);
     strcat(resource_path, TARGET_PART);
     strcat(resource_path, kii->kii_core.author.author_id);
@@ -662,7 +662,7 @@ static void* prv_update_status(void *sdata)
 
     while(1) {
         kii->delay_ms_cb(
-            ((kii_iot_t*)kii->app_context)->state_update_period * 1000);
+            ((kii_thing_if_t*)kii->app_context)->state_update_period * 1000);
 
         if (kii_api_call_start(kii, "PUT", resource_path, CONTENT_TYPE_JSON,
                         KII_TRUE) != 0) {
@@ -670,7 +670,7 @@ static void* prv_update_status(void *sdata)
                     "fail to start api call.\n"));
             return NULL;
         }
-        if (((kii_iot_t*)kii->app_context)->state_handler(kii, prv_writer)
+        if (((kii_thing_if_t*)kii->app_context)->state_handler(kii, prv_writer)
                 == KII_FALSE) {
             M_KII_LOG(kii->kii_core.logger_cb(
                     "fail to start api call.\n"));
@@ -705,27 +705,28 @@ static kii_bool_t prv_set_author(
 }
 
 kii_bool_t onboard_with_vendor_thing_id(
-        kii_iot_t* kii_iot,
+        kii_thing_if_t* kii_thing_if,
         const char* vendor_thing_id,
         const char* password,
         const char* thing_type,
         const char* thing_properties)
 {
-    if (prv_onboard_with_vendor_thing_id(&kii_iot->command_handler,
+    if (prv_onboard_with_vendor_thing_id(&kii_thing_if->command_handler,
                     vendor_thing_id, password, thing_type,
                     thing_properties) == KII_FALSE) {
         return KII_FALSE;
     }
 
-    if (prv_set_author(&(kii_iot->state_updater.kii_core.author),
-                    kii_iot->command_handler.kii_core.author.author_id,
-                    kii_iot->command_handler.kii_core.author.access_token)
+    if (prv_set_author(&(kii_thing_if->state_updater.kii_core.author),
+                    kii_thing_if->command_handler.kii_core.author.author_id,
+                    kii_thing_if->command_handler.kii_core.author.access_token)
             == KII_FALSE) {
         return KII_FALSE;
     }
-    kii_iot->state_updater.task_create_cb(NULL,
-            prv_update_status, (void*)&kii_iot->state_updater,
-            (void*)mIotStateUpdate_taskStk, sizeof(mIotStateUpdate_taskStk), 1);
+    kii_thing_if->state_updater.task_create_cb(NULL,
+            prv_update_status, (void*)&kii_thing_if->state_updater,
+            (void*)mThingIFStateUpdate_taskStk,
+            sizeof(mThingIFStateUpdate_taskStk), 1);
 
     return KII_TRUE;
 }
@@ -737,19 +738,19 @@ static kii_bool_t prv_onboard_with_thing_id(
 {
     char resource_path[64];
 
-    if (prv_kii_iot_get_anonymous_token(kii) != 0) {
+    if (prv_kii_thing_if_get_anonymous_token(kii) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to get anonymous token.\n"));
         return KII_FALSE;
     }
 
     if (sizeof(resource_path) / sizeof(resource_path[0]) <=
-            CONST_STRLEN(IOT_APP_PATH) +
+            CONST_STRLEN(THING_IF_APP_PATH) +
             strlen(kii->kii_core.app_id) + CONST_STRLEN(ONBOARDING_PATH)) {
         M_KII_LOG(kii->kii_core.logger_cb(
                 "resource path is longer than expected.\n"));
         return KII_FALSE;
     }
-    sprintf(resource_path, "%s%s%s", IOT_APP_PATH, kii->kii_core.app_id,
+    sprintf(resource_path, "%s%s%s", THING_IF_APP_PATH, kii->kii_core.app_id,
             ONBOARDING_PATH);
 
     if (kii_api_call_start(kii, "POST", resource_path, CONTENT_TYPE_THING_ID,
@@ -786,7 +787,7 @@ static kii_bool_t prv_onboard_with_thing_id(
         return KII_FALSE;
     }
 
-    if (prv_iot_parse_onboarding_response(kii) != 0) {
+    if (prv_thing_if_parse_onboarding_response(kii) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to parse resonse.\n"));
         return KII_FALSE;
     }
@@ -799,64 +800,66 @@ static kii_bool_t prv_onboard_with_thing_id(
 }
 
 kii_bool_t onboard_with_thing_id(
-        kii_iot_t* kii_iot,
+        kii_thing_if_t* kii_thing_if,
         const char* thing_id,
         const char* password)
 {
-    if (prv_onboard_with_thing_id(&kii_iot->command_handler, thing_id,
+    if (prv_onboard_with_thing_id(&kii_thing_if->command_handler, thing_id,
                     password) == KII_FALSE) {
         return KII_FALSE;
     }
 
-    if (prv_set_author(&(kii_iot->state_updater.kii_core.author),
-                    kii_iot->command_handler.kii_core.author.author_id,
-                    kii_iot->command_handler.kii_core.author.access_token)
+    if (prv_set_author(&(kii_thing_if->state_updater.kii_core.author),
+                    kii_thing_if->command_handler.kii_core.author.author_id,
+                    kii_thing_if->command_handler.kii_core.author.access_token)
             == KII_FALSE) {
         return KII_FALSE;
     }
-    kii_iot->state_updater.task_create_cb(NULL,
-            prv_update_status, (void*)&kii_iot->state_updater,
-            (void*)mIotStateUpdate_taskStk, sizeof(mIotStateUpdate_taskStk), 1);
+    kii_thing_if->state_updater.task_create_cb(NULL,
+            prv_update_status, (void*)&kii_thing_if->state_updater,
+            (void*)mThingIFStateUpdate_taskStk,
+            sizeof(mThingIFStateUpdate_taskStk), 1);
 
     return KII_TRUE;
 
 }
 
-kii_bool_t init_kii_iot_with_onboarded_thing(
-        kii_iot_t* kii_iot,
+kii_bool_t init_kii_thing_if_with_onboarded_thing(
+        kii_thing_if_t* kii_thing_if,
         const char* app_id,
         const char* app_key,
         const char* app_host,
         const char* thing_id,
         const char* access_token,
-        kii_iot_command_handler_resource_t* command_handler_resource,
-        kii_iot_state_updater_resource_t* state_updater_resource,
+        kii_thing_if_command_handler_resource_t* command_handler_resource,
+        kii_thing_if_state_updater_resource_t* state_updater_resource,
         KII_JSON_RESOURCE_CB resource_cb)
 {
-    if (prv_init_kii_iot(kii_iot, app_id, app_key, app_host,
+    if (prv_init_kii_thing_if(kii_thing_if, app_id, app_key, app_host,
                     command_handler_resource, state_updater_resource,
                     resource_cb) == KII_FALSE) {
         return KII_FALSE;
     }
 
-    if (prv_set_author(&kii_iot->command_handler.kii_core.author,
+    if (prv_set_author(&kii_thing_if->command_handler.kii_core.author,
                     thing_id, access_token) == KII_FALSE) {
         return KII_FALSE;
     }
 
-    if (prv_set_author(&kii_iot->state_updater.kii_core.author,
+    if (prv_set_author(&kii_thing_if->state_updater.kii_core.author,
                     thing_id, access_token) == KII_FALSE) {
         return KII_FALSE;
     }
 
-    if (kii_push_start_routine(&kii_iot->command_handler, 0, 0,
+    if (kii_push_start_routine(&kii_thing_if->command_handler, 0, 0,
                     received_callback) != 0) {
         return KII_FALSE;
     }
 
-    kii_iot->state_updater.task_create_cb(NULL,
-            prv_update_status, (void*)&kii_iot->state_updater,
-            (void*)mIotStateUpdate_taskStk, sizeof(mIotStateUpdate_taskStk), 1);
+    kii_thing_if->state_updater.task_create_cb(NULL,
+            prv_update_status, (void*)&kii_thing_if->state_updater,
+            (void*)mThingIFStateUpdate_taskStk,
+            sizeof(mThingIFStateUpdate_taskStk), 1);
 
 
     return KII_TRUE;
