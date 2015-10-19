@@ -1,6 +1,6 @@
 #include "example.h"
 
-#include <kii_iot.h>
+#include <kii_thing_if.h>
 #include <kii_json.h>
 
 #include <string.h>
