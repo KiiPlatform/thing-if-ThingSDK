@@ -1,11 +1,11 @@
 /**
- * @file kii_iot_environment_dependent.h
- * @brief This is a file defining environment dependent functions. Kii
- * IoT ThingSDK requires to implement these functions in each target
+ * @file kii_thing_if_environment_dependent.h
+ * @brief This is a file defining environment dependent functions.
+ * this SDKrequires to implement these functions in each target
  * environment.
  */
-#ifndef _KII_IOT_ENVIRONMENT_DEPENDENT_
-#define _KII_IOT_ENVIRONMENT_DEPENDENT_
+#ifndef _KII_THING_IF_ENVIRONMENT_DEPENDENT_
+#define _KII_THING_IF_ENVIRONMENT_DEPENDENT_
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,7 +15,7 @@ extern "C" {
 #include <kii_task_callback.h>
 
 /** Implementation of callback to connect socket to HTTP or HTTPS
- * server. Kii IoT ThingSDK requirest to implement this function in
+ * server. this SDK requirest to implement this function in
  * each target environment.
  *
  * This function is assigned to fields
@@ -36,7 +36,7 @@ kii_socket_code_t socket_connect_cb_impl(
         unsigned int port);
 
 /** Implementation of callback to send data to HTTP or HTTPS server.
- * Kii IoT ThingSDK requirest to implement this function in each
+ * this SDK requirest to implement this function in each
  * target environment.
  *
  * This function is assigned to fields
@@ -50,7 +50,7 @@ kii_socket_code_t socket_connect_cb_impl(
  * return KII_SOCKETC_OK. If connection is failed. applications need
  * to return KII_SOCKETC__FAIL. If applications don't want to send
  * data, applications need to return KII_SOCKETC_AGAIN. In this case,
- * Kii IoT ThingSDK pass same data to this function again.
+ * this SDK pass same data to this function again.
  */
 kii_socket_code_t socket_send_cb_impl(
         kii_socket_context_t* socket_context,
@@ -58,7 +58,7 @@ kii_socket_code_t socket_send_cb_impl(
         size_t length);
 
 /** Implementation of callback for receive data from HTTP or HTTPS server.
- * Kii IoT ThingSDK requirest to implement this function in each
+ * this SDK requirest to implement this function in each
  * target environment.
  *
  * This function is assigned to fields
@@ -84,7 +84,7 @@ kii_socket_code_t socket_recv_cb_impl(
         size_t* out_actual_length);
 
 /** Implementation of callback to close HTTP or HTTPS socket.
- * Kii IoT ThingSDK requirest to implement this function in each
+ * this SDK requirest to implement this function in each
  * target environment.
  *
  * This function is assigned to fields
@@ -103,7 +103,7 @@ kii_socket_code_t socket_close_cb_impl(
         kii_socket_context_t* socket_context);
 
 /** Implementation of callback for connect MQTT socket to server.
- * Kii IoT ThingSDK requirest to implement this function in each
+ * this SDK requirest to implement this function in each
  * target environment.
  *
  * This function is assigned to a field
@@ -124,7 +124,7 @@ kii_socket_code_t mqtt_connect_cb_impl(
         unsigned int port);
 
 /** Implementation of callback to send MQTT data to server.
- * Kii IoT ThingSDK requirest to implement this function in each
+ * this SDK requirest to implement this function in each
  * target environment.
  *
  * This function is assigned to a field
@@ -139,7 +139,7 @@ kii_socket_code_t mqtt_connect_cb_impl(
  * return KII_SOCKETC_OK. If connection is failed. applications need
  * to return KII_SOCKETC__FAIL. If applications don't want to send
  * data, applications need to return KII_SOCKETC_AGAIN. In this case,
- * Kii IoT ThingSDK pass same data to this function again.
+ * this SDK pass same data to this function again.
  */
 kii_socket_code_t mqtt_send_cb_impl(
         kii_socket_context_t* socket_context,
@@ -147,7 +147,7 @@ kii_socket_code_t mqtt_send_cb_impl(
         size_t length);
 
 /** Implementation of callback to receive MQTT data from server.
- * Kii IoT ThingSDK requirest to implement this function in each
+ * this SDK requirest to implement this function in each
  * target environment.
  *
  * This function is assigned to a field
@@ -173,7 +173,7 @@ kii_socket_code_t mqtt_recv_cb_impl(
         size_t* out_actual_length);
 
 /** Implementation of callback to close MQTT socket.
- * Kii IoT ThingSDK requirest to implement this function in each
+ * this SDK requirest to implement this function in each
  * target environment.
  *
  * This function is assigned to a field
@@ -191,7 +191,7 @@ kii_socket_code_t mqtt_recv_cb_impl(
 kii_socket_code_t mqtt_close_cb_impl(kii_socket_context_t* socket_context);
 
 /** Implementation of callback to create task.
- * Kii IoT ThingSDK requirest to implement this function in each
+ * this SDK requirest to implement this function in each
  * target environment.
  *
  * This function is assigned to fields
@@ -215,7 +215,7 @@ kii_task_code_t task_create_cb_impl(
         unsigned int priority);
 
 /** Implementation of callback to delay task.
- * Kii IoT ThingSDK requirest to implement this function in each
+ * this SDK requirest to implement this function in each
  * target environment.
  *
  * This function is assigned to fields
@@ -226,8 +226,8 @@ kii_task_code_t task_create_cb_impl(
  */
 void delay_ms_cb_impl(unsigned int msec);
 
-/** Implementation of callback to log kii iot.
- * Kii IoT ThingSDK requirest to implement this function in each
+/** Implementation of callback to log this SDK.
+ * this SDK requirest to implement this function in each
  * target environment.
  *
  * This function is assigned to fields kii_t#kii_core_t#logger_cb of
@@ -241,4 +241,4 @@ void logger_cb_impl(const char* format, ...);
 }
 #endif
 
-#endif /* _KII_IOT_ENVIRONMENT_DEPENDENT_ */
+#endif /* _KII_THING_IF_ENVIRONMENT_DEPENDENT_ */
