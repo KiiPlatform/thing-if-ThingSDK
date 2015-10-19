@@ -1,4 +1,4 @@
-#include "kii_iot_environment_impl.h"
+#include "kii_thing_if_environment_impl.h"
 
 #include <kii_core_secure_socket.h>
 #include <kii_socket_impl.h>
