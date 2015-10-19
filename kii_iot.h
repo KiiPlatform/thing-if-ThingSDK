@@ -157,7 +157,7 @@ typedef struct kii_iot_t {
  * @param [in] kii_iot kii_iot_t object to be initialized.
  * @param [in] app_id the input of Application ID
  * @param [in] app_key the input of Application Key
- * @param [in] app_host host name. should be one of "CN", "JP", "US",
+ * @param [in] app_host host name. should be one of "CN", "CN3", "JP", "US",
  * "SG"
  * @param [in] command_handler_data data container for command handler.
  * @param [in] state_updater_data data container for state updater.
@@ -232,7 +232,7 @@ kii_bool_t onboard_with_thing_id(
  *
  * @param [in] app_id the input of Application ID
  * @param [in] app_key the input of Application Key
- * @param [in] app_host host name. should be one of "CN", "JP", "US",
+ * @param [in] app_host host name. should be one of "CN", "CN3", "JP", "US",
  * "SG"
  * @param [in] thing_id thing id given by a controller application
  * NonNull, NonEmpty value must be specified.
