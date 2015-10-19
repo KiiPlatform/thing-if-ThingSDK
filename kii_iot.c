@@ -23,7 +23,7 @@
 #define CONST_STRLEN(str) sizeof(str) - 1
 #define APP_PATH "api/apps"
 #define OAUTH_PATH "oauth2/token"
-#define IOT_APP_PATH "iot-api/apps/"
+#define IOT_APP_PATH "thing-if/apps/"
 #define ONBOARDING_PATH "/onboardings"
 #define TARGET_PART "/targets/thing:"
 #define COMMAND_PART "/commands/"

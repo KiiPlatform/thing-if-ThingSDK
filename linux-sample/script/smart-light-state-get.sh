@@ -11,7 +11,7 @@ ACCESS_TOKEN=4JPctYftnTzFgCwKWMZFuzcZ5v-JMEckI1_ynb6eFEg
 curl -v -X GET \
   -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -H "Content-Type: application/json" \
-  "https://${APP_HOST}/iot-api/apps/${APP_ID}/targets/THING:${THING_ID}/states"
+  "https://${APP_HOST}/thing-if/apps/${APP_ID}/targets/THING:${THING_ID}/states"
 
 
 

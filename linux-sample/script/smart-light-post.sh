@@ -10,6 +10,6 @@ USER_ID=53ae324be5a0-bea9-5e11-86a3-0e9cbafc
 curl -v -X POST \
   -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -H "Content-Type: application/json" \
-  "https://${APP_HOST}/iot-api/apps/${APP_ID}/targets/thing:${THING_ID}/commands" \
+  "https://${APP_HOST}/thing-if/apps/${APP_ID}/targets/thing:${THING_ID}/commands" \
   -d "{\"schemaVersion\":1,\"schema\":\"SmartLightDemo\",\"issuer\":\"user:${USER_ID}\",\"actions\":[{\"turnPower\":{\"power\":true}},{\"setBrightness\":{\"brightness\":3000}},{\"setColor\":{\"color\":[0,128,255]}},{\"setColorTemperature\":{\"colorTemperature\":-100}}]}"
 
