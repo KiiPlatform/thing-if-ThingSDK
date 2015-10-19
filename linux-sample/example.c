@@ -224,8 +224,8 @@ int main(int argc, char** argv)
             while (1) {}
             break;
         case 2:
-            init_kii_thing_if_with_onboarded_thing(&kii_thing_if, EX_APP_ID, EX_APP_KEY,
-                    EX_APP_SITE, EX_AUTH_THING_ID, EX_ACCESS_TOKEN,
+            init_kii_thing_if_with_onboarded_thing(&kii_thing_if, EX_APP_ID,
+                    EX_APP_KEY, EX_APP_SITE, EX_AUTH_THING_ID, EX_ACCESS_TOKEN,
                     &command_handler_resource, &state_updater_resource, NULL);
             while (1) {}
             break;

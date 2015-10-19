@@ -7,7 +7,8 @@
 #include <string.h>
 
 
-/* If your environment does not have assert, you must set KII_THING_IF_NOASSERT define. */
+/* If your environment does not have assert, you must set
+   KII_THING_IF_NOASSERT define. */
 #ifdef KII_THING_IF_NOASSERT
   #define M_KII_THING_IF_ASSERT(s)
 #else
@@ -121,7 +122,8 @@ static kii_bool_t prv_init_kii_thing_if(
             state_updater_resource->buffer_size);
 
     /* Initialize command_handler */
-    if (kii_init(&kii_thing_if->command_handler, app_host, app_id, app_key) != 0) {
+    if (kii_init(
+            &kii_thing_if->command_handler, app_host, app_id, app_key) != 0) {
         return KII_FALSE;
     }
     kii_thing_if->command_handler.kii_core.http_context.buffer =
@@ -141,7 +143,8 @@ static kii_bool_t prv_init_kii_thing_if(
     kii_thing_if->command_handler.app_context = (void*)kii_thing_if;
 
     /* Initialize state_updater */
-    if (kii_init(&kii_thing_if->state_updater, app_host, app_id, app_key) != 0) {
+    if (kii_init(
+            &kii_thing_if->state_updater, app_host, app_id, app_key) != 0) {
         return KII_FALSE;
     }
     kii_thing_if->state_updater.kii_core.http_context.buffer =
@@ -176,8 +179,10 @@ static kii_bool_t prv_init_kii_thing_if(
     /* setup state updater callbacks. */
     kii_thing_if->state_updater.kii_core.http_context.connect_cb =
         socket_connect_cb_impl;
-    kii_thing_if->state_updater.kii_core.http_context.send_cb = socket_send_cb_impl;
-    kii_thing_if->state_updater.kii_core.http_context.recv_cb = socket_recv_cb_impl;
+    kii_thing_if->state_updater.kii_core.http_context.send_cb =
+        socket_send_cb_impl;
+    kii_thing_if->state_updater.kii_core.http_context.recv_cb =
+        socket_recv_cb_impl;
     kii_thing_if->state_updater.kii_core.http_context.close_cb =
         socket_close_cb_impl;
     kii_thing_if->state_updater.task_create_cb = task_create_cb_impl;
@@ -283,7 +288,8 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
     fields[4].type = KII_JSON_FIELD_TYPE_LONG;
     fields[5].path = NULL;
 
-    switch(prv_kii_thing_if_json_read_object(kii, buffer, buffer_size, fields)) {
+    switch(prv_kii_thing_if_json_read_object(
+            kii, buffer, buffer_size, fields)) {
         case KII_JSON_PARSE_SUCCESS:
         case KII_JSON_PARSE_PARTIAL_SUCCESS:
             break;
