@@ -1,5 +1,5 @@
-# Thing-IF SDK
-Thing SDK for Kii Thing-IF Cloud.<br>
+# thing-if SDK
+Thing SDK for Kii thing-if Cloud.<br>
 The service is under development.<br>
 Documentation will be available after the service is ready.
 

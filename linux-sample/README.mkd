@@ -1,9 +1,9 @@
-This is a sample application for Thing-IF SDK.
+This is a sample application for thing-if SDK.
 
 ## Build
 
 When you build this sample application for the first time, you need to
-retrieve some modules required by Thing-IF SDK. You can find the
+retrieve some modules required by thing-if SDK. You can find the
 way to retrieve these modules in ../README.mkd.
 
 After that, execute following command:
