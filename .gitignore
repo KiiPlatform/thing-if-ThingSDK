@@ -1,3 +1,4 @@
 *~
 linux-sample/exampleapp
-*libkiiiotsdk.so
+*.so
+*.dSYM
