@@ -18,7 +18,7 @@ If you want to build exampleapp with debug mode. Execute following
 command:
 
 ```sh
-# make "CFLAGS+=-DDEBUG"
+# make DEBUG=1
 ```
 
 In debug mode, All HTTP requests and responses are logged.
