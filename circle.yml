@@ -1,6 +1,6 @@
 general:
   artifacts:
-    - "target"
+    - "doc"
 
 checkout:
   post:
@@ -16,4 +16,3 @@ dependencies:
 test:
   pre:
     - make
-    - make doc
