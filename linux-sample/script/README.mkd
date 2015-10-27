@@ -1,0 +1,21 @@
+## How to use
+
+### Setup thing and owner.
+1. Edit setup.sh
+Go to https://developer.kii.com and create app for you.
+replace APP_ID, APP_KEY, APP_HOST value with yours.
+Create thing in develoer console and replace THING_ID value with yours.
+Remember your thing password. it will be used later.
+
+2. execute setup.sh
+```sh
+source setup.sh
+```
+To export environment variables, use source command instead of sh for later script execution.
+
+3. execute owner.sh
+Go to https://developer.kii.com and create user for test.
+```sh
+source owner.sh -u {username} -p {user-password} -t {thing-password}
+```
+To export environment variables, use source command instead of sh as well.
