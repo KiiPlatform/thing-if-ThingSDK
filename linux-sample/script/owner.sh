@@ -2,7 +2,7 @@
 
 usage_exit() {
   echo "Usage: $0 [-u username] [-p password] [-t thing-password]" 1>&2
-  exit 1
+  return 1 2>/dev/null || exit 1
 }
 
 while getopts u:p:t:h OPT
@@ -33,7 +33,6 @@ if [ -z "$THING_PASSWORD" ]; then
   echo No thing password specified
   usage_exit
 fi
-
 
 curl -v -X POST \
   -H "content-type: application/json" \
