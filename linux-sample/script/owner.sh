@@ -21,6 +21,20 @@ do
   esac
 done
 
+if [ -z "$USERNAME" ]; then
+  echo No username specified
+  usage_exit
+fi
+if [ -z "$PASSWORD" ]; then
+  echo No password specified
+  usage_exit
+fi
+if [ -z "$THING_PASSWORD" ]; then
+  echo No thing password specified
+  usage_exit
+fi
+
+
 curl -v -X POST \
   -H "content-type: application/json" \
   -H "x-kii-appid: ${APP_ID}" \
