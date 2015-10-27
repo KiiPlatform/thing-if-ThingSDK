@@ -19,3 +19,28 @@ Go to https://developer.kii.com and create user for test.
 source owner.sh -u {username} -p {user-password} -t {thing-password}
 ```
 To export environment variables, use source command instead of sh as well.
+
+### Execute Command, Get Status.
+After finished Setup, you can execute following scripts.
+
+#### Execute Command
+After finished Setup, you can execute following scripts.
+```sh
+sh smart-light-command-post.sh
+```
+
+#### List Command
+```sh
+sh smart-light-command-get.sh
+```
+
+#### Get Command with ID
+```sh
+sh smart-light-command-get.sh -c {command-id}
+```
+
+#### Get Thing State
+```sh
+sh smart-light-state-get.sh
+```
+
