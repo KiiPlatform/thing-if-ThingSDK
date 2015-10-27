@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <getopt.h>
+#include <stdlib.h>
 
 typedef struct prv_smartlight_t {
     kii_json_boolean_t power;
@@ -177,22 +178,31 @@ static kii_bool_t state_handler(
     }
 }
 
+static void print_help() {
+    printf("sub commands: [onboard|onboard-with-token]\n\n");
+    printf("to see detail usage of sub command, execute ./exampleapp {subcommand} --help\n\n");
+
+    printf("onboard with vendor-thing-id\n");
+    printf("./exampleapp onboard --vendor-thing-id={vendor thing id} --password={password}\n\n");
+
+    printf("onboard with thing-id\n");
+    printf("./exampleapp onboard --thing-id={vendor thing id} --password={password}\n\n");
+
+    printf("onboard-with-token.\n");
+    printf("./exampleapp onboard-with-token --thing-id={thing id} --access-token={access token}\n\n");
+    printf("to configure app to use, edit example.h\n\n");
+}
+
 int main(int argc, char** argv)
 {
+    char* subc = argv[1];
     kii_thing_if_command_handler_resource_t command_handler_resource;
     kii_thing_if_state_updater_resource_t state_updater_resource;
     char command_handler_buff[EX_COMMAND_HANDLER_BUFF_SIZE];
     char state_updater_buff[EX_STATE_UPDATER_BUFF_SIZE];
     char mqtt_buff[EX_MQTT_BUFF_SIZE];
     kii_thing_if_t kii_thing_if;
-    int option_index = 0;
-    struct option long_options[] = {
-        {"vendor-thing-id", no_argument, NULL, 0},
-        {"thing-id", no_argument, NULL, 1},
-        {"onboarded", no_argument, NULL, 2},
-        {"help", no_argument, NULL, 3},
-        {0, 0, 0, 0}
-    };
+    kii_bool_t result;
 
     command_handler_resource.buffer = command_handler_buff;
     command_handler_resource.buffer_size =
@@ -208,39 +218,142 @@ int main(int argc, char** argv)
     state_updater_resource.period = EX_STATE_UPDATE_PERIOD;
     state_updater_resource.state_handler = state_handler;
 
-    switch (getopt_long(argc, argv, "", long_options, &option_index)) {
-        case 0:
-            init_kii_thing_if(&kii_thing_if, EX_APP_ID, EX_APP_KEY, EX_APP_SITE,
-                    &command_handler_resource, &state_updater_resource, NULL);
-            onboard_with_vendor_thing_id(&kii_thing_if, EX_AUTH_VENDOR_ID,
-                    EX_AUTH_VENDOR_PASS, NULL, NULL);
-            while (1) {}
-            break;
-        case 1:
-            init_kii_thing_if(&kii_thing_if, EX_APP_ID, EX_APP_KEY, EX_APP_SITE,
-                    &command_handler_resource, &state_updater_resource, NULL);
-            onboard_with_thing_id(&kii_thing_if, EX_AUTH_THING_ID,
-                    EX_AUTH_VENDOR_PASS);
-            while (1) {}
-            break;
-        case 2:
-            init_kii_thing_if_with_onboarded_thing(&kii_thing_if, EX_APP_ID,
-                    EX_APP_KEY, EX_APP_SITE, EX_AUTH_THING_ID, EX_ACCESS_TOKEN,
-                    &command_handler_resource, &state_updater_resource, NULL);
-            while (1) {}
-            break;
-        case 3:
-            printf("to configure parameters, edit example.h\n\n");
-            printf("commands: \n");
-            printf("--vendor-thing-id\n onboard to thing_if cloud with vendor thing ID.\n");
-            printf("--thing-id\n onboard to thing if cloud with thing ID.\n");
-            printf("--onboarded\n join to onboarded thing if cloud with thing ID and access token.\n");
-            printf("--help\n show this help.\n");
-            break;
-        default:
-            printf("unknown option: %s\n", argv[1]);
-            break;
+    if (argc < 2) {
+        printf("too few arguments.\n");
+        print_help();
+        exit(1);
     }
 
-    return 0;
+    // Parse command.
+    if (strcmp(subc, "onboard-with-token") == 0) {
+        char* thingID = NULL;
+        char* accessToken = NULL;
+        while(1) {
+            struct option longOptions[] = {
+                {"thing-id", required_argument, 0, 0},
+                {"access-token", required_argument, 0, 1},
+                {"help", no_argument, 0, 2},
+                {0, 0, 0, 0}
+            };
+            int optIndex = 0;
+            int c = getopt_long(argc, argv, "", longOptions, &optIndex);
+            const char* optName = longOptions[optIndex].name;
+            if (c == -1) {
+                if (thingID == NULL) {
+                    printf("thing-id is not specified.\n");
+                    exit(1);
+                }
+                if (accessToken == NULL) {
+                    printf("access-token is not specifeid.\n");
+                    exit(1);
+                }
+                // Initialize with token.
+                result = init_kii_thing_if_with_onboarded_thing(&kii_thing_if, EX_APP_ID,
+                                EX_APP_KEY, EX_APP_SITE, thingID, accessToken,
+                                &command_handler_resource, &state_updater_resource, NULL);
+                if (result == KII_FALSE) {
+                    printf("failed to onboard with token.\n");
+                    exit(1);
+                }
+                printf("program successfully started!\n");
+                break;
+            }
+            printf("option %s : %s\n", optName, optarg);
+            switch(c) {
+                case 0:
+                    thingID = optarg;
+                    break;
+                case 1:
+                    accessToken = optarg;
+                    break;
+                case 3:
+                    printf("usage: \n");
+                    printf("onboard-with-token --thing-id={ID of the thing} --access-token={access token of the thing} or\n");
+                    break;
+                default:
+                    printf("unexpected usage.\n");
+            }
+            if (strcmp(optName, "help") == 0) {
+                break;
+            }
+        }
+    } else if (strcmp(subc, "onboard") == 0) {
+        char* vendorThingID = NULL;
+        char* thingID = NULL;
+        char* password = NULL;
+        while(1) {
+            struct option longOptions[] = {
+                {"vendor-thing-id", required_argument, 0, 0},
+                {"thing-id", required_argument, 0, 1},
+                {"password", required_argument, 0, 2},
+                {"help", no_argument, 0, 3},
+                {0, 0, 0, 0}
+            };
+            int optIndex = 0;
+            int c = getopt_long(argc, argv, "", longOptions, &optIndex);
+            const char* optName = longOptions[optIndex].name;
+            if (c == -1) {
+                if (vendorThingID == NULL && thingID == NULL) {
+                    printf("neither vendor-thing-id and thing-id are specified.\n");
+                    exit(1);
+                }
+                if (password == NULL) {
+                    printf("password is not specifeid.\n");
+                    exit(1);
+                }
+                if (vendorThingID != NULL && thingID != NULL) {
+                    printf("both vendor-thing-id and thing-id is specified.  either of one should be specified.\n");
+                    exit(1);
+                }
+                printf("program successfully started!\n");
+                result = init_kii_thing_if(&kii_thing_if, EX_APP_ID, EX_APP_KEY, EX_APP_SITE,
+                        &command_handler_resource, &state_updater_resource, NULL);
+                if (result == KII_FALSE) {
+                    printf("failed to onboard.\n");
+                    exit(1);
+                }
+                if (vendorThingID != NULL) {
+                    result = onboard_with_vendor_thing_id(&kii_thing_if, vendorThingID,
+                            password, NULL, NULL);
+                } else {
+                    result = onboard_with_thing_id(&kii_thing_if, thingID,
+                            password);
+                }
+                if (result == KII_FALSE) {
+                    printf("failed to onboard.\n");
+                    exit(1);
+                }
+                break;
+            }
+            printf("option %s : %s\n", optName, optarg);
+            switch(c) {
+                case 0:
+                    vendorThingID = optarg;
+                    break;
+                case 1:
+                    thingID = optarg;
+                    break;
+                case 2:
+                    password = optarg;
+                    break;
+                case 3:
+                    printf("usage: \n");
+                    printf("onboard --thing-id={ID of the thing} --password={password of the thing} or\n");
+                    printf("onboard --vendor-thing-id={ID of the thing} --password={password of the thing} or\n");
+                    break;
+                default:
+                    printf("unexpected usage.\n");
+            }
+            if (strcmp(optName, "help") == 0) {
+                break;
+            }
+        }
+    } else {
+        print_help();
+        exit(0);
+    }
+    while(1){}; // run forever.
 }
+
+/* vim: set ts=4 sts=4 sw=4 et fenc=utf-8 ff=unix: */
+
