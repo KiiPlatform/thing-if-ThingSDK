@@ -1,18 +1,23 @@
 #!/bin/sh
 
-APP_ID=00959619
-APP_KEY=1ae0bcded44365e4f83c2daa2f4ca237
-APP_HOST=api-development-jp.internal.kii.com
-THING_ID=th.53ae324be5a0-4908-5e11-a427-010b4f79
-ACCESS_TOKEN=4JPctYftnTzFgCwKWMZFuzcZ5v-JMEckI1_ynb6eFEg
-USER_ID=53ae324be5a0-bea9-5e11-86a3-0e9cbafc
-COMMAND_ID=$1
+usage_exit() {
+  echo "Usage: $0 [-c commandID] [-t thingID]" 1>&2
+  exit 1
+}
 
-if test $# -ne 1
-    then
-    echo "command id is required."
-    exit
-fi
+while getopts c:t:h OPT
+do
+  case $OPT in
+    c) COMMAND_ID=$OPTARG
+      ;;
+    t) THING_ID=$OPTARG
+      ;;
+    h) usage_exit
+      ;;
+    \?) usage_exit
+      ;;
+  esac
+done
 
 curl -v -X GET \
   -H "Authorization: Bearer ${ACCESS_TOKEN}" \
