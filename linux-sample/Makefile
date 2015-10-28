@@ -1,12 +1,7 @@
-override CFLAGS += -std=gnu89 -Wall -pedantic -pthread -DKII_JSON_FIXED_TOKEN_NUM=256
 ifdef DEBUG
 CFLAGS += -g -DDEBUG
 endif
-
-THINGIFSDKPARAM =
-ifdef DEBUG
-THINGIFSDKPARAM += DEBUG=1
-endif
+CFLAGS += -std=gnu89 -Wall -pedantic -pthread -DKII_JSON_FIXED_TOKEN_NUM=256
 
 LIBS = -lssl -lcrypto -lpthread
 LD_FLAGS = -L..

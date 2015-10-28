@@ -1,4 +1,4 @@
-override CFLAGS += -std=gnu89 -Wall -pedantic -pthread -fPIC -shared
+CFLAGS += -std=gnu89 -Wall -pedantic -pthread -fPIC -shared
 
 ifdef DEBUG
 	CFLAGS += -g -DDEBUG
@@ -16,16 +16,16 @@ INCLUDES = -Ikii/kii-core -Ikii/kii-core/linux -Ikii/kii -Ikii/kii_json/include 
 
 TARGET = libkiithingifsdk.so
 
-all: linux
+all: linux doc
 
 linux: clean
 	gcc $(CFLAGS) $(SOURCES) kii_thing_if_environment_linux.c $(LIBS) $(INCLUDES) -o $(TARGET)
 
 clean:
 	touch $(TARGET)
-	rm -rf $(TARGET) html latex
+	rm -rf $(TARGET) doc
 
 doc:
 	doxygen Doxyfile
 
-.PHONY: clean
+.PHONY: clean doc

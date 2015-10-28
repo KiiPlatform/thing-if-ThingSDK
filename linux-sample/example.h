@@ -5,15 +5,14 @@
 extern 'C' {
 #endif
 
-const char EX_APP_ID[] = "00959619";
-const char EX_APP_KEY[] = "1ae0bcded44365e4f83c2daa2f4ca237";
-const char EX_APP_SITE[] = "api-development-jp.internal.kii.com";
-
-const char EX_AUTH_VENDOR_ID[] = "464940";
-const char EX_AUTH_VENDOR_PASS[] = "1234";
-
-const char EX_AUTH_THING_ID[] = "th.53ae324be5a0-4908-5e11-a427-010b4f79";
-const char EX_ACCESS_TOKEN[] = "4JPctYftnTzFgCwKWMZFuzcZ5v-JMEckI1_ynb6eFEg";
+/* Go to https:/developer.kii.com and create app for you! */
+const char EX_APP_ID[] = "b8d819c8";
+const char EX_APP_KEY[] = "bff3bfdc1e3fcf6818919144330a0770";
+/* JP: "api-jp.kii.com" */
+/* US: "api.kii.com" */
+/* SG: "api-sg.kii.com" */
+/* CN: "api-cn3.kii.com" */
+const char EX_APP_SITE[] = "api-jp.kii.com";
 
 #define EX_COMMAND_HANDLER_BUFF_SIZE 4096
 #define EX_STATE_UPDATER_BUFF_SIZE 4096

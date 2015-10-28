@@ -18,25 +18,35 @@ If you want to build exampleapp with debug mode. Execute following
 command:
 
 ```sh
-# make "CFLAGS+=-DDEBUG"
+# make DEBUG=1
 ```
 
 In debug mode, All HTTP requests and responses are logged.
 
 ## How to use
+Go to https://developer.kii.com and create app for you.
+replace EX_APP_ID, EX_APP_KEY, EX_APP_SITE with yours.
 
 Execute folloging command on a terminal. Hereafter This terminal
 called termianl A.
 
 ```sh
-# ./exampleapp --vendor-thing-id
+# ./exampleapp onboard --vendor-thing-id={vendor-thing-id} --password={password}
 ```
+
+After succeeded, go to https://developer.kii.com and check Thing Console.
+There should be a thing created with specified vendor thing ID in the command above.
+Please note thing id displayed here.
 
 After that, open another terminal, and execute following command in
 the another terminal. Hereafter This terminal called termianl B.
-
 ```sh
-sh script/smart-light-post.sh
+cd script
+```
+Please open README.mkd and follow the instruciton of Setup section.
+After the setup, execute
+```sh
+sh script/smart-light-command-post.sh
 ```
 
 This script posts new command entry to server. exampleapp receives the
@@ -49,7 +59,7 @@ schema=SmartLightDemo, schema_version=1, action name=setColor, action params={"c
 schema=SmartLightDemo, schema_version=1, action name=setColorTemperature, action params={"colorTemperature":-100}
 ```
 
-If you want to check command state, you can use `script/smart-light-get.sh`.
+If you want to check command state, you can use `script/smart-light-command-get.sh`.
 
 ```sh
 sh script/smart-light-get.sh {COMMAND_ID}
