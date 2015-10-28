@@ -3,3 +3,4 @@ linux-sample/exampleapp
 *.so
 *.dSYM
 doc
+.DS_Store
