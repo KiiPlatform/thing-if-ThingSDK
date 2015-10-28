@@ -390,8 +390,8 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
                                 "request size overflowed.\n"));
                         return;
                     }
-                    if (kii_api_call_append_body(kii, "\":{\"result\":true}}",
-                                    sizeof("\":{\"result\":true}}") - 1) != 0) {
+                    if (kii_api_call_append_body(kii, "\":{\"succeeded\":true}}",
+                                    sizeof("\":{\"succeeded\":true}}") - 1) != 0) {
                         M_KII_LOG(kii->kii_core.logger_cb(
                                 "request size overflowed.\n"));
                         return;
@@ -409,8 +409,8 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
                         return;
                     }
                     if (kii_api_call_append_body(kii,
-                                    "\":{\"result\":false}, \"errorMessage\":\"",
-                                    sizeof("\":{\"result\":false}, \"errorMessage\":\"") - 1)
+                                    "\":{\"succeeded\":false}, \"errorMessage\":\"",
+                                    sizeof("\":{\"succeeded\":false}, \"errorMessage\":\"") - 1)
                             != 0) {
                         M_KII_LOG(kii->kii_core.logger_cb(
                                 "request size overflowed.\n"));
