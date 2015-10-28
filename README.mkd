@@ -1,9 +1,7 @@
-# thing-if SDK
-Thing SDK for Kii thing-if Cloud.<br>
-The service is under development.<br>
-Documentation will be available after the service is ready.
+# Kii thing-if SDK for Thing
+Thing SDK for Kii Thing Interaction Framework (kii thing-if) .<br>
 
-## Build
+## Retrieve submodules.
 
 When you build this SDK for the first time, you need to
 execute following commands:
@@ -17,11 +15,25 @@ execute following commands:
 # cd ../
 ```
 
-These commands retrieve required modules for this SDK. After
-that, execute following command:
+These commands retrieve required modules for this SDK.
+
+## Build
 
 ```sh
 # make
 ```
 
 This makes libkiithingifsdk.so.
+
+## Debug Build
+```sh
+# make DEBUG=1
+```
+In the Debug build, Debug log is enabled.
+
+## How to use
+After the build finished, API Documentation is created under ./doc/html/index.html
+
+## Sample
+linux-sample shows how to implement the client application works in the Thing.
+
