@@ -23,9 +23,9 @@ linux: clean
 
 clean:
 	touch $(TARGET)
-	rm -rf $(TARGET) html latex
+	rm -rf $(TARGET) doc
 
 doc:
 	doxygen Doxyfile
 
-.PHONY: clean
+.PHONY: clean doc
