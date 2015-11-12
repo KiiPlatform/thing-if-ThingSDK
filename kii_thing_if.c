@@ -35,8 +35,7 @@
 #define CONTENT_TYPE_JSON "application/json"
 
 static unsigned char mThingIFStateUpdate_taskStk[8];
-static unsigned char mThingIFTimer_taskStk[8];
-static kii_bool_t mThingIFDoUpdate;
+static kii_bool_t mThingIFImmediateUpdate;
 
 static kii_json_parse_result_t prv_kii_thing_if_json_read_object(
         kii_t* kii,
@@ -454,7 +453,7 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
         return;
     }
 
-    mThingIFDoUpdate = KII_TRUE;
+    mThingIFImmediateUpdate = KII_TRUE;
     return;
 }
 
@@ -528,116 +527,6 @@ static int prv_kii_thing_if_get_anonymous_token(kii_t* kii)
     }
 
     return 0;
-}
-
-static kii_bool_t prv_writer(kii_t* kii, const char* buff)
-{
-    if (kii_api_call_append_body(kii, buff, strlen(buff)) != 0) {
-        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
-        return KII_FALSE;
-    }
-    return KII_TRUE;
-}
-
-static void* prv_update_status(void *sdata)
-{
-    kii_t* kii = (kii_t*)sdata;
-    char resource_path[256];
-
-    if (sizeof(resource_path) / sizeof(resource_path[0]) <=
-            CONST_STRLEN(THING_IF_APP_PATH) +
-            strlen(kii->kii_core.app_id) + CONST_STRLEN(TARGET_PART) +
-            strlen(kii->kii_core.author.author_id) +
-            CONST_STRLEN(STATES_PART)) {
-        M_KII_LOG(kii->kii_core.logger_cb(
-                "resource path is longer than expected.\n"));
-        return NULL;
-    }
-
-    resource_path[0] = '\0';
-    strcat(resource_path, THING_IF_APP_PATH);
-    strcat(resource_path, kii->kii_core.app_id);
-    strcat(resource_path, TARGET_PART);
-    strcat(resource_path, kii->kii_core.author.author_id);
-    strcat(resource_path, STATES_PART);
-
-    while(1) {
-        kii->delay_ms_cb(1);
-        if (mThingIFDoUpdate == KII_FALSE) {
-            continue;
-        }
-        mThingIFDoUpdate = KII_FALSE;
-
-        if (kii_api_call_start(kii, "PUT", resource_path, CONTENT_TYPE_JSON,
-                        KII_TRUE) != 0) {
-            M_KII_LOG(kii->kii_core.logger_cb(
-                    "fail to start api call.\n"));
-            return NULL;
-        }
-        if (((kii_thing_if_t*)kii->app_context)->state_handler(kii, prv_writer)
-                == KII_FALSE) {
-            M_KII_LOG(kii->kii_core.logger_cb(
-                    "fail to start api call.\n"));
-            return NULL;
-        }
-        if (kii_api_call_run(kii) != 0) {
-            M_KII_LOG(kii->kii_core.logger_cb("fail to run api.\n"));
-            return NULL;
-        }
-    }
-}
-
-static void* prv_update_timer(void *sdata)
-{
-    kii_t* kii = (kii_t*)sdata;
-
-    while(1) {
-        kii->delay_ms_cb(
-            ((kii_thing_if_t*)kii->app_context)->state_update_period * 1000);
-        mThingIFDoUpdate = KII_TRUE;
-    }
-}
-
-static kii_bool_t prv_set_author(
-        kii_author_t* author,
-        const char* thing_id,
-        const char* access_token)
-{
-    if (sizeof(author->author_id) / sizeof(author->author_id[0]) <=
-            strlen(thing_id)) {
-        return KII_FALSE;
-    }
-    if (sizeof(author->access_token) / sizeof(author->access_token[0]) <=
-            strlen(access_token)) {
-        return KII_FALSE;
-    }
-
-    strncpy(author->author_id, thing_id,
-            sizeof(author->author_id) / sizeof(author->author_id[0]));
-    strncpy(author->access_token, access_token,
-            sizeof(author->access_token) / sizeof(author->access_token[0]));
-    return KII_TRUE;
-}
-
-static kii_bool_t prv_init_state_updater(
-        kii_t* kii,
-        const char* thing_id,
-        const char* access_token)
-{
-    if (prv_set_author(&kii->kii_core.author, thing_id, access_token)
-            == KII_FALSE) {
-        return KII_FALSE;
-    }
-
-    kii->task_create_cb(NULL, prv_update_status, (void*)kii,
-            (void*)mThingIFStateUpdate_taskStk,
-            sizeof(mThingIFStateUpdate_taskStk), 1);
-
-    kii->task_create_cb(NULL, prv_update_timer, (void*)kii,
-            (void*)mThingIFTimer_taskStk, sizeof(mThingIFTimer_taskStk), 1);
-    mThingIFDoUpdate = KII_FALSE;
-
-    return KII_TRUE;
 }
 
 static kii_bool_t prv_onboard_with_vendor_thing_id(
@@ -744,6 +633,106 @@ static kii_bool_t prv_onboard_with_vendor_thing_id(
         M_KII_LOG(kii->kii_core.logger_cb("fail to start routine.\n"));
         return KII_FALSE;
     }
+
+    return KII_TRUE;
+}
+
+static kii_bool_t prv_writer(kii_t* kii, const char* buff)
+{
+    if (kii_api_call_append_body(kii, buff, strlen(buff)) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+        return KII_FALSE;
+    }
+    return KII_TRUE;
+}
+
+static void* prv_update_status(void *sdata)
+{
+    kii_t* kii = (kii_t*)sdata;
+    size_t period = 0;
+    char resource_path[256];
+
+    if (sizeof(resource_path) / sizeof(resource_path[0]) <=
+            CONST_STRLEN(THING_IF_APP_PATH) +
+            strlen(kii->kii_core.app_id) + CONST_STRLEN(TARGET_PART) +
+            strlen(kii->kii_core.author.author_id) +
+            CONST_STRLEN(STATES_PART)) {
+        M_KII_LOG(kii->kii_core.logger_cb(
+                "resource path is longer than expected.\n"));
+        return NULL;
+    }
+
+    resource_path[0] = '\0';
+    strcat(resource_path, THING_IF_APP_PATH);
+    strcat(resource_path, kii->kii_core.app_id);
+    strcat(resource_path, TARGET_PART);
+    strcat(resource_path, kii->kii_core.author.author_id);
+    strcat(resource_path, STATES_PART);
+
+    while(1) {
+        while (mThingIFImmediateUpdate == KII_FALSE && period <
+                ((kii_thing_if_t*)kii->app_context)->state_update_period) {
+            ++period;
+            kii->delay_ms_cb(1000);
+        }
+        period = 0;
+        mThingIFImmediateUpdate = KII_FALSE;
+
+        if (kii_api_call_start(kii, "PUT", resource_path, CONTENT_TYPE_JSON,
+                        KII_TRUE) != 0) {
+            M_KII_LOG(kii->kii_core.logger_cb(
+                    "fail to start api call.\n"));
+            return NULL;
+        }
+        if (((kii_thing_if_t*)kii->app_context)->state_handler(kii, prv_writer)
+                == KII_FALSE) {
+            M_KII_LOG(kii->kii_core.logger_cb(
+                    "fail to start api call.\n"));
+            return NULL;
+        }
+        if (kii_api_call_run(kii) != 0) {
+            M_KII_LOG(kii->kii_core.logger_cb("fail to run api.\n"));
+            return NULL;
+        }
+    }
+}
+
+static kii_bool_t prv_set_author(
+        kii_author_t* author,
+        const char* thing_id,
+        const char* access_token)
+{
+    if (sizeof(author->author_id) / sizeof(author->author_id[0]) <=
+            strlen(thing_id)) {
+        return KII_FALSE;
+    }
+    if (sizeof(author->access_token) / sizeof(author->access_token[0]) <=
+            strlen(access_token)) {
+        return KII_FALSE;
+    }
+
+    strncpy(author->author_id, thing_id,
+            sizeof(author->author_id) / sizeof(author->author_id[0]));
+    strncpy(author->access_token, access_token,
+            sizeof(author->access_token) / sizeof(author->access_token[0]));
+    return KII_TRUE;
+}
+
+static kii_bool_t prv_init_state_updater(
+        kii_t* kii,
+        const char* thing_id,
+        const char* access_token)
+{
+    if (prv_set_author(&kii->kii_core.author, thing_id, access_token)
+            == KII_FALSE) {
+        return KII_FALSE;
+    }
+
+    kii->task_create_cb(NULL, prv_update_status, (void*)kii,
+            (void*)mThingIFStateUpdate_taskStk,
+            sizeof(mThingIFStateUpdate_taskStk), 1);
+
+    mThingIFImmediateUpdate = KII_FALSE;
 
     return KII_TRUE;
 }
