@@ -670,12 +670,12 @@ static void* prv_update_status(void *sdata)
     strcat(resource_path, STATES_PART);
 
     while(1) {
-        while (mThingIFImmediateUpdate == KII_FALSE && period <
-                ((kii_thing_if_t*)kii->app_context)->state_update_period) {
-            ++period;
+        for (period = 0;
+             mThingIFImmediateUpdate == KII_FALSE && period <
+                 ((kii_thing_if_t*)kii->app_context)->state_update_period;
+             ++period) {
             kii->delay_ms_cb(1000);
         }
-        period = 0;
         mThingIFImmediateUpdate = KII_FALSE;
 
         if (kii_api_call_start(kii, "PUT", resource_path, CONTENT_TYPE_JSON,
