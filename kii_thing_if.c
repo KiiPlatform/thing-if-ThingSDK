@@ -7,6 +7,18 @@
 #include <string.h>
 
 
+/* thing-is ThingSDK checkes whether command is executed or not every
+   KII_THING_IF_COMMAND_CHECKING_PERIOD milliseconds. Default checking
+   time is 1000 milliseconds. You can change this period with define.
+ */
+#ifndef KII_THING_IF_COMMAND_CHECKING_PERIOD
+  #define KII_THING_IF_COMMAND_CHECKING_PERIOD 1000
+#endif
+
+#if KII_THING_IF_COMMAND_CHECKING_PERIOD <= 0
+  #error KII_THING_IF_COMMAND_CHECKING_PERIOD must be positive.
+#endif
+
 /* If your environment does not have assert, you must set
    KII_THING_IF_NOASSERT define. */
 #ifdef KII_THING_IF_NOASSERT
@@ -649,8 +661,14 @@ static kii_bool_t prv_writer(kii_t* kii, const char* buff)
 static void* prv_update_status(void *sdata)
 {
     kii_t* kii = (kii_t*)sdata;
+    size_t limit = 0;
     size_t period = 0;
     char resource_path[256];
+
+    limit = (size_t)(
+            (double)((((kii_thing_if_t*)kii->app_context)->state_update_period))
+                * ((double)1000 /
+                        (double)KII_THING_IF_COMMAND_CHECKING_PERIOD));
 
     if (sizeof(resource_path) / sizeof(resource_path[0]) <=
             CONST_STRLEN(THING_IF_APP_PATH) +
@@ -671,10 +689,9 @@ static void* prv_update_status(void *sdata)
 
     while(1) {
         for (period = 0;
-             mThingIFImmediateUpdate == KII_FALSE && period <
-                 ((kii_thing_if_t*)kii->app_context)->state_update_period;
-             ++period) {
-            kii->delay_ms_cb(1000);
+                 mThingIFImmediateUpdate == KII_FALSE && period < limit;
+                 ++period) {
+            kii->delay_ms_cb(KII_THING_IF_COMMAND_CHECKING_PERIOD);
         }
         mThingIFImmediateUpdate = KII_FALSE;
 
