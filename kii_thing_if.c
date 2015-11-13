@@ -280,21 +280,19 @@ static void prv_send_state(kii_t* kii, const char* buf) {
     strcat(resource_path, kii->kii_core.author.author_id);
     strcat(resource_path, STATES_PART);
 
-    while(1) {
-        if (kii_api_call_start(kii, "PUT", resource_path, CONTENT_TYPE_JSON,
-                        KII_TRUE) != 0) {
-            M_KII_LOG(kii->kii_core.logger_cb(
-                    "fail to start api call.\n"));
-            return;
-        }
-        if (kii_api_call_append_body(kii, buf, strlen(buf)) != 0) {
-            M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
-            return;
-        }
-        if (kii_api_call_run(kii) != 0) {
-            M_KII_LOG(kii->kii_core.logger_cb("fail to run api.\n"));
-            return;
-        }
+    if (kii_api_call_start(kii, "PUT", resource_path, CONTENT_TYPE_JSON,
+                    KII_TRUE) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb(
+                "fail to start api call.\n"));
+        return;
+    }
+    if (kii_api_call_append_body(kii, buf, strlen(buf)) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+        return;
+    }
+    if (kii_api_call_run(kii) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("fail to run api.\n"));
+        return;
     }
 
 }
@@ -311,7 +309,8 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
     char index2[ULONGBUFSIZE];
     size_t i = 0;
     char resource_path[256];
-    char* const* out_state = NULL;
+    char* state = NULL;
+    char** out_state = NULL;
 
     memset(fields, 0x00, sizeof(fields));
     fields[0].path = "/schema";
@@ -405,12 +404,11 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
                 size_t key_len, value_len;
                 char key_swap, value_swap;
                 char error[EMESSAGE_SIZE + 1];
-                kii_bool_t is_last = KII_FALSE;
                 sprintf(index2, "/[%lu]", i + 1);
                 if (prv_kii_thing_if_json_read_object(kii, actions_str,
                                 actions_len,
-                                check_next) != KII_JSON_PARSE_PARTIAL_SUCCESS) {
-                    is_last = KII_TRUE;
+                                check_next) == KII_JSON_PARSE_PARTIAL_SUCCESS) {
+                    out_state = &state;
                 }
                 if (i >= 1) {
                     if (kii_api_call_append_body(kii, ",", sizeof(",") - 1)
@@ -434,8 +432,8 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
                 value_swap = value[value_len];
                 key[key_len] = '\0';
                 value[value_len] = '\0';
-                if ((*handler)(schema, schema_version, key, value, is_last,
-                                out_state, error) != KII_FALSE) {
+                if ((*handler)(schema, schema_version, key, value, out_state,
+                                error) != KII_FALSE) {
                     if (kii_api_call_append_body(kii,
                                     "{\"", sizeof("{\"") - 1) != 0) {
                         M_KII_LOG(kii->kii_core.logger_cb(
@@ -509,7 +507,9 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
         return;
     }
 
-    if (*out_state != NULL) {
+    printf("HERE A: 1\n");
+    if (out_state != NULL) {
+        printf("HERE A: 2\n");
         prv_send_state(kii, *out_state);
     }
     return;
