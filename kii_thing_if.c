@@ -260,16 +260,58 @@ static int prv_kii_thing_if_get_key_and_value_from_json(
     }
 }
 
+static void prv_send_state(kii_t* kii, const char* buf) {
+    char resource_path[256];
+
+    if (sizeof(resource_path) / sizeof(resource_path[0]) <=
+            CONST_STRLEN(THING_IF_APP_PATH) +
+            strlen(kii->kii_core.app_id) + CONST_STRLEN(TARGET_PART) +
+            strlen(kii->kii_core.author.author_id) +
+            CONST_STRLEN(STATES_PART)) {
+        M_KII_LOG(kii->kii_core.logger_cb(
+                "resource path is longer than expected.\n"));
+        return;
+    }
+
+    resource_path[0] = '\0';
+    strcat(resource_path, THING_IF_APP_PATH);
+    strcat(resource_path, kii->kii_core.app_id);
+    strcat(resource_path, TARGET_PART);
+    strcat(resource_path, kii->kii_core.author.author_id);
+    strcat(resource_path, STATES_PART);
+
+    while(1) {
+        if (kii_api_call_start(kii, "PUT", resource_path, CONTENT_TYPE_JSON,
+                        KII_TRUE) != 0) {
+            M_KII_LOG(kii->kii_core.logger_cb(
+                    "fail to start api call.\n"));
+            return;
+        }
+        if (kii_api_call_append_body(kii, buf, strlen(buf)) != 0) {
+            M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+            return;
+        }
+        if (kii_api_call_run(kii) != 0) {
+            M_KII_LOG(kii->kii_core.logger_cb("fail to run api.\n"));
+            return;
+        }
+    }
+
+}
+
 static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
     kii_json_field_t fields[6];
     kii_json_field_t action[2];
+    kii_json_field_t check_next[2];
     const char* schema = NULL;
     int schema_version = 0;
     char* actions_str = NULL;
     size_t actions_len = 0;
     char index[ULONGBUFSIZE];
+    char index2[ULONGBUFSIZE];
     size_t i = 0;
     char resource_path[256];
+    char* const* out_state = NULL;
 
     memset(fields, 0x00, sizeof(fields));
     fields[0].path = "/schema";
@@ -342,6 +384,14 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
     action[0].field_copy.string = NULL;
     action[0].result = KII_JSON_FIELD_PARSE_SUCCESS;
     action[1].path = NULL;
+
+    memset(check_next, 0x00, sizeof(check_next));
+    check_next[0].path = index2;
+    check_next[0].type = KII_JSON_FIELD_TYPE_OBJECT;
+    check_next[0].field_copy.string = NULL;
+    check_next[0].result = KII_JSON_FIELD_PARSE_SUCCESS;
+    check_next[1].path = NULL;
+
     for (i = 0; action[0].result == KII_JSON_FIELD_PARSE_SUCCESS; ++i) {
         sprintf(index, "/[%lu]", i);
         switch (prv_kii_thing_if_json_read_object(kii, actions_str, actions_len,
@@ -355,6 +405,13 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
                 size_t key_len, value_len;
                 char key_swap, value_swap;
                 char error[EMESSAGE_SIZE + 1];
+                kii_bool_t is_last = KII_FALSE;
+                sprintf(index2, "/[%lu]", i + 1);
+                if (prv_kii_thing_if_json_read_object(kii, actions_str,
+                                actions_len,
+                                check_next) != KII_JSON_PARSE_PARTIAL_SUCCESS) {
+                    is_last = KII_TRUE;
+                }
                 if (i >= 1) {
                     if (kii_api_call_append_body(kii, ",", sizeof(",") - 1)
                             != 0) {
@@ -377,8 +434,8 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
                 value_swap = value[value_len];
                 key[key_len] = '\0';
                 value[value_len] = '\0';
-                if ((*handler)(schema, schema_version, key, value, error)
-                        != KII_FALSE) {
+                if ((*handler)(schema, schema_version, key, value, is_last,
+                                out_state, error) != KII_FALSE) {
                     if (kii_api_call_append_body(kii,
                                     "{\"", sizeof("{\"") - 1) != 0) {
                         M_KII_LOG(kii->kii_core.logger_cb(
@@ -452,6 +509,9 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
         return;
     }
 
+    if (*out_state != NULL) {
+        prv_send_state(kii, *out_state);
+    }
     return;
 }
 

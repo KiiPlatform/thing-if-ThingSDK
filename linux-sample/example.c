@@ -46,6 +46,8 @@ static kii_bool_t action_handler(
         int schema_version,
         const char* action_name,
         const char* action_params,
+        kii_bool_t is_last,
+        char* const* out_state,
         char error[EMESSAGE_SIZE + 1])
 {
     printf("schema=%s, schema_version=%d, action name=%s, action params=%s\n",
