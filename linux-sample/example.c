@@ -16,6 +16,7 @@ typedef struct prv_smartlight_t {
 } prv_smartlight_t;
 
 static prv_smartlight_t m_smartlight;
+static char message[100];
 
 static prv_json_read_object(
         const char* json,
@@ -46,8 +47,16 @@ static kii_bool_t action_handler(
         int schema_version,
         const char* action_name,
         const char* action_params,
+        char** out_state,
         char error[EMESSAGE_SIZE + 1])
 {
+    printf("HERE B:1\n");
+    if (out_state != NULL) {
+        strcpy(message, "{\"power\" : true,\"brightness\" : 200,\"color\" : [0, 2, 4],\"colorTemperature\" : 3000}");
+        *out_state = message;
+        printf("HERE B:2 %s\n", *out_state);
+    }
+
     printf("schema=%s, schema_version=%d, action name=%s, action params=%s\n",
             schema, schema_version, action_name, action_params);
 
@@ -122,6 +131,7 @@ static kii_bool_t action_handler(
         printf("invalid action: %s\n", action_name);
         return KII_FALSE;
     }
+
 }
 
 static kii_bool_t state_handler(

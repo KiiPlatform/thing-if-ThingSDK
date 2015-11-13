@@ -14,6 +14,11 @@ extern "C" {
  * @maram [in] schema_version version of schema.
  * @param [in] action_name name of the action.
  * @param [in] action_params json object represents parameter of this action.
+ * @param [out] state output devices state. This is not NULL if an
+ * action is the last action of a command, otherwise NULL.  thing-if
+ * ThingSDK does not manage memroy of this. If applications use heap
+ * memory, applications must free the memory at appropriate position
+ * and timing.  This string must be null terminated.
  * @param [out] error error message if operation is failed.(optional)
  * @return KII_TRUE if succeeded, otherwise KII_FALSE.
  */
@@ -23,6 +28,7 @@ typedef kii_bool_t
          int schema_version,
          const char* action_name,
          const char* action_params,
+         char** state,
          char error[EMESSAGE_SIZE + 1]);
 
 /** a function pointer to write thing state.
