@@ -7,6 +7,18 @@
 #include <string.h>
 
 
+/* thing-is ThingSDK checkes whether command is executed or not every
+   KII_THING_IF_COMMAND_CHECKING_PERIOD milliseconds. Default checking
+   time is 1000 milliseconds. You can change this period with define.
+ */
+#ifndef KII_THING_IF_COMMAND_CHECKING_PERIOD
+  #define KII_THING_IF_COMMAND_CHECKING_PERIOD 1000
+#endif
+
+#if KII_THING_IF_COMMAND_CHECKING_PERIOD <= 0
+  #error KII_THING_IF_COMMAND_CHECKING_PERIOD must be positive.
+#endif
+
 /* If your environment does not have assert, you must set
    KII_THING_IF_NOASSERT define. */
 #ifdef KII_THING_IF_NOASSERT
@@ -35,6 +47,7 @@
 #define CONTENT_TYPE_JSON "application/json"
 
 static unsigned char mThingIFStateUpdate_taskStk[8];
+static kii_bool_t mThingIFImmediateUpdate;
 
 static kii_json_parse_result_t prv_kii_thing_if_json_read_object(
         kii_t* kii,
@@ -452,6 +465,7 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
         return;
     }
 
+    mThingIFImmediateUpdate = KII_TRUE;
     return;
 }
 
@@ -647,7 +661,14 @@ static kii_bool_t prv_writer(kii_t* kii, const char* buff)
 static void* prv_update_status(void *sdata)
 {
     kii_t* kii = (kii_t*)sdata;
+    size_t limit = 0;
+    size_t period = 0;
     char resource_path[256];
+
+    limit = (size_t)(
+            (double)((((kii_thing_if_t*)kii->app_context)->state_update_period))
+                * ((double)1000 /
+                        (double)KII_THING_IF_COMMAND_CHECKING_PERIOD));
 
     if (sizeof(resource_path) / sizeof(resource_path[0]) <=
             CONST_STRLEN(THING_IF_APP_PATH) +
@@ -667,8 +688,12 @@ static void* prv_update_status(void *sdata)
     strcat(resource_path, STATES_PART);
 
     while(1) {
-        kii->delay_ms_cb(
-            ((kii_thing_if_t*)kii->app_context)->state_update_period * 1000);
+        for (period = 0;
+                 mThingIFImmediateUpdate == KII_FALSE && period < limit;
+                 ++period) {
+            kii->delay_ms_cb(KII_THING_IF_COMMAND_CHECKING_PERIOD);
+        }
+        mThingIFImmediateUpdate = KII_FALSE;
 
         if (kii_api_call_start(kii, "PUT", resource_path, CONTENT_TYPE_JSON,
                         KII_TRUE) != 0) {
@@ -710,6 +735,25 @@ static kii_bool_t prv_set_author(
     return KII_TRUE;
 }
 
+static kii_bool_t prv_init_state_updater(
+        kii_t* kii,
+        const char* thing_id,
+        const char* access_token)
+{
+    if (prv_set_author(&kii->kii_core.author, thing_id, access_token)
+            == KII_FALSE) {
+        return KII_FALSE;
+    }
+
+    kii->task_create_cb(NULL, prv_update_status, (void*)kii,
+            (void*)mThingIFStateUpdate_taskStk,
+            sizeof(mThingIFStateUpdate_taskStk), 1);
+
+    mThingIFImmediateUpdate = KII_FALSE;
+
+    return KII_TRUE;
+}
+
 kii_bool_t onboard_with_vendor_thing_id(
         kii_thing_if_t* kii_thing_if,
         const char* vendor_thing_id,
@@ -723,16 +767,12 @@ kii_bool_t onboard_with_vendor_thing_id(
         return KII_FALSE;
     }
 
-    if (prv_set_author(&(kii_thing_if->state_updater.kii_core.author),
+    if (prv_init_state_updater(&kii_thing_if->state_updater,
                     kii_thing_if->command_handler.kii_core.author.author_id,
                     kii_thing_if->command_handler.kii_core.author.access_token)
             == KII_FALSE) {
         return KII_FALSE;
     }
-    kii_thing_if->state_updater.task_create_cb(NULL,
-            prv_update_status, (void*)&kii_thing_if->state_updater,
-            (void*)mThingIFStateUpdate_taskStk,
-            sizeof(mThingIFStateUpdate_taskStk), 1);
 
     return KII_TRUE;
 }
@@ -815,16 +855,12 @@ kii_bool_t onboard_with_thing_id(
         return KII_FALSE;
     }
 
-    if (prv_set_author(&(kii_thing_if->state_updater.kii_core.author),
+    if (prv_init_state_updater(&kii_thing_if->state_updater,
                     kii_thing_if->command_handler.kii_core.author.author_id,
                     kii_thing_if->command_handler.kii_core.author.access_token)
             == KII_FALSE) {
         return KII_FALSE;
     }
-    kii_thing_if->state_updater.task_create_cb(NULL,
-            prv_update_status, (void*)&kii_thing_if->state_updater,
-            (void*)mThingIFStateUpdate_taskStk,
-            sizeof(mThingIFStateUpdate_taskStk), 1);
 
     return KII_TRUE;
 
@@ -852,21 +888,15 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
         return KII_FALSE;
     }
 
-    if (prv_set_author(&kii_thing_if->state_updater.kii_core.author,
-                    thing_id, access_token) == KII_FALSE) {
-        return KII_FALSE;
-    }
-
     if (kii_push_start_routine(&kii_thing_if->command_handler, 0, 0,
                     received_callback) != 0) {
         return KII_FALSE;
     }
 
-    kii_thing_if->state_updater.task_create_cb(NULL,
-            prv_update_status, (void*)&kii_thing_if->state_updater,
-            (void*)mThingIFStateUpdate_taskStk,
-            sizeof(mThingIFStateUpdate_taskStk), 1);
-
+    if (prv_init_state_updater(&kii_thing_if->state_updater, thing_id,
+                    access_token) == KII_FALSE) {
+        return KII_FALSE;
+    }
 
     return KII_TRUE;
 }
