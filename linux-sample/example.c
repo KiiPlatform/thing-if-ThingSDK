@@ -211,6 +211,7 @@ int main(int argc, char** argv)
     command_handler_resource.mqtt_buffer_size =
         sizeof(mqtt_buff) / sizeof(mqtt_buff[0]);
     command_handler_resource.action_handler = action_handler;
+    command_handler_resource.state_handler = state_handler;
 
     state_updater_resource.buffer = state_updater_buff;
     state_updater_resource.buffer_size =
