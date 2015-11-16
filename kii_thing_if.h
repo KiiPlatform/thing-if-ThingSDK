@@ -93,7 +93,7 @@ typedef kii_bool_t (*KII_THING_IF_WRITER)(kii_t* kii, const char* buff);
  *     }
  *     return KII_TRUE;
  * }
- * @code
+ * @endcode
  *
  * @param [in] kii state_updater object.
  * @param [in] writer writer to write thing state. implementation of
