@@ -105,7 +105,24 @@ typedef kii_bool_t
         (kii_t* kii,
          KII_THING_IF_WRITER writer);
 
-/** Resource for command handler. */
+/**
+ * Resource for command handler.
+ *
+ * kii_thing_if_command_handler_resource_t#action_handler and
+ * kii_thing_if_command_handler_resource_t#state_handler are executed
+ * on a same task, so these are executed sequentially. However,
+ * kii_thing_if_state_updater_resource_t#state_handler is executed on
+ * another task, so
+ * kii_thing_if_command_handler_resource_t#action_handler and
+ * kii_thing_if_command_handler_resource_t#state_handler are executed
+ * concurrently for
+ * kii_thing_if_state_updater_resource_t#state_handler.
+ *
+ * Your application may be required to synchronize
+ * kii_thing_if_command_handler_resource_t#action_handler and
+ * kii_thing_if_command_handler_resource_t#state_handler against
+ * kii_thing_if_state_updater_resource_t#state_handler.
+ */
 typedef struct kii_thing_if_command_handler_resource_t {
     /** HTTP request and response buffer for command handler. */
     char* buffer;
@@ -126,7 +143,24 @@ typedef struct kii_thing_if_command_handler_resource_t {
     KII_THING_IF_STATE_HANDLER state_handler;
 } kii_thing_if_command_handler_resource_t;
 
-/** Resource for state updater. */
+/**
+ * Resource for state updater.
+ *
+ * kii_thing_if_state_updater_resource_t#state_handler is executed on
+ * a task, so this is executed sequentially. However,
+ * kii_thing_if_command_handler_resource_t#action_handler and
+ * kii_thing_if_command_handler_resource_t#state_handler are executed
+ * on another same task, so
+ * kii_thing_if_state_updater_resource_t#state_handler is executed
+ * concurrently for
+ * kii_thing_if_command_handler_resource_t#action_handler and
+ * kii_thing_if_command_handler_resource_t#state_handler.
+ *
+ * Your application may be required to synchronize
+ * kii_thing_if_state_updater_resource_t#state_handler against
+ * kii_thing_if_command_handler_resource_t#action_handler and
+ * kii_thing_if_command_handler_resource_t#state_handler .
+ */
 typedef struct kii_thing_if_state_updater_resource_t {
     /** HTTP request and response buffer for state updater. */
     char* buffer;
