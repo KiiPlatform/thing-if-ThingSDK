@@ -121,6 +121,9 @@ typedef struct kii_thing_if_command_handler_resource_t {
 
     /** callback function to handle received action. */
     KII_THING_IF_ACTION_HANDLER action_handler;
+
+    /** callback function to write thing state after a command is completed. */
+    KII_THING_IF_STATE_HANDLER state_handler;
 } kii_thing_if_command_handler_resource_t;
 
 /** Resource for state updater. */
@@ -134,7 +137,7 @@ typedef struct kii_thing_if_state_updater_resource_t {
     /** the period of updating state in seconds. */
     int period;
 
-    /** callback function to write thing state. */
+    /** callback function to write thing state every period second. */
     KII_THING_IF_STATE_HANDLER state_handler;
 } kii_thing_if_state_updater_resource_t;
 
@@ -142,7 +145,8 @@ typedef struct kii_thing_if_t {
     kii_t command_handler;
     kii_t state_updater;
     KII_THING_IF_ACTION_HANDLER action_handler;
-    KII_THING_IF_STATE_HANDLER state_handler;
+    KII_THING_IF_STATE_HANDLER state_handler_for_period;
+    KII_THING_IF_STATE_HANDLER state_handler_for_command_completed;
     /** Specify the period of updating state in seconds. */
     int state_update_period;
 } kii_thing_if_t;
