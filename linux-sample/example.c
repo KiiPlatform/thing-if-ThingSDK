@@ -210,6 +210,10 @@ int main(int argc, char** argv)
     command_handler_resource.mqtt_buffer = mqtt_buff;
     command_handler_resource.mqtt_buffer_size =
         sizeof(mqtt_buff) / sizeof(mqtt_buff[0]);
+    /* NOTE: These action handler and state handler are thread safe
+       bacause this application does not share objects. If your
+       application shares objects, You must guarantee thread safe of
+       the objects by your application own. */
     command_handler_resource.action_handler = action_handler;
     command_handler_resource.state_handler = state_handler;
 
