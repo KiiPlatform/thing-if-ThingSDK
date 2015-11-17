@@ -210,7 +210,19 @@ int main(int argc, char** argv)
     command_handler_resource.mqtt_buffer = mqtt_buff;
     command_handler_resource.mqtt_buffer_size =
         sizeof(mqtt_buff) / sizeof(mqtt_buff[0]);
+    /*
+     * We don't implement mutual exclusion between the callback called by
+     * command handler and state handler.
+     * m_smartlight could be accessed concurrently.
+     * i.e. Periodic state_handler could upload the state on the way of the
+     * command execution and status change triggered by the command.
+     * If you want to ensure not uploading state on the way of the update by
+     * the command, please implemnt mutual exclusion between
+     * command_handler_resource.action_handler and
+     * state_updater_resource.state_handler.
+     */
     command_handler_resource.action_handler = action_handler;
+    command_handler_resource.state_handler = state_handler;
 
     state_updater_resource.buffer = state_updater_buff;
     state_updater_resource.buffer_size =

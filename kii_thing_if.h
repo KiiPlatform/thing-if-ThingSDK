@@ -93,7 +93,7 @@ typedef kii_bool_t (*KII_THING_IF_WRITER)(kii_t* kii, const char* buff);
  *     }
  *     return KII_TRUE;
  * }
- * @code
+ * @endcode
  *
  * @param [in] kii state_updater object.
  * @param [in] writer writer to write thing state. implementation of
@@ -105,7 +105,21 @@ typedef kii_bool_t
         (kii_t* kii,
          KII_THING_IF_WRITER writer);
 
-/** Resource for command handler. */
+/**
+ * Resource for command handler.
+ *
+ * Invocation of #action_handler and #state_handler callback inside this struct
+ * is serialized since they are called from the single task/thread.
+ *
+ * However, kii_thing_if_state_updater_resource_t#state_handler and callbacks
+ * inside this struct is invoked from different task/ thread.
+ * That means the invocation could be concurrent.
+ *
+ * If you share the resources(memory, file, etc.)
+ * among the callbacks called concurrently,
+ * be aware for it and avoid deadlock when you implement synchronization for
+ * the resources.
+ */
 typedef struct kii_thing_if_command_handler_resource_t {
     /** HTTP request and response buffer for command handler. */
     char* buffer;
@@ -121,9 +135,28 @@ typedef struct kii_thing_if_command_handler_resource_t {
 
     /** callback function to handle received action. */
     KII_THING_IF_ACTION_HANDLER action_handler;
+
+    /** callback function to write the thing state after a command is
+     * processed.
+     */
+    KII_THING_IF_STATE_HANDLER state_handler;
 } kii_thing_if_command_handler_resource_t;
 
-/** Resource for state updater. */
+/**
+ * Resource for state updater.
+ * Invocation of #state_handler callback inside this struct is serialized since
+ * it called from single task/thraed.
+ *
+ * However, #state_handler and callbacks inside
+ * kii_thing_if_command_handler_resource_t
+ * would be invoked from different task/thread.
+ * That means the invocation could be concurrent.
+ *
+ * If you share the resources(memory, file, etc.)
+ * among the callbacks called concurrently,
+ * be aware for it and avoid deadlock when you implement synchronization for
+ * the resources.
+ */
 typedef struct kii_thing_if_state_updater_resource_t {
     /** HTTP request and response buffer for state updater. */
     char* buffer;
@@ -134,7 +167,9 @@ typedef struct kii_thing_if_state_updater_resource_t {
     /** the period of updating state in seconds. */
     int period;
 
-    /** callback function to write thing state. */
+    /** callback function to write thing state.
+     * called in every #period.
+     */
     KII_THING_IF_STATE_HANDLER state_handler;
 } kii_thing_if_state_updater_resource_t;
 
@@ -142,7 +177,8 @@ typedef struct kii_thing_if_t {
     kii_t command_handler;
     kii_t state_updater;
     KII_THING_IF_ACTION_HANDLER action_handler;
-    KII_THING_IF_STATE_HANDLER state_handler;
+    KII_THING_IF_STATE_HANDLER state_handler_for_period;
+    KII_THING_IF_STATE_HANDLER state_handler_for_command_reaction;
     /** Specify the period of updating state in seconds. */
     int state_update_period;
 } kii_thing_if_t;
