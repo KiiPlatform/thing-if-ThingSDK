@@ -92,12 +92,14 @@ static kii_bool_t action_handler(
 
     if (strcmp(schema, "SmartLightDemo") != 0 && schema_version != 1) {
         printf("invalid schema: %s %d\n", schema, schema_version);
+        sprintf(error, "invalid schema: %s %d", schema, schema_version);
         return KII_FALSE;
     }
 
     memset(&smartlight, 0x00, sizeof(smartlight));
     if (prv_get_smartlight_info(&smartlight) == KII_FALSE) {
         printf("fail to lock.\n");
+        strcpy(error, "fail to lock.");
         return KII_FALSE;
     }
     if (strcmp(action_name, "turnPower") == 0) {
