@@ -108,20 +108,15 @@ typedef kii_bool_t
 /**
  * Resource for command handler.
  *
- * kii_thing_if_command_handler_resource_t#action_handler and
- * kii_thing_if_command_handler_resource_t#state_handler are executed
- * on a same task, so these are executed sequentially. However,
- * kii_thing_if_state_updater_resource_t#state_handler is executed on
- * another task, so
- * kii_thing_if_command_handler_resource_t#action_handler and
- * kii_thing_if_command_handler_resource_t#state_handler are executed
- * concurrently for
- * kii_thing_if_state_updater_resource_t#state_handler.
+ * Invocation of #action_handler and #state_handler callback inside this struct
+ * is serialized since they are called from the single task/thread.
+ * However, kii_thing_if_state_updater_resource_t#state_handler and callbacks
+ * inside this resource is invoked from different task/ thread.
+ * That means the invocation could be concurrent.
  *
- * Your application may be required to synchronize
- * kii_thing_if_command_handler_resource_t#action_handler and
- * kii_thing_if_command_handler_resource_t#state_handler against
- * kii_thing_if_state_updater_resource_t#state_handler.
+ * If you share the resource among the callbacks called concurrently,
+ * be aware for it and avoid deadlock when you implement synchronization for
+ * the resource.
  */
 typedef struct kii_thing_if_command_handler_resource_t {
     /** HTTP request and response buffer for command handler. */
@@ -139,27 +134,24 @@ typedef struct kii_thing_if_command_handler_resource_t {
     /** callback function to handle received action. */
     KII_THING_IF_ACTION_HANDLER action_handler;
 
-    /** callback function to write thing state after a command is completed. */
+    /** callback function to write the thing state after a command is
+     * processed.
+     */
     KII_THING_IF_STATE_HANDLER state_handler;
 } kii_thing_if_command_handler_resource_t;
 
 /**
  * Resource for state updater.
+ * Invocation of #state_handler callback inside this struct is serialized since
+ * it called from single task/thraed.
+ * However, #state_handler and callbacks inside
+ * kii_thing_if_command_handler_resource_t
+ * would be invoked from different task/thread.
+ * That means the invocation could be concurrent.
  *
- * kii_thing_if_state_updater_resource_t#state_handler is executed on
- * a task, so this is executed sequentially. However,
- * kii_thing_if_command_handler_resource_t#action_handler and
- * kii_thing_if_command_handler_resource_t#state_handler are executed
- * on another same task, so
- * kii_thing_if_state_updater_resource_t#state_handler is executed
- * concurrently for
- * kii_thing_if_command_handler_resource_t#action_handler and
- * kii_thing_if_command_handler_resource_t#state_handler.
- *
- * Your application may be required to synchronize
- * kii_thing_if_state_updater_resource_t#state_handler against
- * kii_thing_if_command_handler_resource_t#action_handler and
- * kii_thing_if_command_handler_resource_t#state_handler .
+ * If you share the resource among the callbacks called concurrently,
+ * be aware for it and avoid deadlock when you implement synchronization for
+ * the resource.
  */
 typedef struct kii_thing_if_state_updater_resource_t {
     /** HTTP request and response buffer for state updater. */
@@ -171,7 +163,9 @@ typedef struct kii_thing_if_state_updater_resource_t {
     /** the period of updating state in seconds. */
     int period;
 
-    /** callback function to write thing state every period second. */
+    /** callback function to write thing state.
+     * called in every #period.
+     */
     KII_THING_IF_STATE_HANDLER state_handler;
 } kii_thing_if_state_updater_resource_t;
 
@@ -180,7 +174,7 @@ typedef struct kii_thing_if_t {
     kii_t state_updater;
     KII_THING_IF_ACTION_HANDLER action_handler;
     KII_THING_IF_STATE_HANDLER state_handler_for_period;
-    KII_THING_IF_STATE_HANDLER state_handler_for_command_completed;
+    KII_THING_IF_STATE_HANDLER state_handler_for_command_reaction;
     /** Specify the period of updating state in seconds. */
     int state_update_period;
 } kii_thing_if_t;

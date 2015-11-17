@@ -139,7 +139,7 @@ static kii_bool_t prv_init_kii_thing_if(
     kii_thing_if->command_handler.kii_json_resource_cb = resource_cb;
 
     kii_thing_if->action_handler = command_handler_resource->action_handler;
-    kii_thing_if->state_handler_for_command_completed =
+    kii_thing_if->state_handler_for_command_reaction=
         command_handler_resource->state_handler;
 
     kii_thing_if->command_handler.app_context = (void*)kii_thing_if;
@@ -298,7 +298,7 @@ static kii_bool_t prv_send_state(kii_t* kii)
         M_KII_LOG(kii->kii_core.logger_cb("fail to start api call.\n"));
         return KII_FALSE;
     }
-    if (((kii_thing_if_t*)kii->app_context)->state_handler_for_command_completed(kii,
+    if (((kii_thing_if_t*)kii->app_context)->state_handler_for_command_reaction(kii,
                     prv_writer) == KII_FALSE) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to start api call.\n"));
         return KII_FALSE;
