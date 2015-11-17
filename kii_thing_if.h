@@ -110,13 +110,15 @@ typedef kii_bool_t
  *
  * Invocation of #action_handler and #state_handler callback inside this struct
  * is serialized since they are called from the single task/thread.
+ *
  * However, kii_thing_if_state_updater_resource_t#state_handler and callbacks
- * inside this resource is invoked from different task/ thread.
+ * inside this struct is invoked from different task/ thread.
  * That means the invocation could be concurrent.
  *
- * If you share the resource among the callbacks called concurrently,
+ * If you share the resources(memory, file, etc.)
+ * among the callbacks called concurrently,
  * be aware for it and avoid deadlock when you implement synchronization for
- * the resource.
+ * the resources.
  */
 typedef struct kii_thing_if_command_handler_resource_t {
     /** HTTP request and response buffer for command handler. */
@@ -144,14 +146,16 @@ typedef struct kii_thing_if_command_handler_resource_t {
  * Resource for state updater.
  * Invocation of #state_handler callback inside this struct is serialized since
  * it called from single task/thraed.
+ *
  * However, #state_handler and callbacks inside
  * kii_thing_if_command_handler_resource_t
  * would be invoked from different task/thread.
  * That means the invocation could be concurrent.
  *
- * If you share the resource among the callbacks called concurrently,
+ * If you share the resources(memory, file, etc.)
+ * among the callbacks called concurrently,
  * be aware for it and avoid deadlock when you implement synchronization for
- * the resource.
+ * the resources.
  */
 typedef struct kii_thing_if_state_updater_resource_t {
     /** HTTP request and response buffer for state updater. */
