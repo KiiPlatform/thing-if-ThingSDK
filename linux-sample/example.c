@@ -224,7 +224,7 @@ int main(int argc, char** argv)
         exit(1);
     }
 
-    // Parse command.
+    /* Parse command. */
     if (strcmp(subc, "onboard-with-token") == 0) {
         char* thingID = NULL;
         char* accessToken = NULL;
@@ -247,7 +247,7 @@ int main(int argc, char** argv)
                     printf("access-token is not specifeid.\n");
                     exit(1);
                 }
-                // Initialize with token.
+                /* Initialize with token. */
                 result = init_kii_thing_if_with_onboarded_thing(&kii_thing_if, EX_APP_ID,
                                 EX_APP_KEY, EX_APP_SITE, thingID, accessToken,
                                 &command_handler_resource, &state_updater_resource, NULL);
@@ -352,7 +352,7 @@ int main(int argc, char** argv)
         print_help();
         exit(0);
     }
-    while(1){}; // run forever.
+    while(1){}; /* run forever. */
 }
 
 /* vim: set ts=4 sts=4 sw=4 et fenc=utf-8 ff=unix: */
