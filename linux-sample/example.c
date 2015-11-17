@@ -8,6 +8,8 @@
 #include <getopt.h>
 #include <stdlib.h>
 
+#include <pthread.h>
+
 typedef struct prv_smartlight_t {
     kii_json_boolean_t power;
     int brightness;
@@ -16,6 +18,7 @@ typedef struct prv_smartlight_t {
 } prv_smartlight_t;
 
 static prv_smartlight_t m_smartlight;
+static pthread_mutex_t m_mutex;
 
 static prv_json_read_object(
         const char* json,
@@ -41,6 +44,40 @@ static prv_json_read_object(
     return kii_json_read_object(&kii_json, json, json_len, fields);
 }
 
+static kii_bool_t prv_get_smartlight_info(prv_smartlight_t* smartlight)
+{
+    if (pthread_mutex_lock(&m_mutex) != 0) {
+        return KII_FALSE;
+    }
+    smartlight->power = m_smartlight.power;
+    smartlight->brightness = m_smartlight.brightness;
+    smartlight->color[0] = m_smartlight.color[0];
+    smartlight->color[1] = m_smartlight.color[1];
+    smartlight->color[2] = m_smartlight.color[2];
+    smartlight->color_temperature = m_smartlight.color_temperature;
+    if (pthread_mutex_unlock(&m_mutex) != 0) {
+        return KII_FALSE;
+    }
+    return KII_TRUE;
+}
+
+static kii_bool_t prv_set_smartlight_info(const prv_smartlight_t* smartlight)
+{
+    if (pthread_mutex_lock(&m_mutex) != 0) {
+        return KII_FALSE;
+    }
+    m_smartlight.power = smartlight->power;
+    m_smartlight.brightness = smartlight->brightness;
+    m_smartlight.color[0] = smartlight->color[0];
+    m_smartlight.color[1] = smartlight->color[1];
+    m_smartlight.color[2] = smartlight->color[2];
+    m_smartlight.color_temperature = smartlight->color_temperature;
+    if (pthread_mutex_unlock(&m_mutex) != 0) {
+        return KII_FALSE;
+    }
+    return KII_TRUE;
+}
+
 static kii_bool_t action_handler(
         const char* schema,
         int schema_version,
@@ -48,6 +85,8 @@ static kii_bool_t action_handler(
         const char* action_params,
         char error[EMESSAGE_SIZE + 1])
 {
+    prv_smartlight_t smartlight;
+
     printf("schema=%s, schema_version=%d, action name=%s, action params=%s\n",
             schema, schema_version, action_name, action_params);
 
@@ -56,6 +95,11 @@ static kii_bool_t action_handler(
         return KII_FALSE;
     }
 
+    memset(&smartlight, 0x00, sizeof(smartlight));
+    if (prv_get_smartlight_info(&smartlight) == KII_FALSE) {
+        printf("fail to lock.\n");
+        return KII_FALSE;
+    }
     if (strcmp(action_name, "turnPower") == 0) {
         kii_json_field_t fields[2];
 
@@ -68,8 +112,7 @@ static kii_bool_t action_handler(
             printf("invalid turnPower json\n");
             return KII_FALSE;
         }
-        m_smartlight.power = fields[0].field_copy.boolean_value;
-        return KII_TRUE;
+        smartlight.power = fields[0].field_copy.boolean_value;
     } else if (strcmp(action_name, "setBrightness") == 0) {
         kii_json_field_t fields[2];
 
@@ -82,8 +125,7 @@ static kii_bool_t action_handler(
             printf("invalid brightness json\n");
             return KII_FALSE;
         }
-        m_smartlight.brightness = fields[0].field_copy.int_value;
-        return KII_TRUE;
+        smartlight.brightness = fields[0].field_copy.int_value;
     } else if (strcmp(action_name, "setColor") == 0) {
         kii_json_field_t fields[4];
 
@@ -100,10 +142,9 @@ static kii_bool_t action_handler(
             printf("invalid color json\n");
             return KII_FALSE;
         }
-        m_smartlight.color[0] = fields[0].field_copy.int_value;
-        m_smartlight.color[1] = fields[1].field_copy.int_value;
-        m_smartlight.color[2] = fields[2].field_copy.int_value;
-        return KII_TRUE;
+        smartlight.color[0] = fields[0].field_copy.int_value;
+        smartlight.color[1] = fields[1].field_copy.int_value;
+        smartlight.color[2] = fields[2].field_copy.int_value;
     } else if (strcmp(action_name, "setColorTemperature") == 0) {
         kii_json_field_t fields[2];
 
@@ -116,12 +157,17 @@ static kii_bool_t action_handler(
             printf("invalid colorTemperature json\n");
             return KII_FALSE;
         }
-        m_smartlight.color_temperature = fields[0].field_copy.int_value;
-        return KII_TRUE;
+        smartlight.color_temperature = fields[0].field_copy.int_value;
     } else {
         printf("invalid action: %s\n", action_name);
         return KII_FALSE;
     }
+
+    if (prv_set_smartlight_info(&smartlight) == KII_FALSE) {
+        printf("fail to unlock.\n");
+        return KII_FALSE;
+    }
+    return KII_TRUE;
 }
 
 static kii_bool_t state_handler(
@@ -142,10 +188,16 @@ static kii_bool_t state_handler(
         return retval;
     } else {
         char buf[256];
+        prv_smartlight_t smartlight;
+        memset(&smartlight, 0x00, sizeof(smartlight));
+        if (prv_get_smartlight_info(&smartlight) == KII_FALSE) {
+            printf("fail to lock.\n");
+            return KII_FALSE;
+        }
         if ((*writer)(kii, "{\"power\":") == KII_FALSE) {
             return KII_FALSE;
         }
-        if ((*writer)(kii, m_smartlight.power == KII_JSON_TRUE
+        if ((*writer)(kii, smartlight.power == KII_JSON_TRUE
                         ? "true," : "false,") == KII_FALSE) {
             return KII_FALSE;
         }
@@ -153,7 +205,7 @@ static kii_bool_t state_handler(
             return KII_FALSE;
         }
 
-        sprintf(buf, "%d,", m_smartlight.brightness);
+        sprintf(buf, "%d,", smartlight.brightness);
         if ((*writer)(kii, buf) == KII_FALSE) {
             return KII_FALSE;
         }
@@ -161,8 +213,8 @@ static kii_bool_t state_handler(
         if ((*writer)(kii, "\"color\":") == KII_FALSE) {
             return KII_FALSE;
         }
-        sprintf(buf, "[%d,%d,%d],", m_smartlight.color[0],
-                m_smartlight.color[1], m_smartlight.color[2]);
+        sprintf(buf, "[%d,%d,%d],", smartlight.color[0],
+                smartlight.color[1], smartlight.color[2]);
         if ((*writer)(kii, buf) == KII_FALSE) {
             return KII_FALSE;
         }
@@ -170,7 +222,7 @@ static kii_bool_t state_handler(
         if ((*writer)(kii, "\"colorTemperature\":") == KII_FALSE) {
             return KII_FALSE;
         }
-        sprintf(buf, "%d}", m_smartlight.color_temperature);
+        sprintf(buf, "%d}", smartlight.color_temperature);
         if ((*writer)(kii, buf) == KII_FALSE) {
             return KII_FALSE;
         }
@@ -210,17 +262,6 @@ int main(int argc, char** argv)
     command_handler_resource.mqtt_buffer = mqtt_buff;
     command_handler_resource.mqtt_buffer_size =
         sizeof(mqtt_buff) / sizeof(mqtt_buff[0]);
-    /*
-     * We don't implement mutual exclusion between the callback called by
-     * command handler and state handler.
-     * m_smartlight could be accessed concurrently.
-     * i.e. Periodic state_handler could upload the state on the way of the
-     * command execution and status change triggered by the command.
-     * If you want to ensure not uploading state on the way of the update by
-     * the command, please implemnt mutual exclusion between
-     * command_handler_resource.action_handler and
-     * state_updater_resource.state_handler.
-     */
     command_handler_resource.action_handler = action_handler;
     command_handler_resource.state_handler = state_handler;
 
@@ -229,6 +270,11 @@ int main(int argc, char** argv)
         sizeof(state_updater_buff) / sizeof(state_updater_buff[0]);
     state_updater_resource.period = EX_STATE_UPDATE_PERIOD;
     state_updater_resource.state_handler = state_handler;
+
+    if (pthread_mutex_init(&m_mutex, NULL) != 0) {
+        printf("fail to get mutex.\n");
+        exit(1);
+    }
 
     if (argc < 2) {
         printf("too few arguments.\n");
@@ -365,6 +411,14 @@ int main(int argc, char** argv)
         exit(0);
     }
     while(1){}; /* run forever. */
+
+    /*
+     * This sample application does not stop so we can not destroy
+     * mutex.  If your applicatin can stop manually, you need to
+     * destroy mutex like this:
+     *
+     * pthread_mutex_destroy(&m_mutex);
+    */
 }
 
 /* vim: set ts=4 sts=4 sw=4 et fenc=utf-8 ff=unix: */
