@@ -415,10 +415,8 @@ int main(int argc, char** argv)
     while(1){}; /* run forever. */
 
     /*
-     * This sample application does not stop so we can not destroy
-     * mutex.  If your applicatin can stop manually, you need to
-     * destroy mutex like this:
-     *
+     * This sample application keeps mutex from the start to end
+     * of the applicatoin process. So we don't implement destry.
      * pthread_mutex_destroy(&m_mutex);
     */
 }
