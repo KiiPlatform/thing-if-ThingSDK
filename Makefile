@@ -1,8 +1,7 @@
-override CFLAGS += -std=gnu89 -Wall -pedantic -pthread -fPIC -shared
-
 ifdef DEBUG
-	CFLAGS += -g -DDEBUG
+	override CFLAGS += -g -DDEBUG
 endif
+override CFLAGS += -std=gnu89 -Wall -pedantic -pthread -fPIC -shared
 
 LIBS = -lssl -lcrypto -lpthread
 SOURCES = kii_thing_if.c
