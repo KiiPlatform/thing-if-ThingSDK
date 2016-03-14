@@ -474,7 +474,7 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
                         return;
                     }
                     if (kii_api_call_append_body(kii,
-                                    "\"}", sizeof("\"}") - 1) != 0) {
+                                    "\"}}", sizeof("\"}}") - 1) != 0) {
                         M_KII_LOG(kii->kii_core.logger_cb(
                                 "request size overflowed.\n"));
                         return;
