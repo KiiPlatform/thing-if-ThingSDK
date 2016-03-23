@@ -1,7 +1,7 @@
 ifdef DEBUG
 CFLAGS += -g -DDEBUG
 endif
-CFLAGS += -std=gnu89 -Wall -pedantic -pthread -DKII_JSON_FIXED_TOKEN_NUM=256
+CFLAGS += -std=gnu89 -Wall -pedantic -pthread -DKII_JSON_FIXED_TOKEN_NUM=256 -DKII_PUSH_KEEP_ALIVE_INTERVAL_SECONDS=30
 
 LIBS = -lssl -lcrypto -lpthread
 LD_FLAGS = -L..
