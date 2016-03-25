@@ -35,7 +35,7 @@
 #define CONTENT_TYPE_THING_ID "application/vnd.kii.OnboardingWithThingIDByThing+json"
 #define CONTENT_TYPE_JSON "application/json"
 
-#define THING_IF_INFO "sn=tec;sv=0.9.1"
+#define THING_IF_INFO "sn=tic;sv=0.9.1"
 
 static unsigned char mThingIFStateUpdate_taskStk[8];
 
