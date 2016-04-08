@@ -1,7 +1,7 @@
 ifdef DEBUG
 	override CFLAGS += -g -DDEBUG
 endif
-override CFLAGS += -std=gnu89 -Wall -pedantic -pthread -fPIC -shared
+override CFLAGS += -std=gnu89 -Wall -pedantic -pthread -fPIC -shared -DKII_PUSH_KEEP_ALIVE_INTERVAL_SECONDS=30
 
 LIBS = -lssl -lcrypto -lpthread
 SOURCES = kii_thing_if.c

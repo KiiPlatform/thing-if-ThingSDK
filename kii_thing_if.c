@@ -1,5 +1,6 @@
 #include "kii_thing_if.h"
 #include "kii_thing_if_environment_impl.h"
+#include "kii_hidden.h"
 
 #include <kii.h>
 
@@ -33,6 +34,8 @@
 #define CONTENT_TYPE_VENDOR_THING_ID "application/vnd.kii.OnboardingWithVendorThingIDByThing+json"
 #define CONTENT_TYPE_THING_ID "application/vnd.kii.OnboardingWithThingIDByThing+json"
 #define CONTENT_TYPE_JSON "application/json"
+
+#define THING_IF_INFO "sn=tic;sv=0.9.1"
 
 static unsigned char mThingIFStateUpdate_taskStk[8];
 
@@ -122,8 +125,8 @@ static kii_bool_t prv_init_kii_thing_if(
             state_updater_resource->buffer_size);
 
     /* Initialize command_handler */
-    if (kii_init(
-            &kii_thing_if->command_handler, app_host, app_id, app_key) != 0) {
+    if (_kii_init_with_info(&kii_thing_if->command_handler, app_host, app_id,
+                    app_key, THING_IF_INFO) != 0) {
         return KII_FALSE;
     }
     kii_thing_if->command_handler.kii_core.http_context.buffer =
@@ -145,8 +148,8 @@ static kii_bool_t prv_init_kii_thing_if(
     kii_thing_if->command_handler.app_context = (void*)kii_thing_if;
 
     /* Initialize state_updater */
-    if (kii_init(
-            &kii_thing_if->state_updater, app_host, app_id, app_key) != 0) {
+    if (_kii_init_with_info(&kii_thing_if->state_updater, app_host, app_id,
+                    app_key, THING_IF_INFO) != 0) {
         return KII_FALSE;
     }
     kii_thing_if->state_updater.kii_core.http_context.buffer =
@@ -460,8 +463,8 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
                         return;
                     }
                     if (kii_api_call_append_body(kii,
-                                    "\":{\"succeeded\":false}, \"errorMessage\":\"",
-                                    sizeof("\":{\"succeeded\":false}, \"errorMessage\":\"") - 1)
+                                    "\":{\"succeeded\":false,\"errorMessage\":\"",
+                                    sizeof("\":{\"succeeded\":false,\"errorMessage\":\"") - 1)
                             != 0) {
                         M_KII_LOG(kii->kii_core.logger_cb(
                                 "request size overflowed.\n"));
@@ -474,7 +477,7 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
                         return;
                     }
                     if (kii_api_call_append_body(kii,
-                                    "\"}", sizeof("\"}") - 1) != 0) {
+                                    "\"}}", sizeof("\"}}") - 1) != 0) {
                         M_KII_LOG(kii->kii_core.logger_cb(
                                 "request size overflowed.\n"));
                         return;
