@@ -1,0 +1,6 @@
+今はまだメモ書き
+
+cc3200-sdk/example下にfreertos_thingsdk_demoを配置
+freertos_thingsdk_demo下でthing-if-ThingSDKを同名フォルダでclone
+thing-if-ThingSDK/kii/TI/CC3200/wlan_station/kii下のREADME.mdの注意書きの通りに編集、あとkii_json.cでEINVAL関連のエラーが出るのでsocket.hをインクルードした。
+これでIARではビルド自体は出来た。
