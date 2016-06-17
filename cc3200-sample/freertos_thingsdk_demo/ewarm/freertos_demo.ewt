@@ -102,6 +102,9 @@
       <group>
         <name>kii-json</name>
         <file>
+          <name>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii_json\libs\jsmn\jsmn.c</name>
+        </file>
+        <file>
           <name>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii_json\src\kii_json.c</name>
         </file>
       </group>
@@ -151,6 +154,9 @@
   </file>
   <file>
     <name>$PROJ_DIR$\..\..\common\udma_if.c</name>
+  </file>
+  <file>
+    <name>$EW_DIR$\arm\src\lib\write.c</name>
   </file>
 </project>
 

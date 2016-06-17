@@ -28,6 +28,8 @@
 
 #include "pinmux.h"
 
+#include "kii_thing_if.h"
+
 #define IP_ADDR             0xc0a80016 /* 192.168.0.22 */
 #define PORT_NUM            5201
 #define BUF_SIZE            1400
@@ -628,141 +630,84 @@ static long WlanConnect()
 
 }
 
-//****************************************************************************
-//
-//! \brief Opening a TCP client side socket and sending data
-//!
-//! This function opens a TCP socket and tries to connect to a Server IP_ADDR
-//!    waiting on port PORT_NUM.
-//!    If the socket connection is successful then the function will send 1000
-//! TCP packets to the server.
-//!
-//! \param[in]      port number on which the server will be listening on
-//!
-//! \return    0 on success, -1 on Error.
-//
-//****************************************************************************
-int BsdTcpClient(unsigned short usPort, char* msg)
+static kii_bool_t action_handler(
+        const char* schema,
+        int schema_version,
+        const char* action_name,
+        const char* action_params,
+        char error[EMESSAGE_SIZE + 1])
 {
-    int             iCounter;
-    short           sTestBufLen;
-    SlSockAddrIn_t  sAddr;
-    int             iAddrSize;
-    int             iSockID;
-    int             iStatus;
-    long            lLoopCount = 0;
+    UART_PRINT("action_handler\n");
+    return KII_TRUE;
+}
 
-    /*
-    // filling the buffer
-    for (iCounter=0 ; iCounter<BUF_SIZE ; iCounter++)
-    {
-        g_cBsdBuf[iCounter] = (char)(iCounter % 10);
-    }
-    */
-
-    sTestBufLen  = BUF_SIZE;
-
-    //filling the TCP server socket address
-    sAddr.sin_family = SL_AF_INET;
-    sAddr.sin_port = sl_Htons((unsigned short)usPort);
-    sAddr.sin_addr.s_addr = sl_Htonl((unsigned int)g_ulDestinationIp);
-
-    iAddrSize = sizeof(SlSockAddrIn_t);
-
-    // creating a TCP socket
-    iSockID = sl_Socket(SL_AF_INET,SL_SOCK_STREAM, 0);
-    if( iSockID < 0 )
-    {
-        ASSERT_ON_ERROR(SOCKET_CREATE_ERROR);
-    }
-
-    // connecting to TCP server
-    iStatus = sl_Connect(iSockID, ( SlSockAddr_t *)&sAddr, iAddrSize);
-    if( iStatus < 0 )
-    {
-        // error
-        sl_Close(iSockID);       
-        ASSERT_ON_ERROR(CONNECT_ERROR);
-    }
-
-    // sending multiple packets to the TCP server
-    while (lLoopCount < g_ulPacketCount)
-    {
-        // sending packet
-        iStatus = sl_Send(iSockID, msg, strlen(msg), 0 );
-        if( iStatus < 0 )
-        {
-            // error
-            sl_Close(iSockID);
-            ASSERT_ON_ERROR(SEND_ERROR);
-        }
-        lLoopCount++;
-    }
-
-    Report("Sent %u packets successfully\n\r",g_ulPacketCount);
-
-    iStatus = sl_Close(iSockID);
-    //closing the socket after sending 1000 packets
-    ASSERT_ON_ERROR(iStatus);
-
-    return SUCCESS;
+static kii_bool_t state_handler(
+        kii_t* kii,
+        KII_THING_IF_WRITER writer)
+{
+    UART_PRINT("state_handler\n");
+    return KII_TRUE;
 }
 
 //******************************************************************************
 //
-//! First test task
+//! Command input task
 //!
 //! \param pvParameters is the parameter passed to the task while creating it.
 //!
 //!    This Function
-//!        1. Receive message from the Queue and display it on the terminal.
+//!        1. Got command and call thing sdk api.
 //!
 //! \return none
 //
 //******************************************************************************
-void vTestTask1( void *pvParameters )
+void vCmdTask( void *pvParameters )
 {
-    char pcMessage[MAX_MSG_LENGTH];
-    for( ;; )
-    {
-        /* Wait for a message to arrive. */
-        osi_MsgQRead(&MsgQ, pcMessage, OSI_WAIT_FOREVER);
-
-        UART_PRINT("message = ");
-        UART_PRINT(pcMessage);
-        UART_PRINT("\n\r");
-        BsdTcpClient(g_uiPortNum, pcMessage);
-        osi_Sleep(200);
-    }
-}
-
-//******************************************************************************
-//
-//! Second test task
-//!
-//! \param pvParameters is the parameter passed to the task while creating it.
-//!
-//!    This Function
-//!        1. Creates a message and send it to the queue.
-//!
-//! \return none
-//
-//******************************************************************************
-void vTestTask2( void *pvParameters )
-{
+    kii_thing_if_command_handler_resource_t command_handler_resource;
+    kii_thing_if_state_updater_resource_t state_updater_resource;
+    char command_handler_buff[4096];
+    char state_updater_buff[4096];
+    char mqtt_buff[2048];
+    kii_thing_if_t kii_thing_if;
     char acCmdStore[MAX_MSG_LENGTH];
     int lRetVal;
+
+    command_handler_resource.buffer = command_handler_buff;
+    command_handler_resource.buffer_size =
+        sizeof(command_handler_buff) / sizeof(command_handler_buff[0]);
+    command_handler_resource.mqtt_buffer = mqtt_buff;
+    command_handler_resource.mqtt_buffer_size =
+        sizeof(mqtt_buff) / sizeof(mqtt_buff[0]);
+    command_handler_resource.action_handler = action_handler;
+    command_handler_resource.state_handler = state_handler;
+
+    state_updater_resource.buffer = state_updater_buff;
+    state_updater_resource.buffer_size =
+        sizeof(state_updater_buff) / sizeof(state_updater_buff[0]);
+    state_updater_resource.period = 60;
+    state_updater_resource.state_handler = state_handler;
+
+    if (init_kii_thing_if(&kii_thing_if, "9ab34d8b",
+            "7a950d78956ed39f3b0815f0f001b43b", "JP",
+            &command_handler_resource, &state_updater_resource, NULL) == KII_FALSE) {
+        UART_PRINT("init failed.\n");
+    } else {
+        UART_PRINT("init succeed.\n");
+    }
+
     for( ;; )
     {
         lRetVal = GetCmd(acCmdStore, sizeof(acCmdStore));
         if (lRetVal != 0) {
-            /* Wait for a message to arrive. */
-            osi_MsgQWrite(&MsgQ, (void*) acCmdStore, OSI_NO_WAIT);
+            if (onboard_with_vendor_thing_id(&kii_thing_if, "4649", "1234", "my_type", NULL) == KII_FALSE) {
+                UART_PRINT("onboard failed.\n");
+            } else {
+                UART_PRINT("onboard succeed.\n");
+            }
         }
         osi_Sleep(200);
     }
 }
-
 //*****************************************************************************
 //
 //! Application startup display on UART
@@ -924,6 +869,7 @@ int main( void )
     	while(1);
     }
 
+    /*
     //
     // Create the Queue Receive task
     //
@@ -933,6 +879,9 @@ int main( void )
     // Create the Queue Send task
     //
     osi_TaskCreate( vTestTask2, "TASK2", OSI_STACK_SIZE,NULL, 1, NULL );
+    */
+
+    osi_TaskCreate( vCmdTask, "CMDTASK", OSI_STACK_SIZE * 10,NULL, 1, NULL );
 
     //
     // Start the task scheduler

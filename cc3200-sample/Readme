@@ -4,3 +4,9 @@ cc3200-sdk/example下にfreertos_thingsdk_demoを配置
 freertos_thingsdk_demo下でthing-if-ThingSDKを同名フォルダでclone
 thing-if-ThingSDK/kii/TI/CC3200/wlan_station/kii下のREADME.mdの注意書きの通りに編集、あとkii_json.cでEINVAL関連のエラーが出るのでsocket.hをインクルードした。
 これでIARではビルド自体は出来た。
+
+no definition for "__write" [referenced from putchar.o(dl7M_tln.a)]
+実際にThingSDKのAPIを利用したら上記エラーが出た。
+これはIARの環境だとwrite.c(IAR Workbenchをインストールした所にある)を直接ワークスペースに含めて対処するとIARの公式見解があった。(詳しくはWikiに記述)
+
+KII_JSON_FIXED_TOKEN_NUMについては前述のREADME.mdの値(20)では足らなくなっていた。今のRestAPIの応答では最低27いる模様。安全マージンで30に変更した。

@@ -4,6 +4,9 @@
 #include <stdarg.h>
 
 #include "simplelink.h"
+#ifndef NOTERM
+#include "uart_if.h"
+#endif
 
 kii_socket_code_t socket_connect_cb_impl(
         kii_socket_context_t* socket_context,
@@ -42,6 +45,7 @@ kii_socket_code_t socket_send_cb_impl(
     int ret;
     int sock;
 
+    Report("%.*s\r\n", length, buffer);
     sock = socket_context->sock;
     ret = sl_Send(sock, buffer, length, 0);
     if (ret > 0) {
@@ -64,6 +68,7 @@ kii_socket_code_t socket_recv_cb_impl(
     ret = sl_Recv(sock, buffer, length_to_read, 0);
     if (ret > 0) {
         *out_actual_length = ret;
+        Report("%s", buffer);
         return KII_SOCKETC_OK;
     } else {
         return KII_SOCKETC_FAIL;
