@@ -194,7 +194,7 @@ typedef struct kii_thing_if_t {
  * @param [in] app_id the input of Application ID
  * @param [in] app_key the input of Application Key
  * @param [in] app_host host name. should be one of "CN", "CN3", "JP", "US",
- * "SG"
+ * "SG" or "EU".
  * @param [in] command_handler_data data container for command handler.
  * @param [in] state_updater_data data container for state updater.
  * @param [in] resource_cb callback to resize to kii_json_resource
@@ -269,7 +269,7 @@ kii_bool_t onboard_with_thing_id(
  * @param [in] app_id the input of Application ID
  * @param [in] app_key the input of Application Key
  * @param [in] app_host host name. should be one of "CN", "CN3", "JP", "US",
- * "SG"
+ * "SG" or "EU".
  * @param [in] thing_id thing id given by a controller application
  * NonNull, NonEmpty value must be specified.
  * @param [in] access_token access token of the thing given by a
