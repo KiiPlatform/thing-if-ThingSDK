@@ -110,11 +110,13 @@ typedef kii_bool_t
  * @param [in] kii_t kii_t object if you want to send request to kii
  * cloud you can use this kii_t object.
  * @param [in] message message from pushing to application.
+ * @param [in] message_length length of message.
  */
 typedef kii_bool_t
     (*KII_THING_IF_NOTIFICATION_HANDLER)
         (const kii_t *kii,
-         const char* message);
+         const char* message,
+         size_t message_length);
 
 /**
  * Resource for command handler.
