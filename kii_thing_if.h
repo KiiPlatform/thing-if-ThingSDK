@@ -156,7 +156,9 @@ typedef struct kii_thing_if_command_handler_resource_t {
     KII_THING_IF_STATE_HANDLER state_handler;
 
     /**
-     * callback function to handle recived notification.
+     * callback function to handle recived notification. This field
+     * can be NULL. If NULL then notifications excepting command
+     * action does not be notified to application.
      */
     KII_THING_IF_NOTIFICATION_HANDLER notification_handler;
 
