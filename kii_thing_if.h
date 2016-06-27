@@ -106,13 +106,13 @@ typedef kii_bool_t
          KII_THING_IF_WRITER writer);
 
 /**
- * callback function for handling message from pushing to application.
+ * callback function for handling notification.
  * @param [in] kii_t kii_t object if you want to send request to kii
  * cloud you can use this kii_t object.
  * @param [in] message message from pushing to application.
  */
 typedef kii_bool_t
-    (*KII_THING_IF_PUSH_TO_APP_HANDLER)
+    (*KII_THING_IF_NOTIFICATION_HANDLER)
         (const kii_t *kii,
          const char* message);
 
@@ -120,7 +120,7 @@ typedef kii_bool_t
  * Resource for command handler.
  *
  * Invocation of #action_handler, #state_handler and
- * #push_to_app_handler callback inside this struct is serialized
+ * #notification_handler callback inside this struct is serialized
  * since they are called from the single task/thread.
  *
  * However, kii_thing_if_state_updater_resource_t#state_handler and callbacks
@@ -154,9 +154,9 @@ typedef struct kii_thing_if_command_handler_resource_t {
     KII_THING_IF_STATE_HANDLER state_handler;
 
     /**
-     * callback function to handle recived push to application message.
+     * callback function to handle recived notification.
      */
-    KII_THING_IF_PUSH_TO_APP_HANDLER push_to_app_handler;
+    KII_THING_IF_NOTIFICATION_HANDLER notification_handler;
 
 } kii_thing_if_command_handler_resource_t;
 
