@@ -112,7 +112,7 @@ typedef kii_bool_t
  * @param [in] message message from pushing to application.
  * @param [in] message_length length of message.
  */
-typedef kii_bool_t
+typedef void
     (*KII_THING_IF_NOTIFICATION_HANDLER)
         (kii_t *kii,
          const char* message,
