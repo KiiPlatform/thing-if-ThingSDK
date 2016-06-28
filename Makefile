@@ -1,7 +1,25 @@
 ifdef DEBUG
 	override CFLAGS += -g -DDEBUG
 endif
-override CFLAGS += -std=gnu89 -Wall -pedantic -pthread -fPIC -shared -DKII_PUSH_KEEP_ALIVE_INTERVAL_SECONDS=30
+override CFLAGS += -std=gnu89 -Wall -pedantic -pthread -fPIC -shared
+
+ifndef KEEP_ALIVE_INTERVAL
+	override CFLAGS += -DKII_PUSH_KEEP_ALIVE_INTERVAL_SECONDS=30
+else
+	override CFLAGS += -DKII_PUSH_KEEP_ALIVE_INTERVAL_SECONDS=$(KEEP_ALIVE_INTERVAL)
+endif
+
+ifndef FIXED_JSON_TOKEN_NUM
+	JSON_FLAG = -DKII_JSON_FIXED_TOKEN_NUM=256
+else
+	JSON_FLAG = -DKII_JSON_FIXED_TOKEN_NUM=$(FIXED_JSON_TOKEN_NUM)
+endif
+
+ifdef FLEXIBLE_JSON_TOKEN
+	JSON_FLAG =
+endif
+
+override CFLAGS += $(JSON_FLAG)
 
 LIBS = -lssl -lcrypto -lpthread
 SOURCES = kii_thing_if.c
