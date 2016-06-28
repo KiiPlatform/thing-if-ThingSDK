@@ -655,17 +655,13 @@ static kii_bool_t prv_onboard_with_vendor_thing_id(
         }
     }
     if (thing_properties != NULL) {
-        if (kii_api_call_append_body(kii, ",\"thingProperties\":\"",
-                        CONST_STRLEN(",\"thingProperties\":\"")) != 0) {
+        if (kii_api_call_append_body(kii, ",\"thingProperties\":",
+                        CONST_STRLEN(",\"thingProperties\":")) != 0) {
             M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
             return KII_FALSE;
         }
         if (kii_api_call_append_body(kii, thing_properties,
                         strlen(thing_properties)) != 0) {
-            M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
-            return KII_FALSE;
-        }
-        if (kii_api_call_append_body(kii, "\"", CONST_STRLEN("\"")) != 0) {
             M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
             return KII_FALSE;
         }
