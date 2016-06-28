@@ -114,7 +114,7 @@ typedef kii_bool_t
  */
 typedef kii_bool_t
     (*KII_THING_IF_NOTIFICATION_HANDLER)
-        (const kii_t *kii,
+        (kii_t *kii,
          const char* message,
          size_t message_length);
 
