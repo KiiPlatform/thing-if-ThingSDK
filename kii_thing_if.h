@@ -107,9 +107,16 @@ typedef kii_bool_t
 
 /**
  * callback function for handling notification.
+ *
+ * Servers sends notification when
+ * - Objects in subscribed buckets are modified.
+ * - Messages are send to the subscribed topics
+ *
+ * This handler handles such notifications.
+ *
  * @param [in] kii_t kii_t object if you want to send request to kii
  * cloud you can use this kii_t object.
- * @param [in] message message from pushing to application.
+ * @param [in] message notification message
  * @param [in] message_length length of message.
  */
 typedef void
@@ -157,7 +164,7 @@ typedef struct kii_thing_if_command_handler_resource_t {
 
     /**
      * callback function to handle recived notification. This field
-     * can be NULL. If NULL then notifications excepting command
+     * can be NULL. If NULL then notifications except command
      * action does not be notified to application.
      */
     KII_THING_IF_NOTIFICATION_HANDLER notification_handler;
