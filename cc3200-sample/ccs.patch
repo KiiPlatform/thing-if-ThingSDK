@@ -1,0 +1,77 @@
+diff --git kii_thing_if.c kii_thing_if.c
+index 7191456..63aec01 100644
+--- kii_thing_if.c
++++ kii_thing_if.c
+@@ -780,8 +780,7 @@ kii_bool_t onboard_with_vendor_thing_id(
+     }
+     kii_thing_if->state_updater.task_create_cb(NULL,
+             prv_update_status, (void*)&kii_thing_if->state_updater,
+-            (void*)mThingIFStateUpdate_taskStk,
+-            sizeof(mThingIFStateUpdate_taskStk), 1);
++            NULL, 2048, 1);
+ 
+     return KII_TRUE;
+ }
+@@ -872,8 +871,7 @@ kii_bool_t onboard_with_thing_id(
+     }
+     kii_thing_if->state_updater.task_create_cb(NULL,
+             prv_update_status, (void*)&kii_thing_if->state_updater,
+-            (void*)mThingIFStateUpdate_taskStk,
+-            sizeof(mThingIFStateUpdate_taskStk), 1);
++            NULL, 2048, 1);
+ 
+     return KII_TRUE;
+ 
+@@ -913,9 +911,7 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
+ 
+     kii_thing_if->state_updater.task_create_cb(NULL,
+             prv_update_status, (void*)&kii_thing_if->state_updater,
+-            (void*)mThingIFStateUpdate_taskStk,
+-            sizeof(mThingIFStateUpdate_taskStk), 1);
+-
++            NULL, 2048, 1);
+ 
+     return KII_TRUE;
+ }
+diff --git kii/kii-core/kii_socket_callback.h kii/kii-core/kii_socket_callback.h
+index ea576c9..27176f7 100644
+--- kii/kii-core/kii_socket_callback.h
++++ kii/kii-core/kii_socket_callback.h
+@@ -16,7 +16,7 @@ typedef struct kii_socket_context_t {
+     /** Application specific socket.
+      * Used by socket callback implementations.
+      */
+-    int socket;
++    int sock;
+ } kii_socket_context_t;
+ 
+ typedef enum kii_socket_code_t {
+diff --git kii/kii/kii_mqtt.c kii/kii/kii_mqtt.c
+index 765e26d..e319683 100644
+--- kii/kii/kii_mqtt.c
++++ kii/kii/kii_mqtt.c
+@@ -50,7 +50,7 @@ int kiiMQTT_connect(kii_t* kii, kii_mqtt_endpoint_t* endpoint, unsigned short ke
+     kii_socket_code_t sock_err;
+     size_t actual_length;
+ 
+-    if (kii->mqtt_socket_context.socket > 0) {
++    if (kii->mqtt_socket_context.sock > 0) {
+         M_KII_LOG(kii->kii_core.logger_cb("closing socket as socket is already created.\r\n"));
+         sock_err = kii->mqtt_socket_close_cb(&(kii->mqtt_socket_context));
+         if (sock_err != KII_SOCKETC_OK) {
+diff --git kii/kii/kii_push.c kii/kii/kii_push.c
+index e08dfdc..ea4a523 100644
+--- kii/kii/kii_push.c
++++ kii/kii/kii_push.c
+@@ -25,10 +25,10 @@ typedef enum
+     KIIPUSH_READY = 2
+ } kiiPush_state;
+ 
+-#define KIIPUSH_TASK_STK_SIZE 8
++#define KIIPUSH_TASK_STK_SIZE 4096
+ static unsigned int mKiiPush_taskStk[KIIPUSH_TASK_STK_SIZE];
+ #ifdef KII_PUSH_KEEP_ALIVE_INTERVAL_SECONDS
+-#define KIIPUSH_PINGREQ_TASK_STK_SIZE 8
++#define KIIPUSH_PINGREQ_TASK_STK_SIZE 1024
+ static unsigned int mKiiPush_pingReqTaskStk[KIIPUSH_PINGREQ_TASK_STK_SIZE];
+ #endif
