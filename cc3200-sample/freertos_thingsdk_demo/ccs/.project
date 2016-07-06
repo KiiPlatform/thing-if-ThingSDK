@@ -26,66 +26,6 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>jsmn.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/thing-if-ThingSDK/kii/kii_json/libs/jsmn/jsmn.c</locationURI>
-		</link>
-		<link>
-			<name>kii_call.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/thing-if-ThingSDK/kii/kii/kii_call.c</locationURI>
-		</link>
-		<link>
-			<name>kii_core.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/thing-if-ThingSDK/kii/kii-core/kii_core.c</locationURI>
-		</link>
-		<link>
-			<name>kii_json.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/thing-if-ThingSDK/kii/kii_json/src/kii_json.c</locationURI>
-		</link>
-		<link>
-			<name>kii_json_utils.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/thing-if-ThingSDK/kii/kii/kii_json_utils.c</locationURI>
-		</link>
-		<link>
-			<name>kii_libc_wrapper.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/thing-if-ThingSDK/kii/kii-core/kii_libc_wrapper.c</locationURI>
-		</link>
-		<link>
-			<name>kii_mqtt.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/thing-if-ThingSDK/kii/kii/kii_mqtt.c</locationURI>
-		</link>
-		<link>
-			<name>kii_object.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/thing-if-ThingSDK/kii/kii/kii_object.c</locationURI>
-		</link>
-		<link>
-			<name>kii_push.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/thing-if-ThingSDK/kii/kii/kii_push.c</locationURI>
-		</link>
-		<link>
-			<name>kii_server_code.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/thing-if-ThingSDK/kii/kii/kii_server_code.c</locationURI>
-		</link>
-		<link>
-			<name>kii_thing.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/thing-if-ThingSDK/kii/kii/kii_thing.c</locationURI>
-		</link>
-		<link>
-			<name>kii_thing_if.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/thing-if-ThingSDK/kii_thing_if.c</locationURI>
-		</link>
-		<link>
 			<name>network_common.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-ORIGINAL_PROJECT_ROOT/common/network_common.c</locationURI>

@@ -45,6 +45,7 @@
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_5.2.compilerID.LITTLE_ENDIAN.724379581" name="Little endian code [See 'General' page to edit] (--little_endian, -me)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_5.2.compilerID.LITTLE_ENDIAN" value="true" valueType="boolean"/>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_5.2.compilerID.INCLUDE_PATH.1818802071" name="Add dir to #include search path (--include_path, -I)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_5.2.compilerID.INCLUDE_PATH" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${CG_TOOL_ROOT}/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${CC3200_SDK_ROOT}/third_party/FreeRTOS/source/portable/CCS/ARM_CM3/&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${CC3200_SDK_ROOT}/third_party/FreeRTOS/source/include/&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${CC3200_SDK_ROOT}/third_party/FreeRTOS/source/&quot;"/>
@@ -56,11 +57,6 @@
 									<listOptionValue builtIn="false" value="&quot;${CC3200_SDK_ROOT}/simplelink_extlib/provisioninglib&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${CC3200_SDK_ROOT}/inc/&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${CC3200_SDK_ROOT}/example/common&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ORIGINAL_PROJECT_ROOT}/../thing-if-ThingSDK&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ORIGINAL_PROJECT_ROOT}/../thing-if-ThingSDK/kii/kii&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ORIGINAL_PROJECT_ROOT}/../thing-if-ThingSDK/kii/kii-core&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ORIGINAL_PROJECT_ROOT}/../thing-if-ThingSDK/kii/kii_json/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ORIGINAL_PROJECT_ROOT}/../thing-if-ThingSDK/kii/kii_json/libs/jsmn&quot;"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_5.2.compilerID.DEBUGGING_MODEL.1272231094" name="Debugging model" superClass="com.ti.ccstudio.buildDefinitions.TMS470_5.2.compilerID.DEBUGGING_MODEL" value="com.ti.ccstudio.buildDefinitions.TMS470_5.2.compilerID.DEBUGGING_MODEL.SYMDEBUG__DWARF" valueType="enumerated"/>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_5.2.compilerID.NO_INTRINSICS.1056236510" name="Disable intrinsic functions (--no_intrinsics, -pn)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_5.2.compilerID.NO_INTRINSICS" value="true" valueType="boolean"/>
