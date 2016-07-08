@@ -106,21 +106,35 @@ typedef kii_bool_t
          KII_THING_IF_WRITER writer);
 
 /**
- * callback function for handling notification.
+ * callback function to enable to handle all notifications.
  *
  * Servers sends notification when
  * - Objects in subscribed buckets are modified.
- * - Messages are send to the subscribed topics
+ * - Messages are sent to the subscribed topics
+ * - Commands are sent from server.
  *
- * This handler handles such notifications.
+ * This handler can handle such notifications.
+ *
+ * Usually command notifications should be handled with
+ * #KII_THING_IF_ACTION_HANDLER, so this handler should be handle
+ * bucket notifications and topic notifications. Of course you can
+ * handle command notifications in this handler but it is not good
+ * manner.
  *
  * @param [in] kii_t kii_t object if you want to send request to kii
  * cloud you can use this kii_t object.
  * @param [in] message notification message
  * @param [in] message_length length of message.
+ * @return
+ * - KII_TRUE, then ThingSDK skips to handle command
+ * notification. Usually this handler should return KII_TRUE if
+ * receiving message is bucket notification or topic notification.
+ * - KII_FALSE, then ThingSDK proceeds to handle command
+ * notification. Usually, this handler should return KII_FALSE if
+ * receiving message is command notification.
  */
-typedef void
-    (*KII_THING_IF_NOTIFICATION_HANDLER)
+typedef kii_bool_t
+    (*KII_THING_IF_CUSTOM_PUSH_HANDLER)
         (kii_t *kii,
          const char* message,
          size_t message_length);
@@ -129,7 +143,7 @@ typedef void
  * Resource for command handler.
  *
  * Invocation of #action_handler, #state_handler and
- * #notification_handler callback inside this struct is serialized
+ * #custom_push_handler callback inside this struct is serialized
  * since they are called from the single task/thread.
  *
  * However, kii_thing_if_state_updater_resource_t#state_handler and callbacks
@@ -163,11 +177,11 @@ typedef struct kii_thing_if_command_handler_resource_t {
     KII_THING_IF_STATE_HANDLER state_handler;
 
     /**
-     * callback function to handle recived notification. This field
-     * can be NULL. If NULL then notifications except command
-     * action does not be notified to application.
+     * callback function to handle recived all push
+     * notifications. This field can be NULL if your application does
+     * not have custom push procedure.
      */
-    KII_THING_IF_NOTIFICATION_HANDLER notification_handler;
+    KII_THING_IF_CUSTOM_PUSH_HANDLER custom_push_handler;
 
 } kii_thing_if_command_handler_resource_t;
 
