@@ -44,3 +44,51 @@ sh smart-light-command-get.sh -c {command-id}
 sh smart-light-state-get.sh
 ```
 
+### Notifications
+
+If you want to receive notifications. You can execute followings after
+*Setup thing and owner*
+
+#### Push to App Notifications
+
+Procedure to receive Push to App Notifications are followings:
+
+  1. Subscribe a bucket.
+  1. Create, modify, or delete a object in the bucket.
+
+The commands are followings:
+
+```sh
+sh subscribe_bucket.sh
+sh create_object.sh
+```
+
+After `sh create_object.sh`, this sample application will receive
+notification.
+
+Once you execute `sh subscribe_bucket.sh`, You does not need to
+execute the command twice. Notifications are sent by only `sh
+create_object.sh` command.
+
+#### Push to User Notifications
+
+Procedure to receive Push to User Notifications are followings:
+
+  1. Create a topic.
+  1. Subscribe the topic.
+  1. Send message to the topic.
+
+The commands are followings:
+
+```sh
+sh create_topic.sh
+sh subscribe_topic.sh
+sh send_topic.sh
+```
+
+After `sh send_topic.sh`, this sample application will receive
+notification.
+
+Once you execute `sh create_topic.sh` and `sh subscribe_topic.sh`, You
+does not need to execute these command twice. Notifications are sent
+by only `sh send_topic.sh` command.
