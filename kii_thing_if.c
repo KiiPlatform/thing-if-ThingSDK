@@ -134,6 +134,10 @@ static kii_bool_t prv_init_kii_thing_if(
     kii_thing_if->command_handler.kii_core.http_context.buffer_size =
         command_handler_resource->buffer_size;
 
+    kii_sprintf(kii_thing_if->command_handler.kii_core.sdk_info,
+                "sn=is;sv=%s;tv=%s;",
+                KII_SDK_VERSION, THING_IF_VERSION);
+
     kii_thing_if->command_handler.mqtt_buffer =
         command_handler_resource->mqtt_buffer;
     kii_thing_if->command_handler.mqtt_buffer_size =

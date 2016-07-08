@@ -8,7 +8,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+#define THING_IF_VERSION "0.9.1"
 /** callback function for handling action.
  * @param [in] schema name of schema.
  * @maram [in] schema_version version of schema.
@@ -300,4 +300,3 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
 #endif
 
 #endif /* _KII_THING_IF_ */
-
