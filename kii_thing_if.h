@@ -105,11 +105,53 @@ typedef kii_bool_t
         (kii_t* kii,
          KII_THING_IF_WRITER writer);
 
+/** callback function enables to handle all push notifications.
+ *
+ * This handler is optional and only used for advanced use-cases.
+ * Push notification will be sent to the thing in following cases.
+ * - Subscribed buckets events
+ * - Messages sent to the subscribed topics
+ * - Commands sent to this thing.
+ *
+ * Normally you don't need to implement this handler.
+ * Without this handler, SDK only deals with push notification includes
+ * Command. In this case, SDK parses the push notification and if its a 
+ * valid Command to the thing, #KII_THING_IF_ACTION_HANDLER will be called.
+ *
+ * This handler will be implemented and passed to #kii_thing_if_t
+ * in case you need to handle bucket events notification, messages arrived to
+ * subscribed topic or need to implement custom procedure when received a
+ * Commands sent to this thing.
+ *
+ * You can choose by retruning KII_TRUE or KII_FALSE whether to let SDK to
+ * continue handling with default logic which deals with Command push
+ * notification.
+ *
+ * @param [in] kii_t kii_t object if you want to send request to kii
+ * cloud you can use this kii_t object.
+ * @param [in] message notification message
+ * @param [in] message_length length of message.
+ * @return
+ * - KII_TRUE Let SDK to skip executing default logic handles Command.
+ *   In this case #KII_THING_IF_ACTION_HANDLER won't be called even if the
+ *   push notification includes valid Command.
+ * - KII_FALSE Let SDK to execute default logic handles Command. If the push
+ *   notification includes valid Command, #KII_THING_IF_ACTION_HANDLER will be
+ *   called.
+ *   (If the push notification is not Command, would be ignored safely.) 
+ */
+typedef kii_bool_t
+    (*KII_THING_IF_CUSTOM_PUSH_HANDLER)
+        (kii_t *kii,
+         const char* message,
+         size_t message_length);
+
 /**
  * Resource for command handler.
  *
- * Invocation of #action_handler and #state_handler callback inside this struct
- * is serialized since they are called from the single task/thread.
+ * Invocation of #action_handler, #state_handler and
+ * #custom_push_handler callback inside this struct is serialized
+ * since they are called from the single task/thread.
  *
  * However, kii_thing_if_state_updater_resource_t#state_handler and callbacks
  * inside this struct is invoked from different task/ thread.
@@ -140,6 +182,15 @@ typedef struct kii_thing_if_command_handler_resource_t {
      * processed.
      */
     KII_THING_IF_STATE_HANDLER state_handler;
+
+    /** callback function to handle recived all push notifications.
+     * Normally you can left this field as NULL.
+     * Only required when you have to deal with push notification with your
+     * custom logic.
+     * @see KII_THING_IF_CUSTOM_PUSH_HANDLER
+     */
+    KII_THING_IF_CUSTOM_PUSH_HANDLER custom_push_handler;
+
 } kii_thing_if_command_handler_resource_t;
 
 /**
