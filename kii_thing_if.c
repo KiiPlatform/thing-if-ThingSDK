@@ -144,6 +144,8 @@ static kii_bool_t prv_init_kii_thing_if(
     kii_thing_if->action_handler = command_handler_resource->action_handler;
     kii_thing_if->state_handler_for_command_reaction=
         command_handler_resource->state_handler;
+    kii_thing_if->custom_push_handler =
+        command_handler_resource->custom_push_handler;
 
     kii_thing_if->command_handler.app_context = (void*)kii_thing_if;
 
@@ -314,7 +316,11 @@ static kii_bool_t prv_send_state(kii_t* kii)
     return KII_TRUE;
 }
 
-static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
+static void received_callback_default(
+        kii_t* kii,
+        char* buffer,
+        size_t buffer_size)
+{
     kii_json_field_t fields[6];
     kii_json_field_t action[2];
     const char* schema = NULL;
@@ -511,6 +517,18 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
     }
 
     return;
+}
+
+static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
+    kii_bool_t skip = KII_FALSE;
+    if (((kii_thing_if_t*)kii->app_context)->custom_push_handler != NULL) {
+        KII_THING_IF_CUSTOM_PUSH_HANDLER handler =
+            ((kii_thing_if_t*)kii->app_context)->custom_push_handler;
+        skip = (*handler)(kii, buffer, buffer_size);
+    }
+    if (skip == KII_FALSE) {
+        received_callback_default(kii, buffer, buffer_size);
+    }
 }
 
 static int prv_kii_thing_if_get_anonymous_token(kii_t* kii)
