@@ -105,33 +105,40 @@ typedef kii_bool_t
         (kii_t* kii,
          KII_THING_IF_WRITER writer);
 
-/**
- * callback function to enable to handle all notifications.
+/** callback function enables to handle all push notifications.
  *
- * Servers sends notification when
- * - Objects in subscribed buckets are modified.
- * - Messages are sent to the subscribed topics
- * - Commands are sent from server.
+ * This handler is optional and only used for advanced use-cases.
+ * Push notification will be sent to the thing in following cases.
+ * - Subscribed buckets events
+ * - Messages sent to the subscribed topics
+ * - Commands sent to this thing.
  *
- * This handler can handle such notifications.
+ * Normally you don't need to implement this handler.
+ * Without this handler, SDK only deals with push notification includes
+ * Command. In this case, SDK parses the push notification and if its a 
+ * valid Command to the thing, #KII_THING_IF_ACTION_HANDLER will be called.
  *
- * Usually command notifications should be handled with
- * #KII_THING_IF_ACTION_HANDLER, so this handler should be handle
- * bucket notifications and topic notifications. Of course you can
- * handle command notifications in this handler but it is not good
- * manner.
+ * This handler will be implemented and passed to #kii_thing_if_t
+ * in case you need to handle bucket events notification, messages arrived to
+ * subscribed topic or need to implement custom procedure when received a
+ * Commands sent to this thing.
+ *
+ * You can choose by retruning KII_TRUE or KII_FALSE whether to let SDK to
+ * continue handling with default logic which deals with Command push
+ * notification.
  *
  * @param [in] kii_t kii_t object if you want to send request to kii
  * cloud you can use this kii_t object.
  * @param [in] message notification message
  * @param [in] message_length length of message.
  * @return
- * - KII_TRUE, then ThingSDK skips to handle command
- * notification. Usually this handler should return KII_TRUE if
- * receiving message is bucket notification or topic notification.
- * - KII_FALSE, then ThingSDK proceeds to handle command
- * notification. Usually, this handler should return KII_FALSE if
- * receiving message is command notification.
+ * - KII_TRUE Let SDK to skip executing default logic handles Command.
+ *   In this case #KII_THING_IF_ACTION_HANDLER won't be called even if the
+ *   push notification includes valid Command.
+ * - KII_FALSE Let SDK to execute default logic handles Command. If the push
+ *   notification includes valid Command, #KII_THING_IF_ACTION_HANDLER will be
+ *   called.
+ *   (If the push notification is not Command, would be ignored safely.) 
  */
 typedef kii_bool_t
     (*KII_THING_IF_CUSTOM_PUSH_HANDLER)
@@ -176,10 +183,11 @@ typedef struct kii_thing_if_command_handler_resource_t {
      */
     KII_THING_IF_STATE_HANDLER state_handler;
 
-    /**
-     * callback function to handle recived all push
-     * notifications. This field can be NULL if your application does
-     * not have custom push procedure.
+    /** callback function to handle recived all push notifications.
+     * Normally you can left this field as NULL.
+     * Only required when you have to deal with push notification with your
+     * custom logic.
+     * @see KII_THING_IF_CUSTOM_PUSH_HANDLER
      */
     KII_THING_IF_CUSTOM_PUSH_HANDLER custom_push_handler;
 
