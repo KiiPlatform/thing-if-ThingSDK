@@ -351,7 +351,7 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
             break;
         case KII_JSON_PARSE_PARTIAL_SUCCESS:
             if (fields[0].result != KII_JSON_FIELD_PARSE_SUCCESS) {
-                // no command.
+                // no schema.
                 return;
             }
             break;
