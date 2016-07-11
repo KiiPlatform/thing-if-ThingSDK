@@ -316,10 +316,7 @@ static kii_bool_t prv_send_state(kii_t* kii)
     return KII_TRUE;
 }
 
-static void received_callback_default(
-        kii_t* kii,
-        char* buffer,
-        size_t buffer_size)
+static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
 {
     kii_json_field_t fields[6];
     kii_json_field_t action[2];
@@ -351,7 +348,12 @@ static void received_callback_default(
     switch(prv_kii_thing_if_json_read_object(
             kii, buffer, buffer_size, fields)) {
         case KII_JSON_PARSE_SUCCESS:
+            break;
         case KII_JSON_PARSE_PARTIAL_SUCCESS:
+            if (fields[0].result != KII_JSON_FIELD_PARSE_SUCCESS) {
+                // no command.
+                return;
+            }
             break;
         default:
             M_KII_LOG(kii->kii_core.logger_cb(
@@ -527,7 +529,7 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
         skip = (*handler)(kii, buffer, buffer_size);
     }
     if (skip == KII_FALSE) {
-        received_callback_default(kii, buffer, buffer_size);
+        handle_command(kii, buffer, buffer_size);
     }
 }
 

@@ -237,10 +237,14 @@ static kii_bool_t custom_push_handler(
         const char* message,
         size_t message_length)
 {
-    kii_bool_t ret = KII_FALSE;
+    kii_bool_t ret = KII_TRUE;
     printf("custom_push_handler:\n%s\n", message);
     if (strncmp(message, "{\"schema\"", 9) == 0) {
-        ret = KII_TRUE;
+        ret = KII_FALSE;
+    }
+    // check no error in parsing topic.
+    if (strncmp(message, "{\"Item\":\"CheckNoError\"", 22) == 0) {
+        ret = KII_FALSE;
     }
     return ret;
 }
