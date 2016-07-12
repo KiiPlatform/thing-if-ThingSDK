@@ -61,9 +61,9 @@ typedef enum{
 #define OSI_STACK_SIZE          2048
 #define APP_NAME                "ThingSDK Demo"
 #define MAX_MSG_LENGTH			16
-#define APP_ID                  "04110545"
-#define APP_KEY                 "325cc0c05bb480e7cfd7876eaba6abd7"
-#define APP_SITE                "JP"
+#define APP_ID                  YOUR_APP_ID
+#define APP_KEY                 YOUR_APP_KEY
+#define APP_SITE                YOUR_SITE
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
