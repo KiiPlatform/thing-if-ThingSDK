@@ -64,6 +64,8 @@ typedef enum{
 #define APP_ID                  YOUR_APP_ID
 #define APP_KEY                 YOUR_APP_KEY
 #define APP_SITE                YOUR_SITE
+#define VENDOR_THING_ID         YOUR_VENDOR_THING_ID
+#define THING_PASSWORD          YOUR_THING_PASSWORD
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
@@ -883,7 +885,7 @@ void vCmdTask( void *pvParameters )
     {
         lRetVal = GetCmd(acCmdStore, sizeof(acCmdStore));
         if (lRetVal != 0) {
-            if (onboard_with_vendor_thing_id(&kii_thing_if, "4649", "1234", "my_type", NULL) == KII_FALSE) {
+            if (onboard_with_vendor_thing_id(&kii_thing_if, VENDOR_THING_ID, THING_PASSWORD, "my_type", NULL) == KII_FALSE) {
                 UART_PRINT("onboard failed.\n");
             } else {
                 UART_PRINT("onboard succeed.\n");
