@@ -28,6 +28,16 @@ application.
 A way to create kii application is described in [this
 page](http://docs.kii.com/en/guides/thingifsdk/android/quickstart/create-app/)
 
+### Wi-Fi connection
+
+Before you use this sample application, you need to enable Wi-Fi
+connection of CC3200 SimpleLink.
+
+You can enabled Wi-Fi connection acording to [CC3200 SimpleLink Wi-Fi
+and IoT Solution With MCU LaunchPad Getting Started
+Guide](http://www.tij.co.jp/jp/lit/ug/swru376d/swru376d.pdf) at
+section 3.1. "*Option 1: Code Composer Studio (CCS)*".
+
 ### Build sample application.
 
 1. Unzip freertos\_thingsdk\_demo.zip.
@@ -36,13 +46,10 @@ page](http://docs.kii.com/en/guides/thingifsdk/android/quickstart/create-app/)
 1. Import project in freertos_thingsdk_demo/ccs as CCS Project on CCS.
   1. Choose File -> Import
   1. In Import window, Select Code Compose Studio -> CCS Projects.
-1. Edit SSID\_NAME, SECURITY\_TYPE and SECURITY\_KEY in the file of cc3200-sdk/example/common/common.h. SSID\_NAME, SECURITY\_TYPE and SECURITY\_KEY are access point information
-  * SSID\_NAME : Access point name.
-  * SECURITY\_TYPE : Security type of you access point Such as WEP or WPA.
-  * SECURITY\_KEY : Password of the your secured access point.
-1. Edit APP_ID, APP_KEY and APP_SITE in main.c with your created Kii application information.
+1. Edit APP_ID, APP_KEY and APP_SITE macro in main.c with your created Kii application information.
+1. Edit VENDOR_THING_ID and THING_PASSWORD in main.c. You can replace these values what you want.
 1. Connect SimpleLink board with USB to your PC.
-1. Lunch tera term. A way to use tera term is described in [CC3200 SimpleLink Wi-Fi and IoT Solution With MCU LaunchPad Getting Started Guide](http://www.tij.co.jp/jp/lit/ug/swru376d/swru376d.pdf) at section 3.1. Option 1: Code Composer Studio (CCS).
+1. Lunch tera term. A way to use tera term is described in [CC3200 SimpleLink Wi-Fi and IoT Solution With MCU LaunchPad Getting Started Guide](http://www.tij.co.jp/jp/lit/ug/swru376d/swru376d.pdf) at section 3.1. "*Option 1: Code Composer Studio (CCS)*".
 1. Press Debug button (it is a bug icon). Building and transfering this sample application to board are started.
 1. Type 'o' key and return, onboarding starts on CC3200.
 
