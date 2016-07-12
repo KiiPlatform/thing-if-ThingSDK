@@ -230,6 +230,7 @@ typedef struct kii_thing_if_t {
     KII_THING_IF_ACTION_HANDLER action_handler;
     KII_THING_IF_STATE_HANDLER state_handler_for_period;
     KII_THING_IF_STATE_HANDLER state_handler_for_command_reaction;
+    KII_THING_IF_CUSTOM_PUSH_HANDLER custom_push_handler;
     /** Specify the period of updating state in seconds. */
     int state_update_period;
 } kii_thing_if_t;

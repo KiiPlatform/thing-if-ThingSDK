@@ -51,7 +51,11 @@ curl -v -X POST \
   -H "content-type: application/vnd.kii.onboardingWithThingIDByOwner+json" \
   -H "authorization: bearer ${ACCESS_TOKEN}" \
   "https://${APP_HOST}/thing-if/apps/${APP_ID}/onboardings" \
-  -d "{\"thingPassword\" : \"${THING_PASSWORD}\", \"thingID\" : \"${THING_ID}\", \"owner\" : \"user:${USER_ID}\"}"
+  -d "{\"thingPassword\" : \"${THING_PASSWORD}\", \"thingID\" : \"${THING_ID}\", \"owner\" : \"user:${USER_ID}\"}" | tee .result.txt
+
+export THING_ACCESS_TOKEN=`grep 'accessToken' .result.txt | sed -e 's/^ *\"accessToken\" *: *\"\([a-zA-Z0-9_-]*\)\",/\1/'`
+
+rm .result.txt
 
 echo ' '
 echo ' '
@@ -60,4 +64,5 @@ echo OWNER INFORMATION:
 echo ==================
 echo ACCESS_TOKEN=$ACCESS_TOKEN
 echo USER_ID=$USER_ID
+echo THING_ACCESS_TOKEN=$THING_ACCESS_TOKEN
 

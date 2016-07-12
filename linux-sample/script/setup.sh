@@ -1,6 +1,6 @@
 # Visit developer.kii.com and create your app and replace the value.
-export APP_ID=b8d819c8
-export APP_KEY=bff3bfdc1e3fcf6818919144330a0770
+export APP_ID=Your App ID
+export APP_KEY=Your App Key
 # Host is based on the server location.
 # JP: api-jp.kii.com
 # US: api.kii.com
@@ -8,4 +8,7 @@ export APP_KEY=bff3bfdc1e3fcf6818919144330a0770
 # CN: api-cn3.kii.com
 export APP_HOST=api-jp.kii.com
 # you can create thing for test in developer.kii.com.
-export THING_ID=th.88eb20051321-9f79-5e11-69c7-0f1eec9b
+export THING_ID=Your thing ID
+# you can change there IDs. Values below works fine in this sample application.
+export BUCKET_ID=test_bucket
+export TOPIC_ID=test_topic

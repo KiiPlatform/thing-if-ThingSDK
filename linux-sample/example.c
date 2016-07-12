@@ -232,6 +232,23 @@ static kii_bool_t state_handler(
     }
 }
 
+static kii_bool_t custom_push_handler(
+        kii_t *kii,
+        const char* message,
+        size_t message_length)
+{
+    kii_bool_t ret = KII_TRUE;
+    printf("custom_push_handler:\n%s\n", message);
+    if (strncmp(message, "{\"schema\"", 9) == 0) {
+        ret = KII_FALSE;
+    }
+    // check no error in parsing topic.
+    if (strncmp(message, "{\"Item\":\"CheckNoError\"", 22) == 0) {
+        ret = KII_FALSE;
+    }
+    return ret;
+}
+
 static void print_help() {
     printf("sub commands: [onboard|onboard-with-token]\n\n");
     printf("to see detail usage of sub command, execute ./exampleapp {subcommand} --help\n\n");
@@ -266,6 +283,7 @@ int main(int argc, char** argv)
         sizeof(mqtt_buff) / sizeof(mqtt_buff[0]);
     command_handler_resource.action_handler = action_handler;
     command_handler_resource.state_handler = state_handler;
+    command_handler_resource.custom_push_handler = custom_push_handler;
 
     state_updater_resource.buffer = state_updater_buff;
     state_updater_resource.buffer_size =
