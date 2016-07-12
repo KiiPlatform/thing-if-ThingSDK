@@ -1,4 +1,10 @@
 #!/bin/sh
+
+# This is a script to create freertos_thingsdk_demo.zip
+# freertos_thingsdk_demo.zip contains Code Composer Studio's project.
+# To release cc3200 sample, please update freertos_thingsdk_demo.zip
+# with this script.
+
 rm -rf target
 mkdir -p target/freertos_thingsdk_demo
 cp -rf freertos_thingsdk_demo/ccs  target/freertos_thingsdk_demo
@@ -33,3 +39,5 @@ cp ../kii_thing_if.h target/freertos_thingsdk_demo
 cp ../kii_thing_if_environment_impl.h target/freertos_thingsdk_demo
 patch -p0 < ccs.patch
 cd target;zip freertos_thingsdk_demo.zip -r freertos_thingsdk_demo
+cd ../
+cp target/freertos_thingsdk_demo.zip ./
