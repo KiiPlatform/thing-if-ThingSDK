@@ -28,17 +28,17 @@ application.
 A way to create kii application is described in [this
 page](http://docs.kii.com/en/guides/thingifsdk/android/quickstart/create-app/)
 
-### Wi-Fi connection
+### Wi-Fi Connection
 
 Before you use this sample application, you need to enable Wi-Fi
 connection of CC3200 SimpleLink.
 
-You can enabled Wi-Fi connection acording to [CC3200 SimpleLink Wi-Fi
+You can enable Wi-Fi connection acording to [CC3200 SimpleLink Wi-Fi
 and IoT Solution With MCU LaunchPad Getting Started
 Guide](http://www.tij.co.jp/jp/lit/ug/swru376d/swru376d.pdf) at
 section 3.1. "*Option 1: Code Composer Studio (CCS)*".
 
-### Build sample application.
+### Build Sample Application.
 
 1. Unzip freertos\_thingsdk\_demo.zip.
 1. Copy unzipped directory to CC3200 SDK example folder(C:/TI/CC3200SDK\_1.2.0/cc3200-sdk/example as default).
@@ -53,3 +53,37 @@ section 3.1. "*Option 1: Code Composer Studio (CCS)*".
 1. Press Debug button (it is a bug icon). Building and transfering this sample application to board are started.
 1. Type 'o' key and return, onboarding starts on CC3200.
 
+## Send Commands
+
+If you successfully start this sample application, you can send
+command using scripts in ../linux-sample/script/.  How to use these
+scripts are described in ../linux-sample/scripts/README.mkd.
+
+To use these scripts, you need to edit APP ID, APP KEY, APP_HOST and
+THING_ID in ../linux-sample/scripts/setup.sh
+
+You set your created Kii application information to APP ID, APP KEY
+and APP_HOST.
+
+THING_ID is displayed in tera term. You can find JSON string like following:
+
+```js
+{
+  "accessToken" : "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "thingID" : "th.XXXXXXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX",
+  "mqttEndpoint" : {
+     "installationID" : "XXXXXXXXXXXXXXXXXXXXXXXXX",
+     "username" : "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+     "password" : "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+     "mqttTopic" : "XXXXXXXXXXXXXXXXXXXXXXX",
+     "host" : "XX-XXXX-XXXXXXXXXXXX.kii.com",
+     "portTCP" : 1883,
+     "portSSL" : 8883,
+     "portWS" : 12470,
+     "portWSS" : 12473,
+     "ttl" : 2147483647
+  }
+}
+```
+
+You set value of thingID in the JSON string to THING_ID.
