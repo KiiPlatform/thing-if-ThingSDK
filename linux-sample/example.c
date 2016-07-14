@@ -20,7 +20,7 @@ typedef struct prv_smartlight_t {
 static prv_smartlight_t m_smartlight;
 static pthread_mutex_t m_mutex;
 
-static prv_json_read_object(
+static kii_json_parse_result_t prv_json_read_object(
         const char* json,
         size_t json_len,
         kii_json_field_t* fields,

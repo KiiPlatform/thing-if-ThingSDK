@@ -1,7 +1,7 @@
 ifdef DEBUG
 CFLAGS += -g -DDEBUG
 endif
-CFLAGS += -std=gnu89 -Wall -pedantic -pthread
+CFLAGS += -Wall -pedantic -pthread
 
 ifndef KEEP_ALIVE_INTERVAL
 	override CFLAGS += -DKII_PUSH_KEEP_ALIVE_INTERVAL_SECONDS=300
