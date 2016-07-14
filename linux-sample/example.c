@@ -92,7 +92,8 @@ static kii_bool_t action_handler(
 
     if (strcmp(schema, "SmartLightDemo") != 0 && schema_version != 1) {
         printf("invalid schema: %s %d\n", schema, schema_version);
-        sprintf(error, "invalid schema: %s %d", schema, schema_version);
+        snprintf(error, EMESSAGE_SIZE + 1, "invalid schema: %s %d",
+                schema, schema_version);
         return KII_FALSE;
     }
 
