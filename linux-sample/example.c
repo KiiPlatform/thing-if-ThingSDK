@@ -20,7 +20,7 @@ typedef struct prv_smartlight_t {
 static prv_smartlight_t m_smartlight;
 static pthread_mutex_t m_mutex;
 
-static prv_json_read_object(
+static kii_json_parse_result_t prv_json_read_object(
         const char* json,
         size_t json_len,
         kii_json_field_t* fields,
@@ -92,7 +92,8 @@ static kii_bool_t action_handler(
 
     if (strcmp(schema, "SmartLightDemo") != 0 || schema_version != 1) {
         printf("invalid schema: %s %d\n", schema, schema_version);
-        sprintf(error, "invalid schema: %s %d", schema, schema_version);
+        snprintf(error, EMESSAGE_SIZE + 1, "invalid schema: %s %d",
+                schema, schema_version);
         return KII_FALSE;
     }
 
@@ -207,7 +208,8 @@ static kii_bool_t state_handler(
             return KII_FALSE;
         }
 
-        sprintf(buf, "%d,", smartlight.brightness);
+        snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%d,",
+                smartlight.brightness);
         if ((*writer)(kii, buf) == KII_FALSE) {
             return KII_FALSE;
         }
@@ -215,8 +217,8 @@ static kii_bool_t state_handler(
         if ((*writer)(kii, "\"color\":") == KII_FALSE) {
             return KII_FALSE;
         }
-        sprintf(buf, "[%d,%d,%d],", smartlight.color[0],
-                smartlight.color[1], smartlight.color[2]);
+        snprintf(buf, sizeof(buf) / sizeof(buf[0]), "[%d,%d,%d],",
+                smartlight.color[0], smartlight.color[1], smartlight.color[2]);
         if ((*writer)(kii, buf) == KII_FALSE) {
             return KII_FALSE;
         }
@@ -224,7 +226,8 @@ static kii_bool_t state_handler(
         if ((*writer)(kii, "\"colorTemperature\":") == KII_FALSE) {
             return KII_FALSE;
         }
-        sprintf(buf, "%d}", smartlight.color_temperature);
+        snprintf(buf, sizeof(buf) / sizeof(buf), "%d}",
+                smartlight.color_temperature);
         if ((*writer)(kii, buf) == KII_FALSE) {
             return KII_FALSE;
         }
