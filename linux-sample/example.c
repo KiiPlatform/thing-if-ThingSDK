@@ -226,7 +226,7 @@ static kii_bool_t state_handler(
         if ((*writer)(kii, "\"colorTemperature\":") == KII_FALSE) {
             return KII_FALSE;
         }
-        snprintf(buf, sizeof(buf) / sizeof(buf), "%d}",
+        snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%d}",
                 smartlight.color_temperature);
         if ((*writer)(kii, buf) == KII_FALSE) {
             return KII_FALSE;
