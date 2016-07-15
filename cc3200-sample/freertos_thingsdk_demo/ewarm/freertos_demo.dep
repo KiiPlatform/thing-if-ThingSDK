@@ -1,0 +1,646 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<project>
+  <fileVersion>2</fileVersion>
+  <fileChecksum>1003529501</fileChecksum>
+  <configuration>
+    <name>Release</name>
+    <outputs>
+      <file>$PROJ_DIR$\Release\Obj\kii_libc_wrapper.o</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Config_Normal.h</file>
+      <file>$PROJ_DIR$\Release\Obj\kii_core.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\limits.h</file>
+      <file>$PROJ_DIR$\Release\Obj\kii_server_code.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\wchar.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Defaults.h</file>
+      <file>$PROJ_DIR$\..\..\..\driverlib\udma.h</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii-core\kii_socket_callback.h</file>
+      <file>$PROJ_DIR$\Release\Obj\kii_thing_if_environment_cc3200.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\driverlib\rom_map.h</file>
+      <file>$PROJ_DIR$\..\..\..\driverlib\prcm.h</file>
+      <file>$PROJ_DIR$\..\..\common\udma_if.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ymath.h</file>
+      <file>$PROJ_DIR$\..\..\..\inc\hw_udma.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\math.h</file>
+      <file>$PROJ_DIR$\..\..\..\driverlib\interrupt.h</file>
+      <file>$PROJ_DIR$\Release\Obj\kii_json.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\simplelink\include\socket.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Threads.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\xlocale_c.h</file>
+      <file>$PROJ_DIR$\Release\Obj\kii_thing_if_environment_cc3200.o</file>
+      <file>$TOOLKIT_DIR$\inc\c\float.h</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii_json\libs\jsmn\jsmn.h</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii-core\kii_core.h</file>
+      <file>$PROJ_DIR$\Release\Obj\kii_thing_if.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\kii_thing.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\driverlib\uart.h</file>
+      <file>$PROJ_DIR$\Release\Obj\kii_thing_if.o</file>
+      <file>$PROJ_DIR$\..\..\..\simplelink\include\netcfg.h</file>
+      <file>$PROJ_DIR$\Release\Obj\pinmux.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\udma_if.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\kii_call.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\network_common.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\xtls.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\xmtx.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Product_string.h</file>
+      <file>$PROJ_DIR$\..\..\..\driverlib\rom.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ctype.h</file>
+      <file>$PROJ_DIR$\..\..\..\inc\hw_gpio.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdlib.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\yvals.h</file>
+      <file>$PROJ_DIR$\Release\Obj\kii_json.o</file>
+      <file>$PROJ_DIR$\Release\Obj\kii_push.o</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii_thing_if_environment_impl.h</file>
+      <file>$PROJ_DIR$\Release\Obj\kii_thing.o</file>
+      <file>$PROJ_DIR$\Release\Obj\kii_object.o</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii\kii_core_hidden.h</file>
+      <file>$PROJ_DIR$\Release\Obj\uart_if.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\stddef.h</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii_thing_if.h</file>
+      <file>$PROJ_DIR$\Release\Obj\startup_ewarm.o</file>
+      <file>$PROJ_DIR$\..\..\..\simplelink\source\nonos.h</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii_hidden.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\xtgmath.h</file>
+      <file>$PROJ_DIR$\Release\Obj\pinmux.o</file>
+      <file>$PROJ_DIR$\Release\Obj\kii_push.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\oslib\osi.h</file>
+      <file>$PROJ_DIR$\Release\Obj\write.o</file>
+      <file>$PROJ_DIR$\..\..\..\simplelink\include\simplelink.h</file>
+      <file>$PROJ_DIR$\Release\Obj\kii_mqtt.pbi</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii-core\kii_libc_wrapper.h</file>
+      <file>$PROJ_DIR$\..\..\..\inc\hw_ints.h</file>
+      <file>$PROJ_DIR$\..\..\..\simplelink\include\netapp.h</file>
+      <file>$PROJ_DIR$\..\..\..\simplelink\include\device.h</file>
+      <file>$PROJ_DIR$\..\..\..\simplelink\include\fs.h</file>
+      <file>$PROJ_DIR$\..\..\..\simplelink\cc_pal.h</file>
+      <file>$PROJ_DIR$\..\..\..\simplelink\source\objInclusion.h</file>
+      <file>$PROJ_DIR$\..\..\..\inc\hw_common_reg.h</file>
+      <file>$PROJ_DIR$\..\..\..\driverlib\pin.h</file>
+      <file>$PROJ_DIR$\..\..\..\driverlib\gpio.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\yfuns.h</file>
+      <file>$PROJ_DIR$\..\..\..\simplelink\include\trace.h</file>
+      <file>$PROJ_DIR$\..\..\..\driverlib\rom_patch.h</file>
+      <file>$PROJ_DIR$\..\..\..\simplelink\user.h</file>
+      <file>$PROJ_DIR$\..\..\common\common.h</file>
+      <file>$PROJ_DIR$\Release\Obj\udma_if.o</file>
+      <file>$PROJ_DIR$\..\..\common\uart_if.h</file>
+      <file>$PROJ_DIR$\Release\Obj\uart_if.o</file>
+      <file>$PROJ_DIR$\Release\Obj\kii_server_code.o</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Product.h</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii\kii_json_utils.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\xlocale.h</file>
+      <file>$PROJ_DIR$\Release\Obj\kii_call.o</file>
+      <file>$PROJ_DIR$\..\..\..\inc\hw_uart.h</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii_json\include\kii_json.h</file>
+      <file>$PROJ_DIR$\..\..\..\driverlib\utils.h</file>
+      <file>$PROJ_DIR$\..\..\..\inc\hw_types.h</file>
+      <file>$PROJ_DIR$\..\..\common\udma_if.c</file>
+      <file>$PROJ_DIR$\..\..\..\simplelink\include\wlan.h</file>
+      <file>$TOOLKIT_DIR$\src\lib\write.c</file>
+      <file>$PROJ_DIR$\..\..\..\simplelink\include\wlan_rx_filters.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ycheck.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\errno.h</file>
+      <file>$PROJ_DIR$\Release\Obj\main.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\network_common.o</file>
+      <file>$PROJ_DIR$\Release\Obj\freertos_demo.pbd</file>
+      <file>$TOOLKIT_DIR$\inc\c\ysizet.h</file>
+      <file>$PROJ_DIR$\Release\Obj\kii_mqtt.o</file>
+      <file>$PROJ_DIR$\..\..\..\inc\hw_memmap.h</file>
+      <file>$PROJ_DIR$\Release\Obj\kii_core.o</file>
+      <file>$PROJ_DIR$\..\kii_thing_if_environment_cc3200.c</file>
+      <file>$PROJ_DIR$\..\pinmux.c</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii_thing_if.c</file>
+      <file>$PROJ_DIR$\..\..\common\uart_if.c</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii\kii_json_utils.c</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii_json\libs\jsmn\jsmn.c</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii\kii_object.c</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii\kii_server_code.c</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii\kii_thing.c</file>
+      <file>$PROJ_DIR$\..\main.c</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii\kii_mqtt.c</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdio.h</file>
+      <file>$PROJ_DIR$\..\..\common\network_common.c</file>
+      <file>$PROJ_DIR$\..\..\common\startup_ewarm.c</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii-core\kii_core.c</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii-core\kii_libc_wrapper.c</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii\kii_call.c</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii_json\src\kii_json.c</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii\kii_push.c</file>
+      <file>$TOOLKIT_DIR$\inc\c\string.h</file>
+      <file>$TOOLKIT_DIR$\lib\m7M_tl.a</file>
+      <file>$TOOLKIT_DIR$\inc\c\xlocaleuse.h</file>
+      <file>$PROJ_DIR$\Release\Obj\main.o</file>
+      <file>$PROJ_DIR$\Release\Obj\write.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdarg.h</file>
+      <file>$TOOLKIT_DIR$\config\linker\TexasInstruments\cc3200.icf</file>
+      <file>$PROJ_DIR$\..\pinmux.h</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii\kii.h</file>
+      <file>$PROJ_DIR$\Release\Obj\kii_json_utils.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\jsmn.pbi</file>
+      <file>$TOOLKIT_DIR$\lib\dl7M_tln.a</file>
+      <file>$TOOLKIT_DIR$\inc\c\ystdio.h</file>
+      <file>$PROJ_DIR$\Release\Obj\kii_json_utils.o</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii\kii_mqtt.h</file>
+      <file>$PROJ_DIR$\Release\Exe\freertos_demo.out</file>
+      <file>$PROJ_DIR$\Release\Obj\kii_object.pbi</file>
+      <file>$PROJ_DIR$\Release\Exe\freertos_demo.bin</file>
+      <file>$TOOLKIT_DIR$\inc\c\assert.h</file>
+      <file>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii\kii_task_callback.h</file>
+      <file>$PROJ_DIR$\..\..\..\simplelink_extlib\provisioninglib\provisioning_api.h</file>
+      <file>$PROJ_DIR$\..\..\..\simplelink\ewarm\NON_OS\Exe\simplelink.a</file>
+      <file>$PROJ_DIR$\Release\Obj\startup_ewarm.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\kii_libc_wrapper.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\driverlib\ewarm\Release\Exe\driverlib.a</file>
+      <file>$PROJ_DIR$\..\..\..\oslib\ewarm\free_rtos\Exe\free_rtos.a</file>
+      <file>$TOOLKIT_DIR$\inc\c\xencoding_limits.h</file>
+      <file>$PROJ_DIR$\Release\Obj\jsmn.o</file>
+      <file>$TOOLKIT_DIR$\lib\rt7M_tl.a</file>
+    </outputs>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>ILINK</name>
+          <file> 135</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\common\udma_if.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 31</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 76</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 84 16 41 112 40 92 80 97 73 62 14 70 27 12 6 19 1 36 120 99 87 37 10 7 11 57 132 146</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 112 92 41 6 1 80 146 19 97 132 120 36 62 99 84 87 14 37 10 73 70 7 16 11 27 40 57 12</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\..\Program Files (x86)\IAR Systems\Embedded Workbench 7.0\arm\src\lib\write.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 124</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 58</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 6 92 97 41 146 19 1 80 71</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 71 97 92 41 6 1 80 146 19</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\kii_thing_if_environment_cc3200.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 9</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 21</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 92 72 59 146 52 97 77 139 132 89 120 125 41 18 29 36 112 8 49 6 19 1 80 67 65 63 64 91 74 66 140 44</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 44 8 49 92 41 6 1 80 146 19 97 139 112 132 59 74 120 36 66 140 67 72 65 18 63 89 64 29 91 52 77</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\pinmux.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 30</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 55</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 11 69 99 10 87 39 37 70 127 73</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 127 87 99 39 69 37 10 73 70 11</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\thing-if-ThingSDK\kii_thing_if.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 25</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 28</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 132 85 146 53 24 92 44 128 97 50 112 120 138 139 8 23 41 36 49 6 19 1 80</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 50 128 24 49 92 41 6 1 80 146 19 97 8 139 85 23 44 53 112 132 120 36 138</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\common\uart_if.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 48</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 78</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 92 57 41 1 112 37 6 19 125 87 69 77 80 97 73 40 120 99 11 27 10 146 132 36</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 40 92 41 6 1 80 146 19 97 112 132 120 36 87 99 11 69 27 37 10 73 57 77</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii\kii_json_utils.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 129</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 133</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 92 146 120 139 8 97 23 81 24 85 49 41 6 19 1 80 128 36</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 128 24 49 92 41 6 1 80 146 19 97 8 139 85 23 81 120 36</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii_json\libs\jsmn\jsmn.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 130</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 147</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 92 146 41 23 97 40 6 19 1 80 49</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 40 92 41 6 1 80 146 19 97 23 49</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii\kii_object.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 136</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 46</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 24 97 8 6 112 92 146 49 120 81 19 128 36 1 41 40 80 139 132 85 23</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 120 92 41 6 1 80 146 19 97 36 112 132 40 128 24 49 8 139 85 23 81</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii\kii_server_code.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 4</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 79</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 92 19 24 36 6 97 146 49 40 1 41 139 112 128 80 23 120 132 85 8</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 120 92 41 6 1 80 146 19 97 36 112 132 40 128 24 49 8 139 85 23</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii\kii_thing.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 26</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 45</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 97 41 92 24 81 146 8 49 40 112 128 47 36 132 85 120 6 19 1 80 139 23</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 120 92 41 6 1 80 146 19 97 36 112 132 40 128 24 49 8 139 85 23 81 47</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\main.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 94</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 123</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 27 50 132 92 41 63 40 62 10 86 59 49 89 87 37 75 127 146 67 91 140 128 112 57 99 68 16 11 12 77 97 6 19 1 80 65 64 74 66 24 85 23 72 18 29 52 120 36 73 139 8</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 112 92 41 6 1 80 146 19 97 132 40 57 59 74 120 36 66 140 67 72 65 18 63 89 64 29 91 52 99 68 87 62 16 37 10 73 27 11 86 12 75 77 127 50 128 24 49 8 139 85 23</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii\kii_mqtt.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 60</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 98</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 80 92 128 49 24 36 41 112 134 97 6 19 1 8 85 23 120 146 132 139</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 120 92 41 6 1 80 146 19 97 36 112 132 24 49 8 134 128 139 85 23</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\common\network_common.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 33</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 95</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 63 66 97 146 80 92 67 91 74 59 19 1 41 65 64 140 6 72 18 89 29 52 120 36 40</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 40 92 41 6 1 80 146 19 97 59 74 120 36 66 140 67 72 65 18 63 89 64 29 91 52</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\common\startup_ewarm.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 142</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 51</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 62 87 16</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 87 62 16</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii-core\kii_core.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 2</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 100</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 92 49 41 61 146 82 24 112 8 97 34 35 120 125 38 6 19 1 80 36 132 122 5 20 40</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 24 49 92 41 6 1 80 146 19 97 8 61 120 36 112 132 38 82 34 35 40 122 20 5</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii-core\kii_libc_wrapper.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 143</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 0</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 41 49 92 120 6 97 112 146 19 1 80 61 125 132 36</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 61 49 92 41 6 1 80 146 19 97 112 132 120 36</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii\kii_call.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 32</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 83</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 80 8 97 139 92 146 24 85 49 41 6 19 1 23 128</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 128 24 49 92 41 6 1 80 146 19 97 8 139 85 23</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii_json\src\kii_json.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 17</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 42</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 1 138 82 15 97 92 74 23 6 19 41 20 40 65 22 85 36 80 49 64 66 59 112 3 93 38 18 146 132 54 67 63 91 140 120 13 34 122 35 5 72 89 29 52</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 120 92 41 6 1 80 146 19 97 36 112 132 40 3 15 13 54 93 22 38 82 34 35 122 20 5 23 49 18 59 74 66 140 67 72 65 63 89 64 29 91 52 138 85</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\thing-if-ThingSDK\kii\kii\kii_push.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 56</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 43</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 97 41 1 139 128 92 6 19 5 138 24 36 80 34 35 112 38 134 81 146 132 122 8 49 120 82 20 40 85 23</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 120 92 41 6 1 80 146 19 97 36 112 132 138 38 82 34 35 40 122 20 5 128 24 49 8 139 85 23 134 81</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Release\Exe\freertos_demo.out</name>
+      <outputs>
+        <tool>
+          <name>OBJCOPY</name>
+          <file> 137</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ILINK</name>
+          <file> 126 147 83 100 42 133 0 98 46 43 79 45 28 21 123 95 55 51 78 76 58 141 144 145 148 121 131</file>
+        </tool>
+      </inputs>
+    </file>
+  </configuration>
+</project>
+
+
