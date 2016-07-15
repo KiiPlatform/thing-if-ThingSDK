@@ -144,6 +144,8 @@ static kii_bool_t prv_init_kii_thing_if(
     kii_thing_if->action_handler = command_handler_resource->action_handler;
     kii_thing_if->state_handler_for_command_reaction=
         command_handler_resource->state_handler;
+    kii_thing_if->custom_push_handler =
+        command_handler_resource->custom_push_handler;
 
     kii_thing_if->command_handler.app_context = (void*)kii_thing_if;
 
@@ -314,7 +316,8 @@ static kii_bool_t prv_send_state(kii_t* kii)
     return KII_TRUE;
 }
 
-static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
+static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
+{
     kii_json_field_t fields[6];
     kii_json_field_t action[2];
     const char* schema = NULL;
@@ -345,7 +348,12 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
     switch(prv_kii_thing_if_json_read_object(
             kii, buffer, buffer_size, fields)) {
         case KII_JSON_PARSE_SUCCESS:
+            break;
         case KII_JSON_PARSE_PARTIAL_SUCCESS:
+            if (fields[0].result != KII_JSON_FIELD_PARSE_SUCCESS) {
+                // no schema.
+                return;
+            }
             break;
         default:
             M_KII_LOG(kii->kii_core.logger_cb(
@@ -513,6 +521,18 @@ static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
     return;
 }
 
+static void received_callback(kii_t* kii, char* buffer, size_t buffer_size) {
+    kii_bool_t skip = KII_FALSE;
+    if (((kii_thing_if_t*)kii->app_context)->custom_push_handler != NULL) {
+        KII_THING_IF_CUSTOM_PUSH_HANDLER handler =
+            ((kii_thing_if_t*)kii->app_context)->custom_push_handler;
+        skip = (*handler)(kii, buffer, buffer_size);
+    }
+    if (skip == KII_FALSE) {
+        handle_command(kii, buffer, buffer_size);
+    }
+}
+
 static int prv_kii_thing_if_get_anonymous_token(kii_t* kii)
 {
     char resource_path[64];
@@ -655,17 +675,13 @@ static kii_bool_t prv_onboard_with_vendor_thing_id(
         }
     }
     if (thing_properties != NULL) {
-        if (kii_api_call_append_body(kii, ",\"thingProperties\":\"",
-                        CONST_STRLEN(",\"thingProperties\":\"")) != 0) {
+        if (kii_api_call_append_body(kii, ",\"thingProperties\":",
+                        CONST_STRLEN(",\"thingProperties\":")) != 0) {
             M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
             return KII_FALSE;
         }
         if (kii_api_call_append_body(kii, thing_properties,
                         strlen(thing_properties)) != 0) {
-            M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
-            return KII_FALSE;
-        }
-        if (kii_api_call_append_body(kii, "\"", CONST_STRLEN("\"")) != 0) {
             M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
             return KII_FALSE;
         }

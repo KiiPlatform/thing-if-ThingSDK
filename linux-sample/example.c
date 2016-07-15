@@ -20,7 +20,7 @@ typedef struct prv_smartlight_t {
 static prv_smartlight_t m_smartlight;
 static pthread_mutex_t m_mutex;
 
-static prv_json_read_object(
+static kii_json_parse_result_t prv_json_read_object(
         const char* json,
         size_t json_len,
         kii_json_field_t* fields,
@@ -90,9 +90,10 @@ static kii_bool_t action_handler(
     printf("schema=%s, schema_version=%d, action name=%s, action params=%s\n",
             schema, schema_version, action_name, action_params);
 
-    if (strcmp(schema, "SmartLightDemo") != 0 && schema_version != 1) {
+    if (strcmp(schema, "SmartLightDemo") != 0 || schema_version != 1) {
         printf("invalid schema: %s %d\n", schema, schema_version);
-        sprintf(error, "invalid schema: %s %d", schema, schema_version);
+        snprintf(error, EMESSAGE_SIZE + 1, "invalid schema: %s %d",
+                schema, schema_version);
         return KII_FALSE;
     }
 
@@ -207,7 +208,8 @@ static kii_bool_t state_handler(
             return KII_FALSE;
         }
 
-        sprintf(buf, "%d,", smartlight.brightness);
+        snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%d,",
+                smartlight.brightness);
         if ((*writer)(kii, buf) == KII_FALSE) {
             return KII_FALSE;
         }
@@ -215,8 +217,8 @@ static kii_bool_t state_handler(
         if ((*writer)(kii, "\"color\":") == KII_FALSE) {
             return KII_FALSE;
         }
-        sprintf(buf, "[%d,%d,%d],", smartlight.color[0],
-                smartlight.color[1], smartlight.color[2]);
+        snprintf(buf, sizeof(buf) / sizeof(buf[0]), "[%d,%d,%d],",
+                smartlight.color[0], smartlight.color[1], smartlight.color[2]);
         if ((*writer)(kii, buf) == KII_FALSE) {
             return KII_FALSE;
         }
@@ -224,12 +226,30 @@ static kii_bool_t state_handler(
         if ((*writer)(kii, "\"colorTemperature\":") == KII_FALSE) {
             return KII_FALSE;
         }
-        sprintf(buf, "%d}", smartlight.color_temperature);
+        snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%d}",
+                smartlight.color_temperature);
         if ((*writer)(kii, buf) == KII_FALSE) {
             return KII_FALSE;
         }
         return KII_TRUE;
     }
+}
+
+static kii_bool_t custom_push_handler(
+        kii_t *kii,
+        const char* message,
+        size_t message_length)
+{
+    kii_bool_t ret = KII_TRUE;
+    printf("custom_push_handler:\n%s\n", message);
+    if (strncmp(message, "{\"schema\"", 9) == 0) {
+        ret = KII_FALSE;
+    }
+    // check no error in parsing topic.
+    if (strncmp(message, "{\"Item\":\"CheckNoError\"", 22) == 0) {
+        ret = KII_FALSE;
+    }
+    return ret;
 }
 
 static void print_help() {
@@ -266,6 +286,7 @@ int main(int argc, char** argv)
         sizeof(mqtt_buff) / sizeof(mqtt_buff[0]);
     command_handler_resource.action_handler = action_handler;
     command_handler_resource.state_handler = state_handler;
+    command_handler_resource.custom_push_handler = custom_push_handler;
 
     state_updater_resource.buffer = state_updater_buff;
     state_updater_resource.buffer_size =
