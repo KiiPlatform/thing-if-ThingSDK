@@ -739,19 +739,20 @@ static void* prv_update_status(void *sdata)
                         KII_TRUE) != 0) {
             M_KII_LOG(kii->kii_core.logger_cb(
                     "fail to start api call.\n"));
-            return NULL;
+            continue;
         }
         if (((kii_thing_if_t*)kii->app_context)->state_handler_for_period(kii,
                         prv_writer) == KII_FALSE) {
             M_KII_LOG(kii->kii_core.logger_cb(
                     "fail to start api call.\n"));
-            return NULL;
+            continue;
         }
         if (kii_api_call_run(kii) != 0) {
             M_KII_LOG(kii->kii_core.logger_cb("fail to run api.\n"));
-            return NULL;
+            continue;
         }
     }
+    return NULL;
 }
 
 static kii_bool_t prv_set_author(
