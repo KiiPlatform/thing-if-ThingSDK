@@ -32,7 +32,7 @@ SOURCES += $(wildcard ../kii/kii/*.c)
 SOURCES += $(wildcard ../kii/kii_json/src/*.c)
 SOURCES += ../kii/lib/jsmn/jsmn.c
 TARGET = exampleapp
-INCLUDES = -I.. -I../kii/kii-core -I../kii/kii-core/linux -I../kii/kii -I../kii/kii_json/include -I../kii/lib/jsmn -I../kii/Linux
+INCLUDES = -I.. -I../kii/kii-core -I../kii/kii-core/linux -I../kii/kii -I../kii/kii_json/include -I../kii/lib/jsmn -I../kii/Linux -I/usr/local/opt/openssl/include/
 
 
 all: clean $(TARGET) $(DOCTARGET)
