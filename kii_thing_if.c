@@ -37,7 +37,7 @@
 
 #define THING_IF_INFO "sn=tic;sv=0.9.4"
 
-static unsigned char mThingIFStateUpdate_taskStk[8];
+#define STATE_UPDATE_TASK_STACK 1200
 
 static kii_json_parse_result_t prv_kii_thing_if_json_read_object(
         kii_t* kii,
@@ -797,8 +797,7 @@ kii_bool_t onboard_with_vendor_thing_id(
     }
     kii_thing_if->state_updater.task_create_cb(NULL,
             prv_update_status, (void*)&kii_thing_if->state_updater,
-            (void*)mThingIFStateUpdate_taskStk,
-            sizeof(mThingIFStateUpdate_taskStk), 1);
+            NULL, STATE_UPDATE_TASK_STACK, 1);
 
     return KII_TRUE;
 }
@@ -889,8 +888,7 @@ kii_bool_t onboard_with_thing_id(
     }
     kii_thing_if->state_updater.task_create_cb(NULL,
             prv_update_status, (void*)&kii_thing_if->state_updater,
-            (void*)mThingIFStateUpdate_taskStk,
-            sizeof(mThingIFStateUpdate_taskStk), 1);
+            NULL, STATE_UPDATE_TASK_STACK, 1);
 
     return KII_TRUE;
 
@@ -930,8 +928,7 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
 
     kii_thing_if->state_updater.task_create_cb(NULL,
             prv_update_status, (void*)&kii_thing_if->state_updater,
-            (void*)mThingIFStateUpdate_taskStk,
-            sizeof(mThingIFStateUpdate_taskStk), 1);
+            NULL, STATE_UPDATE_TASK_STACK, 1);
 
 
     return KII_TRUE;
