@@ -699,7 +699,7 @@ static kii_bool_t prv_onboard_with_vendor_thing_id(
         return KII_FALSE;
     }
 
-    if (kii_push_start_routine(kii, 0, 0, received_callback) != 0) {
+    if (kii_push_start_routine(kii, received_callback) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to start routine.\n"));
         return KII_FALSE;
     }
@@ -861,7 +861,7 @@ static kii_bool_t prv_onboard_with_thing_id(
         return KII_FALSE;
     }
 
-    if (kii_push_start_routine(kii, 0, 0, received_callback) != 0) {
+    if (kii_push_start_routine(kii, received_callback) != 0) {
         return KII_FALSE;
     }
 
@@ -919,7 +919,7 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
         return KII_FALSE;
     }
 
-    if (kii_push_start_routine(&kii_thing_if->command_handler, 0, 0,
+    if (kii_push_start_routine(&kii_thing_if->command_handler,
                     received_callback) != 0) {
         return KII_FALSE;
     }
