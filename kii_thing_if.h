@@ -9,6 +9,8 @@
 extern "C" {
 #endif
 
+#define KII_THING_IF_TASK_NAME_STATUS_UPDATE "status_update_task"
+
 /** callback function for handling action.
  * @param [in] schema name of schema.
  * @maram [in] schema_version version of schema.

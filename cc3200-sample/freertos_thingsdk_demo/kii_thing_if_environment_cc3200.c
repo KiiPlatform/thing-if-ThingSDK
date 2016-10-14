@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#include "kii_thing_if.h"
+
 #include "simplelink.h"
 #ifndef NOTERM
 #include "uart_if.h"
@@ -176,11 +178,22 @@ kii_socket_code_t mqtt_close_cb_impl(kii_socket_context_t* socket_context)
 kii_task_code_t task_create_cb_impl(
         const char* name,
         KII_TASK_ENTRY entry,
-        void* param,
-        unsigned char* stk_start,
-        unsigned int stk_size,
-        unsigned int priority)
+        void* param)
 {
+    unsigned int stk_size = 0;
+    unsigned int priority = 0;
+
+    if (strcmp(name, KII_THING_IF_TASK_NAME_UPDATE_STATUS) == 0) {
+        stk_size = 2048;
+        priority = 1;
+    } else if (strcmp(name, KII_TASK_NAME_RECV_MSG) == 0) {
+        stk_size = 4096;
+#ifdef KII_PUSH_KEEP_ALIVE_INTERVAL_SECONDS
+    } else if (strcmp(name, KII_TASK_NAME_PING_REQ) == 0) {
+        stk_size = 1024;
+#endif
+    }
+
     if (osi_TaskCreate(entry, (const signed char*) name, stk_size, param, priority, NULL) < 0) {
         return KII_TASKC_FAIL;
     } else {
