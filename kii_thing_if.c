@@ -794,7 +794,7 @@ kii_bool_t onboard_with_vendor_thing_id(
         return KII_FALSE;
     }
     kii_thing_if->state_updater.task_create_cb(
-            KII_THING_IF_TASK_NAME_UPDATE_STATUS,
+            KII_THING_IF_TASK_NAME_STATUS_UPDATE,
             prv_update_status, (void*)&kii_thing_if->state_updater);
 
     return KII_TRUE;
@@ -885,7 +885,7 @@ kii_bool_t onboard_with_thing_id(
         return KII_FALSE;
     }
     kii_thing_if->state_updater.task_create_cb(
-            KII_THING_IF_TASK_NAME_UPDATE_STATUS,
+            KII_THING_IF_TASK_NAME_STATUS_UPDATE,
             prv_update_status, (void*)&kii_thing_if->state_updater);
 
     return KII_TRUE;
@@ -925,7 +925,7 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
     }
 
     kii_thing_if->state_updater.task_create_cb(
-            KII_THING_IF_TASK_NAME_UPDATE_STATUS,
+            KII_THING_IF_TASK_NAME_STATUS_UPDATE,
             prv_update_status, (void*)&kii_thing_if->state_updater);
 
 
