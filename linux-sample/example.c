@@ -90,7 +90,7 @@ static kii_bool_t action_handler(
     printf("schema=%s, schema_version=%d, action name=%s, action params=%s\n",
             schema, schema_version, action_name, action_params);
 
-    if (strcmp(schema, "SmartLightDemo") != 0 || schema_version != 1) {
+    if (strcmp(schema, "SmartLight-Demo") != 0 || schema_version != 1) {
         printf("invalid schema: %s %d\n", schema, schema_version);
         snprintf(error, EMESSAGE_SIZE + 1, "invalid schema: %s %d",
                 schema, schema_version);
