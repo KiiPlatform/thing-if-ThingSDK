@@ -70,12 +70,9 @@ kii_socket_code_t mqtt_close_cb_impl(kii_socket_context_t* socket_context)
 kii_task_code_t task_create_cb_impl(
         const char* name,
         KII_TASK_ENTRY entry,
-        void* param,
-        unsigned char* stk_start,
-        unsigned int stk_size,
-        unsigned int priority)
+        void* param)
 {
-    return task_create_cb(name, entry, param, stk_start, stk_size, priority);
+    return task_create_cb(name, entry, param);
 }
 
 void delay_ms_cb_impl(unsigned int msec)
