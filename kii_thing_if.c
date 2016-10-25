@@ -35,7 +35,7 @@
 #define CONTENT_TYPE_THING_ID "application/vnd.kii.OnboardingWithThingIDByThing+json"
 #define CONTENT_TYPE_JSON "application/json"
 
-#define THING_IF_INFO "sn=tic;sv=0.9.4"
+#define THING_IF_INFO "sn=tic;sv=0.9.5"
 
 static kii_json_parse_result_t prv_kii_thing_if_json_read_object(
         kii_t* kii,
