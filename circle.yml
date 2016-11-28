@@ -16,3 +16,9 @@ dependencies:
 test:
   pre:
     - make
+
+deployment:
+  production:
+    tag: /v[0-9]+.*/
+    commands:
+      - bash circleci_scripts/release_doc.sh
