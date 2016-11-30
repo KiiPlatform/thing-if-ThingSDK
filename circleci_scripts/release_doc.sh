@@ -5,7 +5,7 @@ declare -a uploadhosts=($DOC_HOST1 $DOC_HOST2)
 # path TBD
 basedir="/ext/ebs/references/c/thing-if"
 version=$(grep -o "version.*" sdk-info.txt | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')
-docFolderPath="~/thing-if-ThingSDK/doc/"
+docFolderPath="doc/"
 
 updir="$basedir/$version"
 latestdir="$basedir/latest"
