@@ -13,7 +13,7 @@ echo ""
 for host in "${uploadhosts[@]}"; do
   uptarget="$host:$updir"
   echo "Uploading to : $host"
-  rsync -rlptD --chmod=u+rw,g+r,o+r --chmod=Da+x --delete-after "$docFolderPath" "$uptarget"
+  rsync -rlptD --chmod=u+rw,g+r,o+r --chmod=Da+x --delete-after "$docFolderPath" "$uptarget" > /dev/null 2>&1
 
   # check command exit code
   exitCode=$?
@@ -22,7 +22,7 @@ for host in "${uploadhosts[@]}"; do
     exit $exitCode
   fi
 
-  ssh "$host" "rm $latestdir"
+  ssh "$host" "rm $latestdir" > /dev/null 2>&1
   # check command result
   exitCode=$?
   if [ $exitCode -ne 0 ]; then
@@ -30,7 +30,7 @@ for host in "${uploadhosts[@]}"; do
     exit $exitCode
   fi
 
-  ssh "$host" "ln -s $updir $latestdir"
+  ssh "$host" "ln -s $updir $latestdir" > /dev/null 2>&1
   # check command result
   exitCode=$?
   if [ $exitCode -ne 0 ]; then
