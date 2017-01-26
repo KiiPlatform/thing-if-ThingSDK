@@ -69,8 +69,27 @@ $(function() {
 <div class="fragment"><div class="line"># git submodule init</div><div class="line"># git submodule update</div><div class="line"># cd kii</div><div class="line"># git submodule init</div><div class="line"># git submodule update</div><div class="line"># cd ../</div></div><!-- fragment --><p>These commands retrieve required modules for this SDK.</p>
 <h2>Build</h2>
 <div class="fragment"><div class="line"># make</div></div><!-- fragment --><p>This makes libkiithingifsdk.so.</p>
-<p>## Debug Build </p><div class="fragment"><div class="line"># make DEBUG=1</div></div><!-- fragment --><p> In the Debug build, Debug log is enabled.</p>
-<h2>How to use</h2>
+<p>## Debug Build </p><div class="fragment"><div class="line"># make DEBUG=1</div></div><!-- fragment --><p>Standard build for debugging.</p>
+<ul>
+<li>KII_PUSH_KEEP_ALIVE_INTERVAL_SECONDS is set to 300 seconds.</li>
+<li>KII_JSON_FIXED_TOKEN_NUM is set to 128.</li>
+<li>Debug option (-g) and Debug log enabled.</li>
+</ul>
+<h2>Configure KII_PUSH_KEEP_ALIVE_INTERVAL_SECONDS</h2>
+<p>KII_PUSH_KEEP_ALIVE_INTERVAL_SECONDS macro is used to manage the Keep Alive Time Interval in MQTT. By default it is set to 300 seconds in the Makefile. To override the value, we provides <code>KEEP_ALIVE_INTERVAL</code> variable.</p>
+<div class="fragment"><div class="line"># make KEEP_ALIVE_INTERVAL=600</div></div><!-- fragment --><p>If 0 is specified, turn off the keep alive mechanism defined in MQTT. Setting short period will increase the load of MQTT broker when there is a lot of connected devices. For details, please refer to the <a href="http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc385349238">MQTT spec</a>.</p>
+<h2>Configure KII_JSON_FIXED_TOKEN_NUM</h2>
+<p>KII_JSON_FIXED_TOKEN_NUM macro is used to manage amount memory used to parse JSON when received it from server. Memory is allocated on stack. By default it is set to 128 in the Makefile. To override the value, we provides <code>FIXED_JSON_TOKEN_NUM</code> variable.</p>
+<div class="fragment"><div class="line"># make FIXED_JSON_TOKEN_NUM=256</div></div><!-- fragment --><p>Size of memory allocated by this can be calculated as following. </p><div class="fragment"><div class="line"><span class="keyword">sizeof</span>(kii_json_token_t) * KII_JSON_FIXED_TOKEN_NUM</div></div><!-- fragment --> <h2>Dynamic memory allocation for JSON parsing</h2>
+<p>If you prefer to dynamica allocation than fixed memory allocation by KII_JSON_FIXED_TOKEN_NUM, You will build sdk with FLEXIBLE_JSON_TOKEN variable.</p>
+<div class="fragment"><div class="line"># make FLEXIBLE_JSON_TOKEN=1</div></div><!-- fragment --><p>In this case, you need to implement KII_JSON_RESOURCE_CB function and set the pointer in kii_t struct.</p>
+<p>If both KII_JSON_FIXED_TOKEN_NUM and FLEXIBLE_JSON_TOKEN are specified, KII_JSON_FIXED_TOKEN_NUM is ignored.</p>
+<h2>Connect MQTT server using non-secure connection.</h2>
+<p>By default SDK connect to a MQTT broker using secure connection(tls). If you need to use non-secure connection(tcp) , please set KII_MQTT_USE_PORT_TCP macro.</p>
+<div class="fragment"><div class="line"># make KII_MQTT_USE_PORT_TCP=1</div></div><!-- fragment --><h2>Combination of variables</h2>
+<p>Only KII_JSON_FIXED_TOKEN_NUM and FLEXIBLE_JSON_TOKEN is exclusive. DEBUG, KEEP_ALIVE_INTERVAL, KII_MQTT_USE_PORT_TCP and either KII_JSON_FIXED_TOKEN_NUM or FLEXIBLE_JSON_TOKEN can be combined.</p>
+<p>ex.)</p>
+<div class="fragment"><div class="line"># make DEBUG=1 KEEP_ALIVE_INTERVAL=3600 KII_MQTT_USE_PORT_TCP=1 FLEXIBLE_JSON_TOKEN=1</div></div><!-- fragment --><h2>How to use</h2>
 <p>After the build finished, API Documentation is created under ./doc/html/index.html</p>
 <h2>Sample</h2>
 <p>linux-sample shows how to implement the client application works in the Thing.</p>
@@ -92,7 +111,7 @@ $(function() {
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 26 2017 14:27:12 for thing-if SDK by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jan 26 2017 19:25:09 for thing-if SDK by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.12
 </small></address>
