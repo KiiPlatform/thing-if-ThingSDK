@@ -9,6 +9,10 @@ else
 	override CFLAGS += -DKII_PUSH_KEEP_ALIVE_INTERVAL_SECONDS=$(KEEP_ALIVE_INTERVAL)
 endif
 
+ifdef KII_MQTT_USE_PORT_TCP
+	override CFLAGS += -DKII_MQTT_USE_PORT_TCP=$(KII_MQTT_USE_PORT_TCP)
+endif
+
 ifndef FIXED_JSON_TOKEN_NUM
 	JSON_FLAG = -DKII_JSON_FIXED_TOKEN_NUM=128
 else
@@ -21,26 +25,25 @@ endif
 
 override CFLAGS += $(JSON_FLAG)
 
-LIBS = -lssl -lcrypto -lpthread
-LD_FLAGS = -L..
+LIBS = -lssl -lcrypto -lpthread -lkiithingifsdk
+LD_FLAGS = -L.
 SOURCES = $(wildcard *.c)
-SOURCES += ../kii_thing_if.c ../kii_thing_if_environment_linux.c
-SOURCES += $(wildcard ../kii/Linux/kii_*.c)
-SOURCES += $(wildcard ../kii/kii-core/*.c)
-SOURCES += $(wildcard ../kii/kii-core/linux/kii_core*.c)
-SOURCES += $(wildcard ../kii/kii/*.c)
-SOURCES += $(wildcard ../kii/kii_json/src/*.c)
-SOURCES += ../kii/lib/jsmn/jsmn.c
 TARGET = exampleapp
 INCLUDES = -I.. -I../kii/kii-core -I../kii/kii-core/linux -I../kii/kii -I../kii/kii_json/include -I../kii/lib/jsmn -I../kii/Linux -I/usr/local/opt/openssl/include/
 
 
-all: clean $(TARGET) $(DOCTARGET)
+all: clean sdk $(TARGET) $(DOCTARGET)
+
+sdk:
+	$(MAKE) -C .. linux "CFLAGS+=$(CFLAGS)"
+	cp ../libkiithingifsdk.so ./
 
 $(TARGET):
 	gcc $(CFLAGS) $(SOURCES) $(LIBS) $(LD_FLAGS) $(INCLUDES) -o $@
 
 clean:
+	$(MAKE) -C .. clean
+	rm -f libkiithingifsdk.so
 	touch $(TARGET)
 	rm $(TARGET)
 	rm -rf $(DOCTARGET)
