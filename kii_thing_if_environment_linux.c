@@ -42,7 +42,11 @@ kii_socket_code_t mqtt_connect_cb_impl(
         const char* host,
         unsigned int port)
 {
+#ifdef KII_MQTT_USE_PORT_TCP
     return mqtt_connect_cb(socket_context, host, port);
+#else
+    return s_connect_cb(socket_context, host, port);
+#endif
 }
 
 kii_socket_code_t mqtt_send_cb_impl(
@@ -50,7 +54,11 @@ kii_socket_code_t mqtt_send_cb_impl(
         const char* buffer,
         size_t length)
 {
+#ifdef KII_MQTT_USE_PORT_TCP
     return mqtt_send_cb(socket_context, buffer, length);
+#else
+    return s_send_cb(socket_context, buffer, length);
+#endif
 }
 
 kii_socket_code_t mqtt_recv_cb_impl(
@@ -59,12 +67,20 @@ kii_socket_code_t mqtt_recv_cb_impl(
         size_t length_to_read,
         size_t* out_actual_length)
 {
+#ifdef KII_MQTT_USE_PORT_TCP
     return mqtt_recv_cb(socket_context, buffer, length_to_read, out_actual_length);
+#else
+    return s_recv_cb(socket_context, buffer, length_to_read, out_actual_length);
+#endif
 }
 
 kii_socket_code_t mqtt_close_cb_impl(kii_socket_context_t* socket_context)
 {
+#ifdef KII_MQTT_USE_PORT_TCP
     return mqtt_close_cb(socket_context);
+#else
+    return s_close_cb(socket_context);
+#endif
 }
 
 kii_task_code_t task_create_cb_impl(
