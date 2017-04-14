@@ -875,7 +875,7 @@ kii_bool_t onboard_with_thing_id(
         const char* thing_type,
         const char* thing_properties,
         const char* firmware_version,
-        const char* layout_position);
+        const char* layout_position)
 
 {
     // TODO: implement me.
