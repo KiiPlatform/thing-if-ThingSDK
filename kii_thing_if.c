@@ -805,6 +805,10 @@ static kii_bool_t prv_onboard_with_thing_id(
         const char* thing_id,
         const char* password)
 {
+    // TODO: implement me.
+    M_KII_THING_IF_ASSERT(0);
+    return KII_FALSE;
+    /*
     char resource_path[64];
 
     if (prv_kii_thing_if_get_anonymous_token(kii) != 0) {
@@ -866,6 +870,7 @@ static kii_bool_t prv_onboard_with_thing_id(
     }
 
     return KII_TRUE;
+    */
 }
 
 kii_bool_t onboard_with_thing_id(
