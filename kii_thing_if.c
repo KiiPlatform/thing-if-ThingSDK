@@ -878,8 +878,17 @@ static kii_bool_t prv_onboard_with_thing_id(
 kii_bool_t onboard_with_thing_id(
         kii_thing_if_t* kii_thing_if,
         const char* thing_id,
-        const char* password)
+        const char* password,
+        const char* thing_type,
+        const char* thing_properties,
+        const char* firmware_version,
+        const char* layout_position)
+
 {
+    // TODO: implement me.
+    M_KII_THING_IF_ASSERT(0);
+    return KII_FALSE;
+    /*
     if (prv_onboard_with_thing_id(&kii_thing_if->command_handler, thing_id,
                     password) == KII_FALSE) {
         return KII_FALSE;
@@ -896,7 +905,7 @@ kii_bool_t onboard_with_thing_id(
             prv_update_status, (void*)&kii_thing_if->state_updater);
 
     return KII_TRUE;
-
+    */
 }
 
 kii_bool_t init_kii_thing_if_with_onboarded_thing(
