@@ -277,20 +277,20 @@ kii_bool_t init_kii_thing_if(
  * @param [in] password Password of the thing given by thing
  * vendor. Must not be NULL and empty string.
  * @param [in] thing_type Type of the thing. If the thing is already
- * registered, this value would be ignored by IoT Cloud. If this value
+ * registered, this value would be ignored by Kii Cloud. If this value
  * is NULL or empty string, this value is ignored.
  * @param [in] thing_properties Other properties of the thing. please
  * refer to
  * http://docs.kii.com/rest/#thing_management-register_a_thing about
  * the format. If the thing is already registered, this value would be
- * ignored by IoT Cloud. If this value is NULL or empty string this
+ * ignored by Kii Cloud. If this value is NULL or empty string this
  * value is ignored.
  * @param [in] firmware_version Firmware version of the thing. If the
- * thing is already registered, this value would be ignored by IoT
+ * thing is already registered, this value would be ignored by Kii
  * Cloud. If this value is NULL or empty string this value is ignored.
  * @param [in] layout_position Layout position of the thing. Should be
  * one of "STANDALONE", "GATEWAY" or "ENDNODE". If the thing is
- * already registered, this value would be ignored by IoT Cloud. If
+ * already registered, this value would be ignored by Kii Cloud. If
  * this value is NULL or empty string and the thing is not registered
  * yet, then "STANDALONE" is used as default.
  * @return KII_TRUE when succeeded, KII_FALSE when failed.
@@ -308,25 +308,25 @@ kii_bool_t onboard_with_vendor_thing_id(
  * kii_thing_if_t#command_handler and kii_thing_if_t#state_updater instances are
  * used to call api.
  * @param [inout] kii_thing_if This SDK instance.
- * @param [in] thing_id thing ID issued by IoT Cloud. Must not be NULL
+ * @param [in] thing_id thing ID issued by Kii Cloud. Must not be NULL
  * and empty string.
  * @param [in] password Password of the thing given by thing
  * vendor. Must not be NULL and empty string.
  * @param [in] thing_type Type of the thing. If the thing is already
- * registered, this value would be ignored by IoT Cloud. If this value
+ * registered, this value would be ignored by Kii Cloud. If this value
  * is NULL or empty string, this value is ignored.
  * @param [in] thing_properties Other properties of the thing. please
  * refer to
  * http://docs.kii.com/rest/#thing_management-register_a_thing about
  * the format. If the thing is already registered, this value would be
- * ignored by IoT Cloud. If this value is NULL or empty string this
+ * ignored by Kii Cloud. If this value is NULL or empty string this
  * value is ignored.
  * @param [in] firmware_version Firmware version of the thing. If the
- * thing is already registered, this value would be ignored by IoT
+ * thing is already registered, this value would be ignored by Kii
  * Cloud. If this value is NULL or empty string this value is ignored.
  * @param [in] layout_position Layout position of the thing. Should be
  * one of "STANDALONE", "GATEWAY" or "ENDNODE". If the thing is
- * already registered, this value would be ignored by IoT Cloud. If
+ * already registered, this value would be ignored by Kii Cloud. If
  * this value is NULL or empty string and the thing is not registered
  * yet, then "STANDALONE" is used as default.
  * @return KII_TRUE when succeeded, KII_FALSE when failed.
