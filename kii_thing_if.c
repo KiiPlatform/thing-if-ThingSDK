@@ -608,7 +608,9 @@ static kii_bool_t prv_onboard_with_vendor_thing_id(
         const char* vendor_thing_id,
         const char* password,
         const char* thing_type,
-        const char* thing_properties)
+        const char* thing_properties,
+        const char* firmware_version,
+        const char* layout_position)
 {
     char resource_path[64];
 
@@ -680,6 +682,30 @@ static kii_bool_t prv_onboard_with_vendor_thing_id(
         }
         if (kii_api_call_append_body(kii, thing_properties,
                         strlen(thing_properties)) != 0) {
+            M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+            return KII_FALSE;
+        }
+    }
+    if (firmware_version != NULL) {
+        if (kii_api_call_append_body(kii, ",\"firmwareVersion\":",
+                        CONST_STRLEN(",\"firmwareVersion\":")) != 0) {
+            M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+            return KII_FALSE;
+        }
+        if (kii_api_call_append_body(kii, firmware_version,
+                        strlen(firmware_version)) != 0) {
+            M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+            return KII_FALSE;
+        }
+    }
+    if (layout_position != NULL) {
+        if (kii_api_call_append_body(kii, ",\"layoutPosition\":",
+                        CONST_STRLEN(",\"layoutPosition\":")) != 0) {
+            M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+            return KII_FALSE;
+        }
+        if (kii_api_call_append_body(kii, layout_position,
+                        strlen(layout_position)) != 0) {
             M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
             return KII_FALSE;
         }
@@ -783,13 +809,10 @@ kii_bool_t onboard_with_vendor_thing_id(
         const char* firmware_version,
         const char* layout_position)
 {
-    // TODO: implement me.
-    M_KII_THING_IF_ASSERT(0);
-    return KII_FALSE;
-    /*
     if (prv_onboard_with_vendor_thing_id(&kii_thing_if->command_handler,
                     vendor_thing_id, password, thing_type,
-                    thing_properties) == KII_FALSE) {
+                    thing_properties, firmware_version, layout_position)
+            == KII_FALSE) {
         return KII_FALSE;
     }
 
@@ -804,7 +827,6 @@ kii_bool_t onboard_with_vendor_thing_id(
             prv_update_status, (void*)&kii_thing_if->state_updater);
 
     return KII_TRUE;
-    */
 }
 
 static kii_bool_t prv_onboard_with_thing_id(
