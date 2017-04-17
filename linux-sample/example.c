@@ -395,10 +395,10 @@ int main(int argc, char** argv)
                 }
                 if (vendorThingID != NULL) {
                     result = onboard_with_vendor_thing_id(&kii_thing_if, vendorThingID,
-                            password, NULL, NULL);
+                            password, NULL, NULL, NULL, NULL);
                 } else {
                     result = onboard_with_thing_id(&kii_thing_if, thingID,
-                            password);
+                            password, NULL, NULL, NULL, NULL);
                 }
                 if (result == KII_FALSE) {
                     printf("failed to onboard.\n");
