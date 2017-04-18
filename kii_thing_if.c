@@ -527,6 +527,10 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
                 value_swap = value[value_len];
                 key[key_len] = '\0';
                 value[value_len] = '\0';
+
+                /* TODO: implement me. */
+                M_KII_THING_IF_ASSERT(0);
+                /*
                 if ((*handler)(schema, schema_version, key, value, error)
                         != KII_FALSE) {
                     if (kii_api_call_append_body(kii,
@@ -581,6 +585,7 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
                 }
                 key[key_len] = key_swap;
                 value[value_len] = value_swap;
+                */
             }
             case KII_JSON_PARSE_PARTIAL_SUCCESS:
                 /* This must be end of array. */
