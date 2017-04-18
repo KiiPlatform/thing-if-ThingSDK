@@ -873,7 +873,12 @@ kii_bool_t onboard_with_vendor_thing_id(
 static kii_bool_t prv_onboard_with_thing_id(
         kii_t* kii,
         const char* thing_id,
-        const char* password)
+        const char* password,
+        const char* thing_type,
+        const char* thing_properties,
+        const char* firmware_version,
+        const char* layout_position)
+
 {
     char resource_path[64];
 
@@ -898,25 +903,28 @@ static kii_bool_t prv_onboard_with_thing_id(
             "fail to start api call.\n"));
     }
 
-    if (kii_api_call_append_body(kii, "{\"thingID\":\"",
-                    CONST_STRLEN("{\"thingID\":\"")) != 0) {
+    /* Open to write JSON object. */
+    if (kii_api_call_append_body(kii, "{", CONST_STRLEN("{")) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
         return KII_FALSE;
     }
-    if (kii_api_call_append_body(kii, thing_id, strlen(thing_id)) != 0) {
+    /* Append key value pairs. */
+    if (prv_append_key_value_string(kii, "thingID", thing_id, FALSE) != 0 ||
+            prv_append_key_value_string(
+                kii, "thingPassword", password, TRUE) != 0 ||
+            prv_append_key_value_string_optional(
+                kii, "thingType", thing_type, TRUE) != 0 ||
+            prv_append_key_value_object_optional(
+                kii, "thingProperties", thing_properties, TRUE) != 0 ||
+            prv_append_key_value_string_optional(
+                kii, "firmwareVersion", firmware_version, TRUE) != 0 ||
+            prv_append_key_value_string_optional(
+                kii, "layoutPosition", layout_position, TRUE) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
         return KII_FALSE;
     }
-    if (kii_api_call_append_body(kii, "\",\"thingPassword\":\"",
-                    CONST_STRLEN("\",\"thingPassword\":\"")) != 0) {
-        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
-        return KII_FALSE;
-    }
-    if (kii_api_call_append_body(kii, password, strlen(password)) != 0) {
-        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
-        return KII_FALSE;
-    }
-    if (kii_api_call_append_body(kii, "\"}", CONST_STRLEN("\"}")) != 0) {
+    /* Close JSON object. */
+    if (kii_api_call_append_body(kii, "}", CONST_STRLEN("}")) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
         return KII_FALSE;
     }
@@ -948,12 +956,9 @@ kii_bool_t onboard_with_thing_id(
         const char* layout_position)
 
 {
-    // TODO: implement me.
-    M_KII_THING_IF_ASSERT(0);
-    return KII_FALSE;
-    /*
     if (prv_onboard_with_thing_id(&kii_thing_if->command_handler, thing_id,
-                    password) == KII_FALSE) {
+                    password, thing_type, thing_properties, firmware_version,
+                    layout_position) == KII_FALSE) {
         return KII_FALSE;
     }
 
@@ -968,7 +973,6 @@ kii_bool_t onboard_with_thing_id(
             prv_update_status, (void*)&kii_thing_if->state_updater);
 
     return KII_TRUE;
-    */
 }
 
 kii_bool_t init_kii_thing_if_with_onboarded_thing(
