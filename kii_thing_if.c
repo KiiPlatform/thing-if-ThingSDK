@@ -37,16 +37,17 @@
 
 #define THING_IF_INFO "sn=tic;sv=0.9.6"
 
-typedef enum successor_t {
-    NOT_SUCCESSOR,
-    IS_SUCCESSOR
-} successor_t;
+typedef enum prv_bool_t {
+    TRUE,
+    FALSE
+} prv_bool_t;
 
-static int prv_append_key_value_string(
+static int prv_append_key_value(
         kii_t* kii,
         const char* key,
         const char* value,
-        successor_t successor)
+        prv_bool_t is_successor,
+        prv_bool_t is_string)
 {
     if (key == NULL) {
         M_KII_LOG(kii->kii_core.logger_cb("key not specified.\n"));
@@ -58,38 +59,73 @@ static int prv_append_key_value_string(
         return -1;
     }
 
-    if (successor == IS_SUCCESSOR) {
+    if (is_successor == TRUE) {
         if (kii_api_call_append_body(kii, ",", CONST_STRLEN(",") != 0)) {
             M_KII_LOG(kii->kii_core.logger_cb(
                 "request size overflowed: (%s, %s).\n", key, value));
             return -1;
         }
     }
+    // Write key.
     if (kii_api_call_append_body(kii, "\"", CONST_STRLEN("\"")) != 0 ||
             kii_api_call_append_body(kii, key, strlen(key)) != 0 ||
-            kii_api_call_append_body(
-                kii, "\":\"", CONST_STRLEN("\":\"")) != 0 ||
-            kii_api_call_append_body(kii, value, strlen(value)) != 0 ||
-            kii_api_call_append_body(kii, "\"", CONST_STRLEN("\"")) != 0) {
+            kii_api_call_append_body(kii, "\":", CONST_STRLEN("\":")) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb(
             "request size overflowed: (%s, %s).\n", key, value));
         return -1;
     }
+
+    // Write value.
+    if (is_string == TRUE) {
+        if (kii_api_call_append_body(kii, "\"", CONST_STRLEN("\"")) != 0 ||
+                kii_api_call_append_body(kii, value, strlen(value)) != 0 ||
+                kii_api_call_append_body(kii, "\"", CONST_STRLEN("\"")) != 0) {
+            M_KII_LOG(kii->kii_core.logger_cb(
+                    "request size overflowed: (%s, %s).\n", key, value));
+            return -1;
+        }
+    } else {
+        if (kii_api_call_append_body(kii, value, strlen(value)) != 0) {
+            M_KII_LOG(kii->kii_core.logger_cb(
+                    "request size overflowed: (%s, %s).\n", key, value));
+            return -1;
+        }
+    }
     return 0;
+}
+
+static int prv_append_key_value_string(
+        kii_t* kii,
+        const char* key,
+        const char* value,
+        prv_bool_t is_successor)
+{
+    return prv_append_key_value(kii, key, value, is_successor, TRUE);
 }
 
 static int prv_append_key_value_string_optional(
         kii_t* kii,
         const char* key,
         const char* value,
-        successor_t successor)
+        prv_bool_t is_successor)
 {
     if (key == NULL || value == NULL) {
         return 0;
     }
-    return prv_append_key_value_string(kii, key, value, successor);
+    return prv_append_key_value(kii, key, value, is_successor, TRUE);
 }
 
+static int prv_append_key_value_object_optional(
+        kii_t* kii,
+        const char* key,
+        const char* value,
+        prv_bool_t is_successor)
+{
+    if (key == NULL || value == NULL) {
+        return 0;
+    }
+    return prv_append_key_value(kii, key, value, is_successor, FALSE);
+}
 
 static kii_json_parse_result_t prv_kii_thing_if_json_read_object(
         kii_t* kii,
@@ -695,17 +731,17 @@ static kii_bool_t prv_onboard_with_vendor_thing_id(
     }
     // Append key value pairs.
     if (prv_append_key_value_string(
-            kii, "vendorThingID", vendor_thing_id, NOT_SUCCESSOR) != 0 ||
+            kii, "vendorThingID", vendor_thing_id, FALSE) != 0 ||
             prv_append_key_value_string(
-                kii, "thingPassword", password, IS_SUCCESSOR) != 0 ||
+                kii, "thingPassword", password, TRUE) != 0 ||
             prv_append_key_value_string_optional(
-                kii, "thingType", thing_type, IS_SUCCESSOR) != 0 ||
+                kii, "thingType", thing_type, TRUE) != 0 ||
+            prv_append_key_value_object_optional(
+                kii, "thingProperties", thing_properties, TRUE) != 0 ||
             prv_append_key_value_string_optional(
-                kii, "thingProperties", thing_properties, IS_SUCCESSOR) != 0 ||
+                kii, "firmwareVersion", firmware_version, TRUE) != 0 ||
             prv_append_key_value_string_optional(
-                kii, "firmwareVersion", firmware_version, IS_SUCCESSOR) != 0 ||
-            prv_append_key_value_string_optional(
-                kii, "layoutPosition", layout_position, IS_SUCCESSOR) != 0) {
+                kii, "layoutPosition", layout_position, TRUE) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
         return KII_FALSE;
     }
