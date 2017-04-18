@@ -12,7 +12,7 @@ extern "C" {
 #define KII_THING_IF_TASK_NAME_STATUS_UPDATE "status_update_task"
 
 /** callback function for handling action.
- * @param [in] alias name of schema.
+ * @param [in] alias name of alias.
  * @param [in] action_name name of the action.
  * @param [in] action_params json object represents parameter of this action.
  * @param [out] error error message if operation is failed.(optional)
