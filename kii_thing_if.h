@@ -12,8 +12,7 @@ extern "C" {
 #define KII_THING_IF_TASK_NAME_STATUS_UPDATE "status_update_task"
 
 /** callback function for handling action.
- * @param [in] schema name of schema.
- * @maram [in] schema_version version of schema.
+ * @param [in] alias name of schema.
  * @param [in] action_name name of the action.
  * @param [in] action_params json object represents parameter of this action.
  * @param [out] error error message if operation is failed.(optional)
@@ -21,8 +20,7 @@ extern "C" {
  */
 typedef kii_bool_t
     (*KII_THING_IF_ACTION_HANDLER)
-        (const char* schema,
-         int schema_version,
+        (const char* alias,
          const char* action_name,
          const char* action_params,
          char error[EMESSAGE_SIZE + 1]);
