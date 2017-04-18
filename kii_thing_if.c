@@ -66,7 +66,7 @@ static int prv_append_key_value(
             return -1;
         }
     }
-    // Write key.
+    /* Write key. */
     if (kii_api_call_append_body(kii, "\"", CONST_STRLEN("\"")) != 0 ||
             kii_api_call_append_body(kii, key, strlen(key)) != 0 ||
             kii_api_call_append_body(kii, "\":", CONST_STRLEN("\":")) != 0) {
@@ -75,7 +75,7 @@ static int prv_append_key_value(
         return -1;
     }
 
-    // Write value.
+    /* Write value. */
     if (is_string == TRUE) {
         if (kii_api_call_append_body(kii, "\"", CONST_STRLEN("\"")) != 0 ||
                 kii_api_call_append_body(kii, value, strlen(value)) != 0 ||
@@ -439,7 +439,7 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
             break;
         case KII_JSON_PARSE_PARTIAL_SUCCESS:
             if (fields[0].result != KII_JSON_FIELD_PARSE_SUCCESS) {
-                // no schema.
+                /* no schema. */
                 return;
             }
             break;
@@ -729,12 +729,12 @@ static kii_bool_t prv_onboard_with_vendor_thing_id(
         M_KII_LOG(kii->kii_core.logger_cb("fail to start api call.\n"));
     }
 
-    // Open to write JSON object.
+    /* Open to write JSON object. */
     if (kii_api_call_append_body(kii, "{", CONST_STRLEN("{")) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
         return KII_FALSE;
     }
-    // Append key value pairs.
+    /* Append key value pairs. */
     if (prv_append_key_value_string(
             kii, "vendorThingID", vendor_thing_id, FALSE) != 0 ||
             prv_append_key_value_string(
@@ -750,7 +750,7 @@ static kii_bool_t prv_onboard_with_vendor_thing_id(
         M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
         return KII_FALSE;
     }
-    // Close JSON object.
+    /* Close JSON object. */
     if (kii_api_call_append_body(kii, "}", CONST_STRLEN("}")) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
         return KII_FALSE;
