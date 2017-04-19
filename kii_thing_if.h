@@ -274,12 +274,12 @@ kii_bool_t init_kii_thing_if(
  * vendor. Must not be NULL and empty string.
  * @param [in] password Password of the thing given by thing
  * vendor. Must not be NULL and empty string.
- * @param [in] thing_type Type of the thing. If the thing is already
- * registered, this value would be ignored by Kii Cloud. If this value
- * is NULL or empty string, this value is ignored.
- * @param [in] firmware_version Firmware version of the thing. If the
- * thing is already registered, this value would be ignored by Kii
- * Cloud. If this value is NULL or empty string this value is ignored.
+ * @param [in] thing_type Type of the thing. If users specify
+ * thing_type, this SDK updates thing type in Kii Cloud. If NULL or
+ * empty string, this value is ignored.
+ * @param [in] firmware_version Firmware version of the thing. If
+ * users specify firmware_version, this SDK updates firmware version
+ * in Kii Cloud. If NULL or empty string, this value is ignored.
  * @param [in] layout_position Layout position of the thing. Should be
  * one of "STANDALONE", "GATEWAY" or "ENDNODE". If the thing is
  * already registered, this value would be ignored by Kii Cloud. If
@@ -310,12 +310,12 @@ kii_bool_t onboard_with_vendor_thing_id(
  * and empty string.
  * @param [in] password Password of the thing given by thing
  * vendor. Must not be NULL and empty string.
- * @param [in] thing_type Type of the thing. If the thing is already
- * registered, this value would be ignored by Kii Cloud. If this value
- * is NULL or empty string, this value is ignored.
- * @param [in] firmware_version Firmware version of the thing. If the
- * thing is already registered, this value would be ignored by Kii
- * Cloud. If this value is NULL or empty string this value is ignored.
+ * @param [in] thing_type Type of the thing. If users specify
+ * thing_type, this SDK updates thing type in Kii Cloud. If NULL or
+ * empty string, this value is ignored.
+ * @param [in] firmware_version Firmware version of the thing. If
+ * users specify firmware_version, this SDK updates firmware version
+ * in Kii Cloud. If NULL or empty string, this value is ignored.
  * @param [in] layout_position Layout position of the thing. Should be
  * one of "STANDALONE", "GATEWAY" or "ENDNODE". If the thing is
  * already registered, this value would be ignored by Kii Cloud. If
