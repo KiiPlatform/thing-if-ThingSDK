@@ -277,12 +277,6 @@ kii_bool_t init_kii_thing_if(
  * @param [in] thing_type Type of the thing. If the thing is already
  * registered, this value would be ignored by Kii Cloud. If this value
  * is NULL or empty string, this value is ignored.
- * @param [in] thing_properties Other properties of the thing. please
- * refer to
- * http://docs.kii.com/rest/#thing_management-register_a_thing about
- * the format. If the thing is already registered, this value would be
- * ignored by Kii Cloud. If this value is NULL or empty string this
- * value is ignored.
  * @param [in] firmware_version Firmware version of the thing. If the
  * thing is already registered, this value would be ignored by Kii
  * Cloud. If this value is NULL or empty string this value is ignored.
@@ -291,6 +285,12 @@ kii_bool_t init_kii_thing_if(
  * already registered, this value would be ignored by Kii Cloud. If
  * this value is NULL or empty string and the thing is not registered
  * yet, then "STANDALONE" is used as default.
+ * @param [in] thing_properties Other properties of the thing. please
+ * refer to
+ * http://docs.kii.com/rest/#thing_management-register_a_thing about
+ * the format. If the thing is already registered, this value would be
+ * ignored by Kii Cloud. If this value is NULL or empty string this
+ * value is ignored.
  * @return KII_TRUE when succeeded, KII_FALSE when failed.
  */
 kii_bool_t onboard_with_vendor_thing_id(
@@ -298,9 +298,9 @@ kii_bool_t onboard_with_vendor_thing_id(
         const char* vendor_thing_id,
         const char* password,
         const char* thing_type,
-        const char* thing_properties,
         const char* firmware_version,
-        const char* layout_position);
+        const char* layout_position,
+        const char* thing_properties);
 
 /** Onboard to Thing_If Cloud with specified thing ID.
  * kii_thing_if_t#command_handler and kii_thing_if_t#state_updater instances are
@@ -313,12 +313,6 @@ kii_bool_t onboard_with_vendor_thing_id(
  * @param [in] thing_type Type of the thing. If the thing is already
  * registered, this value would be ignored by Kii Cloud. If this value
  * is NULL or empty string, this value is ignored.
- * @param [in] thing_properties Other properties of the thing. please
- * refer to
- * http://docs.kii.com/rest/#thing_management-register_a_thing about
- * the format. If the thing is already registered, this value would be
- * ignored by Kii Cloud. If this value is NULL or empty string this
- * value is ignored.
  * @param [in] firmware_version Firmware version of the thing. If the
  * thing is already registered, this value would be ignored by Kii
  * Cloud. If this value is NULL or empty string this value is ignored.
@@ -327,6 +321,12 @@ kii_bool_t onboard_with_vendor_thing_id(
  * already registered, this value would be ignored by Kii Cloud. If
  * this value is NULL or empty string and the thing is not registered
  * yet, then "STANDALONE" is used as default.
+ * @param [in] thing_properties Other properties of the thing. please
+ * refer to
+ * http://docs.kii.com/rest/#thing_management-register_a_thing about
+ * the format. If the thing is already registered, this value would be
+ * ignored by Kii Cloud. If this value is NULL or empty string this
+ * value is ignored.
  * @return KII_TRUE when succeeded, KII_FALSE when failed.
  */
 kii_bool_t onboard_with_thing_id(
@@ -334,9 +334,9 @@ kii_bool_t onboard_with_thing_id(
         const char* thing_id,
         const char* password,
         const char* thing_type,
-        const char* thing_properties,
         const char* firmware_version,
-        const char* layout_position);
+        const char* layout_position,
+        const char* thing_properties);
 
 
 /** Initialize kii_thing_if_t object with onboarded thing information.
