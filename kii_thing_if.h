@@ -279,7 +279,7 @@ kii_bool_t init_kii_thing_if(
  * @param [in] kii_thing_if_t This SDK instance.
  * @return KII_TRUE when succeeded, KII_FALSE when failed.
  */
-kii_bool_t activate(kii_thing_if_tg* kii_thing_if);
+kii_bool_t activate(kii_thing_if_t* kii_thing_if);
 
 /** Onboard to Thing_If Cloud with specified vendor thing ID.
  * kii_thing_if_t#command_handler and kii_thing_if_t#state_updater instances are
