@@ -1,3 +1,4 @@
+/** @file */
 #ifndef _KII_THING_IF_
 #define _KII_THING_IF_
 
@@ -266,6 +267,21 @@ kii_bool_t init_kii_thing_if(
         kii_thing_if_state_updater_resource_t* state_updater_resource,
         KII_JSON_RESOURCE_CB resource_cb);
 
+/** Activate kii_thing_if_t instance.
+ *
+ * thing-if ThingSDK starts to receive command and update states with
+ * this function.
+ *
+ * This function must be called after one of following functions
+ * - ::onboard_with_vendor_thing_id,
+ * - ::onboard_with_thing_id
+ * - ::init_kii_thing_if_with_onboarded_thing
+ *
+ * @param [in] kii_thing_if_t This SDK instance.
+ * @return KII_TRUE when succeeded, KII_FALSE when failed.
+ */
+kii_bool_t activate(kii_thing_if_tg* kii_thing_if);
+
 /** Onboard to Thing_If Cloud with specified vendor thing ID.
  * kii_thing_if_t#command_handler and kii_thing_if_t#state_updater instances are
  * used to call api.
@@ -378,6 +394,40 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
         kii_thing_if_command_handler_resource_t* command_handler_resource,
         kii_thing_if_state_updater_resource_t* state_updater_resource,
         KII_JSON_RESOURCE_CB resource_cb);
+
+/** Upate firmware version of a thing.
+ *
+ * This function must be called between ::activate and one of
+ * following functions:
+ * - ::onboard_with_vendor_thing_id,
+ * - ::onboard_with_thing_id
+ * - ::init_kii_thing_if_with_onboarded_thing
+ *
+ * @param [in] kii_thing_if_t This SDK instance.
+ * @param [in] firmware_version firmware version to update.
+ * @return KII_TRUE when succeeded, KII_FALSE when failed.
+ */
+kii_bool_t update_firmware_version(
+        kii_thing_if_t* kii_thing_if,
+        const char* firmware_version);
+
+/** Get current firmware version of a thing.
+ *
+ * This function must be called between ::activate and one of
+ * following functions:
+ * - ::onboard_with_vendor_thing_id,
+ * - ::onboard_with_thing_id
+ * - ::init_kii_thing_if_with_onboarded_thing
+ *
+ * @param [in] kii_thing_if_t This SDK instance.
+ * @param [out] current_firmware_version current firmware
+ * version. This is null terminated string. Application must not free
+ * this memory. If execution fails, NULL is assigned.
+ * @return KII_TRUE when succeeded, KII_FALSE when failed.
+ */
+kii_bool_t get_current_firmware_version(
+        kii_thing_if_t* kii_thing_if,
+        char** current_firmware_version);
 
 #ifdef __cplusplus
 }
