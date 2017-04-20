@@ -1,4 +1,3 @@
-/** @file */
 #ifndef _KII_THING_IF_
 #define _KII_THING_IF_
 
