@@ -293,9 +293,13 @@ kii_bool_t init_kii_thing_if(
  * - ::init_kii_thing_if_with_onboarded_thing
  *
  * @param [in] kii_thing_if_t This SDK instance.
- * @return KII_TRUE when succeeded, KII_FALSE when failed.
+ * @return This function returns following elements of ::kii_thing_if_error_t:
+ * | Element | Description |
+ * | :------ | :---------- |
+ * | ::KII_THING_IF_ERROR_NO_ERROR | execution succeed. |
+ * | ::KII_THING_IF_ERROR_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
  */
-kii_bool_t start(kii_thing_if_t* kii_thing_if);
+kii_thing_if_error_t start(kii_thing_if_t* kii_thing_if);
 
 /** Onboard to Thing_If Cloud with specified vendor thing ID.
  * kii_thing_if_t#command_handler and kii_thing_if_t#state_updater instances are
