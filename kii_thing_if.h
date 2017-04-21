@@ -420,9 +420,14 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
  *
  * @param [in] kii_thing_if_t This SDK instance.
  * @param [in] firmware_version firmware version to update.
- * @return KII_TRUE when succeeded, KII_FALSE when failed.
+ * @return This function returns following elements of ::kii_thing_if_error_t:
+ * | Element | Description |
+ * | :------ | :---------- |
+ * | ::KII_THING_IF_ERROR_NO_ERROR | execution succeed. |
+ * | ::KII_THING_IF_ERROR_THING_NOT_FOUND | There is no thing in Kii Cloud. |
+ * | ::KII_THING_IF_ERROR_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
  */
-kii_bool_t update_firmware_version(
+kii_thing_if_error_t update_firmware_version(
         kii_thing_if_t* kii_thing_if,
         const char* firmware_version);
 
@@ -463,9 +468,14 @@ kii_thing_if_error_t get_firmware_version(
  *
  * @param [in] kii_thing_if_t This SDK instance.
  * @param [in] thing_type thing type to update.
- * @return KII_TRUE when succeeded, KII_FALSE when failed.
+ * @return This function returns following elements of ::kii_thing_if_error_t:
+ * | Element | Description |
+ * | :------ | :---------- |
+ * | ::KII_THING_IF_ERROR_NO_ERROR | execution succeed. |
+ * | ::KII_THING_IF_ERROR_THING_NOT_FOUND | There is no thing in Kii Cloud. |
+ * | ::KII_THING_IF_ERROR_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
  */
-kii_bool_t update_thing_type(
+kii_thing_if_error_t update_thing_type(
         kii_thing_if_t* kii_thing_if,
         const char* thing_type);
 
