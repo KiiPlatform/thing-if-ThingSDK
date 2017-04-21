@@ -408,8 +408,6 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
 {
     kii_json_field_t fields[6];
     kii_json_field_t action[2];
-    const char* schema = NULL;
-    int schema_version = 0;
     char* actions_str = NULL;
     size_t actions_len = 0;
     char index[ULONGBUFSIZE];
@@ -417,11 +415,6 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
     char resource_path[256];
 
     memset(fields, 0x00, sizeof(fields));
-    fields[0].path = "/schema";
-    fields[0].type = KII_JSON_FIELD_TYPE_STRING;
-    fields[0].field_copy.string = NULL;
-    fields[1].path = "/schemaVersion";
-    fields[1].type = KII_JSON_FIELD_TYPE_INTEGER;
     fields[1].field_copy.string = NULL;
     fields[2].path = "/commandID";
     fields[2].type = KII_JSON_FIELD_TYPE_STRING;
@@ -481,9 +474,6 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
         M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
     }
 
-    schema = buffer + fields[0].start;
-    buffer[fields[0].end] = '\0';
-    schema_version = fields[1].field_copy.int_value;
     actions_str = buffer + fields[3].start;
     actions_len = fields[3].end - fields[3].start;
     memset(action, 0x00, sizeof(action));
