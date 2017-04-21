@@ -434,7 +434,7 @@ kii_bool_t update_firmware_version(
  *   empty string. This string also null terminated.
  * - Otherwise, returns NULL.
  */
-const char* get_current_firmware_version(kii_thing_if_t* kii_thing_if);
+const char* get_firmware_version(kii_thing_if_t* kii_thing_if);
 
 /** Upate thing type of a thing.
  *
@@ -476,7 +476,7 @@ kii_bool_t update_thing_type(
  *   empty string. This string also null terminated.
  * - Otherwise, returns NULL.
  */
-const char* get_current_thing_type(kii_thing_if_t* kii_thing_if);
+const char* get_thing_type(kii_thing_if_t* kii_thing_if);
 
 #ifdef __cplusplus
 }
