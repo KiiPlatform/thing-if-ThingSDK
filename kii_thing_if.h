@@ -418,9 +418,12 @@ kii_bool_t update_firmware_version(
  * - ::onboard_with_thing_id
  * - ::init_kii_thing_if_with_onboarded_thing
  *
- * Applications <b> must not free </b> the returned value. The
- * returned value is valid until other API is called. After other API
- * is called, the returned value might be broken.
+ * Applications <b> must not free </b> the returned value.
+ *
+ * The returned value is valid until other API is called. After other
+ * API is called, the returned value might be broken. If you want to
+ * use the returned value over other API call, you need to copy the
+ * returned value in your own.
  *
  * @param [in] kii_thing_if_t This SDK instance.
  * @return current firmware version. Contents of the return value is
@@ -432,6 +435,48 @@ kii_bool_t update_firmware_version(
  * - Otherwise, returns NULL.
  */
 const char* get_current_firmware_version(kii_thing_if_t* kii_thing_if);
+
+/** Upate thing type of a thing.
+ *
+ * This function must be called between ::activate and one of
+ * following functions:
+ * - ::onboard_with_vendor_thing_id,
+ * - ::onboard_with_thing_id
+ * - ::init_kii_thing_if_with_onboarded_thing
+ *
+ * @param [in] kii_thing_if_t This SDK instance.
+ * @param [in] thing_type thing type to update.
+ * @return KII_TRUE when succeeded, KII_FALSE when failed.
+ */
+kii_bool_t update_thing_type(
+        kii_thing_if_t* kii_thing_if,
+        const char* thing_type);
+
+/** Get current thing type of a thing.
+ *
+ * This function must be called between ::activate and one of
+ * following functions:
+ * - ::onboard_with_vendor_thing_id,
+ * - ::onboard_with_thing_id
+ * - ::init_kii_thing_if_with_onboarded_thing
+ *
+ * Applications <b> must not free </b> the returned value.
+ *
+ * The returned value is valid until other API is called. After other
+ * API is called, the returned value might be broken. If you want to
+ * use the returned value over other API call, you need to copy the
+ * returned value in your own.
+ *
+ * @param [in] kii_thing_if_t This SDK instance.
+ * @return current thing type. Contents of the return value is one of
+ * the followings:
+ * - If succeed to get current thing type, this function
+ *   returnes null terminated string denoting thing type.
+ * - If thing does not have thing type, this function returns
+ *   empty string. This string also null terminated.
+ * - Otherwise, returns NULL.
+ */
+const char* get_current_thing_type(kii_thing_if_t* kii_thing_if);
 
 #ifdef __cplusplus
 }
