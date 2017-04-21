@@ -406,25 +406,22 @@ static kii_bool_t prv_send_state(kii_t* kii)
 
 static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
 {
-    kii_json_field_t fields[6];
-    kii_json_field_t action[2];
-    char* actions_str = NULL;
-    size_t actions_len = 0;
+    kii_json_field_t fields[3];
+    kii_json_field_t alias_acton[2];
+    char* alias_actons_str = NULL;
+    size_t alias_actons_len = 0;
     char index[ULONGBUFSIZE];
     size_t i = 0;
     char resource_path[256];
 
     memset(fields, 0x00, sizeof(fields));
+    fields[0].path = "/commandID";
+    fields[0].type = KII_JSON_FIELD_TYPE_STRING;
+    fields[0].field_copy.string = NULL;
+    fields[1].path = "/actions";
+    fields[1].type = KII_JSON_FIELD_TYPE_ARRAY;
     fields[1].field_copy.string = NULL;
-    fields[2].path = "/commandID";
-    fields[2].type = KII_JSON_FIELD_TYPE_STRING;
-    fields[2].field_copy.string = NULL;
-    fields[3].path = "/actions";
-    fields[3].type = KII_JSON_FIELD_TYPE_ARRAY;
-    fields[3].field_copy.string = NULL;
-    fields[4].path = "/when";
-    fields[4].type = KII_JSON_FIELD_TYPE_LONG;
-    fields[5].path = NULL;
+    fields[2].path = NULL;
 
     switch(prv_kii_thing_if_json_read_object(
             kii, buffer, buffer_size, fields)) {
@@ -432,7 +429,7 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
             break;
         case KII_JSON_PARSE_PARTIAL_SUCCESS:
             if (fields[0].result != KII_JSON_FIELD_PARSE_SUCCESS) {
-                /* no schema. */
+                /* no command ID. */
                 return;
             }
             break;
@@ -474,18 +471,18 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
         M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
     }
 
-    actions_str = buffer + fields[3].start;
-    actions_len = fields[3].end - fields[3].start;
-    memset(action, 0x00, sizeof(action));
-    action[0].path = index;
-    action[0].type = KII_JSON_FIELD_TYPE_OBJECT;
-    action[0].field_copy.string = NULL;
-    action[0].result = KII_JSON_FIELD_PARSE_SUCCESS;
-    action[1].path = NULL;
-    for (i = 0; action[0].result == KII_JSON_FIELD_PARSE_SUCCESS; ++i) {
+    alias_actons_str = buffer + fields[1].start;
+    alias_actons_len = fields[1].end - fields[1].start;
+    memset(alias_acton, 0x00, sizeof(alias_acton));
+    alias_acton[0].path = index;
+    alias_acton[0].type = KII_JSON_FIELD_TYPE_OBJECT;
+    alias_acton[0].field_copy.string = NULL;
+    alias_acton[0].result = KII_JSON_FIELD_PARSE_SUCCESS;
+    alias_acton[1].path = NULL;
+    for (i = 0; alias_acton[0].result == KII_JSON_FIELD_PARSE_SUCCESS; ++i) {
         sprintf(index, "/[%lu]", i);
-        switch (prv_kii_thing_if_json_read_object(kii, actions_str, actions_len,
-                        action)) {
+        switch (prv_kii_thing_if_json_read_object(kii, alias_actons_str, alias_actons_len,
+                        alias_acton)) {
             case KII_JSON_PARSE_SUCCESS:
             {
                 KII_THING_IF_ACTION_HANDLER handler =
@@ -504,13 +501,13 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
                     }
                 }
                 if (prv_kii_thing_if_get_key_and_value_from_json(kii,
-                            actions_str + action[0].start,
-                            action[0].end - action[0].start, &key, &value,
+                            alias_actons_str + alias_acton[0].start,
+                            alias_acton[0].end - alias_acton[0].start, &key, &value,
                             &key_len, &value_len) != 0) {
-                    *(actions_str + action[0].end) = '\0';
+                    *(alias_actons_str + alias_acton[0].end) = '\0';
                     M_KII_LOG(kii->kii_core.logger_cb(
-                            "fail to parse action: %s.\n",
-                            actions_str + action[0].start));
+                            "fail to parse alias_acton: %s.\n",
+                            alias_actons_str + alias_acton[0].start));
                     return;
                 }
                 key_swap = key[key_len];
