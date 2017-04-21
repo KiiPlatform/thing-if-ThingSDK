@@ -406,11 +406,8 @@ static kii_bool_t prv_send_state(kii_t* kii)
 
 static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
 {
-    kii_json_field_t alias_acton[2];
     char* alias_actons_str = NULL;
     size_t alias_actons_len = 0;
-    char index[ULONGBUFSIZE];
-    size_t i = 0;
 
     /*
       1. Get start position of alias action array
@@ -483,115 +480,127 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
         return;
     }
 
-    memset(alias_acton, 0x00, sizeof(alias_acton));
-    alias_acton[0].path = index;
-    alias_acton[0].type = KII_JSON_FIELD_TYPE_OBJECT;
-    alias_acton[0].field_copy.string = NULL;
-    alias_acton[0].result = KII_JSON_FIELD_PARSE_SUCCESS;
-    alias_acton[1].path = NULL;
-    for (i = 0; alias_acton[0].result == KII_JSON_FIELD_PARSE_SUCCESS; ++i) {
-        sprintf(index, "/[%lu]", i);
-        switch (prv_kii_thing_if_json_read_object(kii, alias_actons_str, alias_actons_len,
-                        alias_acton)) {
-            case KII_JSON_PARSE_SUCCESS:
-            {
-                KII_THING_IF_ACTION_HANDLER handler =
-                    ((kii_thing_if_t*)kii->app_context)->action_handler;
-                char* key;
-                char* value;
-                size_t key_len, value_len;
-                char key_swap, value_swap;
-                char error[EMESSAGE_SIZE + 1];
-                if (i >= 1) {
-                    if (kii_api_call_append_body(kii, ",", sizeof(",") - 1)
-                            != 0) {
+    /*
+      1. Parse alias actions.
+      2. Send each alias action to application.
+      3. Make request to update command result.
+     */
+    {
+        kii_json_field_t alias_acton[2];
+        char index[ULONGBUFSIZE];
+        size_t i = 0;
+        memset(alias_acton, 0x00, sizeof(alias_acton));
+        alias_acton[0].path = index;
+        alias_acton[0].type = KII_JSON_FIELD_TYPE_OBJECT;
+        alias_acton[0].field_copy.string = NULL;
+        alias_acton[0].result = KII_JSON_FIELD_PARSE_SUCCESS;
+        alias_acton[1].path = NULL;
+        for (i = 0;
+                alias_acton[0].result == KII_JSON_FIELD_PARSE_SUCCESS;
+                ++i) {
+            sprintf(index, "/[%lu]", i);
+            switch (prv_kii_thing_if_json_read_object(kii, alias_actons_str,
+                            alias_actons_len, alias_acton)) {
+                case KII_JSON_PARSE_SUCCESS:
+                {
+                    KII_THING_IF_ACTION_HANDLER handler =
+                        ((kii_thing_if_t*)kii->app_context)->action_handler;
+                    char* key;
+                    char* value;
+                    size_t key_len, value_len;
+                    char key_swap, value_swap;
+                    char error[EMESSAGE_SIZE + 1];
+                    if (i >= 1) {
+                        if (kii_api_call_append_body(kii, ",", sizeof(",") - 1)
+                                != 0) {
+                            M_KII_LOG(kii->kii_core.logger_cb(
+                                    "request size overflowed.\n"));
+                            return;
+                        }
+                    }
+                    if (prv_kii_thing_if_get_key_and_value_from_json(kii,
+                                alias_actons_str + alias_acton[0].start,
+                                alias_acton[0].end - alias_acton[0].start,
+                                &key, &value, &key_len, &value_len) != 0) {
+                        *(alias_actons_str + alias_acton[0].end) = '\0';
                         M_KII_LOG(kii->kii_core.logger_cb(
-                                "request size overflowed.\n"));
+                                "fail to parse alias_acton: %s.\n",
+                                alias_actons_str + alias_acton[0].start));
                         return;
                     }
-                }
-                if (prv_kii_thing_if_get_key_and_value_from_json(kii,
-                            alias_actons_str + alias_acton[0].start,
-                            alias_acton[0].end - alias_acton[0].start, &key, &value,
-                            &key_len, &value_len) != 0) {
-                    *(alias_actons_str + alias_acton[0].end) = '\0';
-                    M_KII_LOG(kii->kii_core.logger_cb(
-                            "fail to parse alias_acton: %s.\n",
-                            alias_actons_str + alias_acton[0].start));
-                    return;
-                }
-                key_swap = key[key_len];
-                value_swap = value[value_len];
-                key[key_len] = '\0';
-                value[value_len] = '\0';
+                    key_swap = key[key_len];
+                    value_swap = value[value_len];
+                    key[key_len] = '\0';
+                    value[value_len] = '\0';
 
-                /* TODO: implement me. */
-                M_KII_THING_IF_ASSERT(0);
-                /*
-                if ((*handler)(schema, schema_version, key, value, error)
-                        != KII_FALSE) {
-                    if (kii_api_call_append_body(kii,
-                                    "{\"", sizeof("{\"") - 1) != 0) {
-                        M_KII_LOG(kii->kii_core.logger_cb(
-                                "request size overflowed.\n"));
-                        return;
+                    /* TODO: implement me. */
+                    M_KII_THING_IF_ASSERT(0);
+                    /*
+                    if ((*handler)(schema, schema_version, key, value, error)
+                            != KII_FALSE) {
+                        if (kii_api_call_append_body(kii,
+                                        "{\"", sizeof("{\"") - 1) != 0) {
+                            M_KII_LOG(kii->kii_core.logger_cb(
+                                    "request size overflowed.\n"));
+                            return;
+                        }
+                        if (kii_api_call_append_body(kii, key, strlen(key)) != 0) {
+                            M_KII_LOG(kii->kii_core.logger_cb(
+                                    "request size overflowed.\n"));
+                            return;
+                        }
+                        if (kii_api_call_append_body(kii, "\":{\"succeeded\":true}}",
+                                        sizeof("\":{\"succeeded\":true}}") - 1) != 0) {
+                            M_KII_LOG(kii->kii_core.logger_cb(
+                                    "request size overflowed.\n"));
+                            return;
+                        }
+                    } else {
+                        if (kii_api_call_append_body(kii,
+                                        "{\"", sizeof("{\"") - 1) != 0) {
+                            M_KII_LOG(kii->kii_core.logger_cb(
+                                    "request size overflowed.\n"));
+                            return;
+                        }
+                        if (kii_api_call_append_body(kii, key, strlen(key)) != 0) {
+                            M_KII_LOG(kii->kii_core.logger_cb(
+                                    "request size overflowed.\n"));
+                            return;
+                        }
+                        if (kii_api_call_append_body(kii,
+                                        "\":{\"succeeded\":false,\"errorMessage\":\"",
+                                        sizeof("\":{\"succeeded\":false,\"errorMessage\":\"") - 1)
+                                != 0) {
+                            M_KII_LOG(kii->kii_core.logger_cb(
+                                    "request size overflowed.\n"));
+                            return;
+                        }
+                        if (kii_api_call_append_body(kii, error, strlen(error))
+                                != 0) {
+                            M_KII_LOG(kii->kii_core.logger_cb(
+                                    "request size overflowed.\n"));
+                            return;
+                        }
+                        if (kii_api_call_append_body(kii,
+                                        "\"}}", sizeof("\"}}") - 1) != 0) {
+                            M_KII_LOG(kii->kii_core.logger_cb(
+                                    "request size overflowed.\n"));
+                            return;
+                        }
                     }
-                    if (kii_api_call_append_body(kii, key, strlen(key)) != 0) {
-                        M_KII_LOG(kii->kii_core.logger_cb(
-                                "request size overflowed.\n"));
-                        return;
-                    }
-                    if (kii_api_call_append_body(kii, "\":{\"succeeded\":true}}",
-                                    sizeof("\":{\"succeeded\":true}}") - 1) != 0) {
-                        M_KII_LOG(kii->kii_core.logger_cb(
-                                "request size overflowed.\n"));
-                        return;
-                    }
-                } else {
-                    if (kii_api_call_append_body(kii,
-                                    "{\"", sizeof("{\"") - 1) != 0) {
-                        M_KII_LOG(kii->kii_core.logger_cb(
-                                "request size overflowed.\n"));
-                        return;
-                    }
-                    if (kii_api_call_append_body(kii, key, strlen(key)) != 0) {
-                        M_KII_LOG(kii->kii_core.logger_cb(
-                                "request size overflowed.\n"));
-                        return;
-                    }
-                    if (kii_api_call_append_body(kii,
-                                    "\":{\"succeeded\":false,\"errorMessage\":\"",
-                                    sizeof("\":{\"succeeded\":false,\"errorMessage\":\"") - 1)
-                            != 0) {
-                        M_KII_LOG(kii->kii_core.logger_cb(
-                                "request size overflowed.\n"));
-                        return;
-                    }
-                    if (kii_api_call_append_body(kii, error, strlen(error))
-                            != 0) {
-                        M_KII_LOG(kii->kii_core.logger_cb(
-                                "request size overflowed.\n"));
-                        return;
-                    }
-                    if (kii_api_call_append_body(kii,
-                                    "\"}}", sizeof("\"}}") - 1) != 0) {
-                        M_KII_LOG(kii->kii_core.logger_cb(
-                                "request size overflowed.\n"));
-                        return;
-                    }
+                    key[key_len] = key_swap;
+                    value[value_len] = value_swap;
+                    */
                 }
-                key[key_len] = key_swap;
-                value[value_len] = value_swap;
-                */
+                case KII_JSON_PARSE_PARTIAL_SUCCESS:
+                    /* This must be end of array. */
+                    break;
+                case KII_JSON_PARSE_ROOT_TYPE_ERROR:
+                case KII_JSON_PARSE_INVALID_INPUT:
+                default:
+                    M_KII_LOG(kii->kii_core.logger_cb("unexpected error.\n"));
+                    return ;
             }
-            case KII_JSON_PARSE_PARTIAL_SUCCESS:
-                /* This must be end of array. */
-                break;
-            case KII_JSON_PARSE_ROOT_TYPE_ERROR:
-            case KII_JSON_PARSE_INVALID_INPUT:
-            default:
-                M_KII_LOG(kii->kii_core.logger_cb("unexpected error.\n"));
-                return ;
         }
     }
 
