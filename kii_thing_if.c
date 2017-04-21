@@ -406,8 +406,8 @@ static kii_bool_t prv_send_state(kii_t* kii)
 
 static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
 {
-    char* alias_actons_str = NULL;
-    size_t alias_actons_len = 0;
+    char* alias_actions_str = NULL;
+    size_t alias_actions_len = 0;
 
     /*
       1. Get start position of alias action array
@@ -470,8 +470,8 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
             return;
         }
 
-        alias_actons_str = buffer + fields[1].start;
-        alias_actons_len = fields[1].end - fields[1].start;
+        alias_actions_str = buffer + fields[1].start;
+        alias_actions_len = fields[1].end - fields[1].start;
     }
 
     if (kii_api_call_append_body(kii, "{\"actionResults\":[",
@@ -486,21 +486,21 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
       3. Make request to update command result.
      */
     {
-        kii_json_field_t alias_acton[2];
+        kii_json_field_t alias_action[2];
         char index[ULONGBUFSIZE];
-        size_t i = 0;
-        memset(alias_acton, 0x00, sizeof(alias_acton));
-        alias_acton[0].path = index;
-        alias_acton[0].type = KII_JSON_FIELD_TYPE_OBJECT;
-        alias_acton[0].field_copy.string = NULL;
-        alias_acton[0].result = KII_JSON_FIELD_PARSE_SUCCESS;
-        alias_acton[1].path = NULL;
-        for (i = 0;
-                alias_acton[0].result == KII_JSON_FIELD_PARSE_SUCCESS;
-                ++i) {
-            sprintf(index, "/[%lu]", i);
-            switch (prv_kii_thing_if_json_read_object(kii, alias_actons_str,
-                            alias_actons_len, alias_acton)) {
+        size_t alias_action_index = 0;
+        memset(alias_action, 0x00, sizeof(alias_action));
+        alias_action[0].path = index;
+        alias_action[0].type = KII_JSON_FIELD_TYPE_OBJECT;
+        alias_action[0].field_copy.string = NULL;
+        alias_action[0].result = KII_JSON_FIELD_PARSE_SUCCESS;
+        alias_action[1].path = NULL;
+        for (alias_action_index = 0;
+                alias_action[0].result == KII_JSON_FIELD_PARSE_SUCCESS;
+                ++alias_action_index) {
+            sprintf(index, "/[%lu]", alias_action_index);
+            switch (prv_kii_thing_if_json_read_object(kii, alias_actions_str,
+                            alias_actions_len, alias_action)) {
                 case KII_JSON_PARSE_SUCCESS:
                 {
                     KII_THING_IF_ACTION_HANDLER handler =
@@ -510,7 +510,7 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
                     size_t key_len, value_len;
                     char key_swap, value_swap;
                     char error[EMESSAGE_SIZE + 1];
-                    if (i >= 1) {
+                    if (alias_action_index >= 1) {
                         if (kii_api_call_append_body(kii, ",", sizeof(",") - 1)
                                 != 0) {
                             M_KII_LOG(kii->kii_core.logger_cb(
@@ -519,13 +519,13 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
                         }
                     }
                     if (prv_kii_thing_if_get_key_and_value_from_json(kii,
-                                alias_actons_str + alias_acton[0].start,
-                                alias_acton[0].end - alias_acton[0].start,
+                                alias_actions_str + alias_action[0].start,
+                                alias_action[0].end - alias_action[0].start,
                                 &key, &value, &key_len, &value_len) != 0) {
-                        *(alias_actons_str + alias_acton[0].end) = '\0';
+                        *(alias_actions_str + alias_action[0].end) = '\0';
                         M_KII_LOG(kii->kii_core.logger_cb(
-                                "fail to parse alias_acton: %s.\n",
-                                alias_actons_str + alias_acton[0].start));
+                                "fail to parse alias_action: %s.\n",
+                                alias_actions_str + alias_action[0].start));
                         return;
                     }
                     key_swap = key[key_len];
