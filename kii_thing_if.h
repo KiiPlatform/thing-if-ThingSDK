@@ -9,6 +9,22 @@
 extern "C" {
 #endif
 
+/** Enumeration representing error of thing-if ThingSDK. */
+typedef enum kii_thing_if_error_t {
+    /** Functions succeed. There is no error. */
+    KII_THING_IF_ERROR_NO_ERROR = 0,
+    /** Information trying to get from a function is not found. */
+    KII_THING_IF_ERROR_TARGET_NOT_FOUND,
+    /** Thing is not found in Kii Cloud. */
+    KII_THING_IF_ERROR_THING_NOT_FOUND,
+    /** kii_thing_if_t instance is not onbarded. Please onboard first. */
+    KII_THING_IF_ERROR_NOT_ONBOARDED,
+    /** A buffer size provided from applications is shorter than a
+     * function can copy the information got from Kii Cloud.
+     */
+    KII_THING_IF_ERROR_LENGTH_EXCEEDED
+} kii_thing_if_error_t;
+
 #define KII_THING_IF_TASK_NAME_STATUS_UPDATE "status_update_task"
 
 /** callback function for handling action.
@@ -410,7 +426,7 @@ kii_bool_t update_firmware_version(
         kii_thing_if_t* kii_thing_if,
         const char* firmware_version);
 
-/** Get current firmware version of a thing.
+/** Get firmware version of a thing.
  *
  * This function must be called between ::start and one of
  * following functions:
@@ -418,23 +434,24 @@ kii_bool_t update_firmware_version(
  * - ::onboard_with_thing_id
  * - ::init_kii_thing_if_with_onboarded_thing
  *
- * Applications <b> must not free </b> the returned value.
- *
- * The returned value is valid until other API is called. After other
- * API is called, the returned value might be broken. If you want to
- * use the returned value over other API call, you need to copy the
- * returned value in your own.
- *
  * @param [in] kii_thing_if_t This SDK instance.
- * @return current firmware version. Contents of the return value is
- * one of the followings:
- * - If succeed to get current firmware version, this function
- *   returnes null terminated string denoting firmware version.
- * - If thing does not have firmware version, this function returns
- *   empty string. This string also null terminated.
- * - Otherwise, returns NULL.
+ * @param [out] firmware_version a buffer to copy firmware version got
+ * from Kii Cloud. This SDK makes the buffer null terminated string.
+ * @param [in] firmware_version_len length of firmware_version which
+ * is second argument of this function.
+ * @return This function returns following elements of ::kii_thing_if_error_t:
+ * | Element | Description |
+ * | :------ | :---------- |
+ * | ::KII_THING_IF_ERROR_NO_ERROR | execution succeed. |
+ * | ::KII_THING_IF_ERROR_TARGET_NOT_FOUND | Thing has no firmware version. |
+ * | ::KII_THING_IF_ERROR_THING_NOT_FOUND | There is no thing in Kii Cloud. |
+ * | ::KII_THING_IF_ERROR_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
+ * | ::KII_THING_IF_ERROR_LENGTH_EXCEEDED | Length of firmware version exceed by firmware_version_len. |
  */
-const char* get_firmware_version(kii_thing_if_t* kii_thing_if);
+kii_thing_if_error_t get_firmware_version(
+        kii_thing_if_t* kii_thing_if,
+        char* firmware_version,
+        size_t firmware_version_len);
 
 /** Upate thing type of a thing.
  *
@@ -460,23 +477,24 @@ kii_bool_t update_thing_type(
  * - ::onboard_with_thing_id
  * - ::init_kii_thing_if_with_onboarded_thing
  *
- * Applications <b> must not free </b> the returned value.
- *
- * The returned value is valid until other API is called. After other
- * API is called, the returned value might be broken. If you want to
- * use the returned value over other API call, you need to copy the
- * returned value in your own.
- *
  * @param [in] kii_thing_if_t This SDK instance.
- * @return current thing type. Contents of the return value is one of
- * the followings:
- * - If succeed to get current thing type, this function
- *   returnes null terminated string denoting thing type.
- * - If thing does not have thing type, this function returns
- *   empty string. This string also null terminated.
- * - Otherwise, returns NULL.
+ * @param [out] thing_type a buffer to copy thing type got
+ * from Kii Cloud. This SDK makes the buffer null terminated string.
+ * @param [in] thing_type_len length of thing_type which
+ * is second argument of this function.
+ * @return This function returns following elements of ::kii_thing_if_error_t:
+ * | Element | Description |
+ * | :------ | :---------- |
+ * | ::KII_THING_IF_ERROR_NO_ERROR | execution succeed. |
+ * | ::KII_THING_IF_ERROR_TARGET_NOT_FOUND | Thing has no thing type. |
+ * | ::KII_THING_IF_ERROR_THING_NOT_FOUND | There is no thing in Kii Cloud. |
+ * | ::KII_THING_IF_ERROR_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
+ * | ::KII_THING_IF_ERROR_LENGTH_EXCEEDED | Length of thing type exceed by thing_type_len. |
  */
-const char* get_thing_type(kii_thing_if_t* kii_thing_if);
+kii_thing_if_error_t get_thing_type(
+        kii_thing_if_t* kii_thing_if,
+        char* thing_type,
+        size_t thing_type_len);
 
 #ifdef __cplusplus
 }
