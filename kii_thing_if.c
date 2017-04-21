@@ -406,73 +406,83 @@ static kii_bool_t prv_send_state(kii_t* kii)
 
 static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
 {
-    kii_json_field_t fields[3];
     kii_json_field_t alias_acton[2];
     char* alias_actons_str = NULL;
     size_t alias_actons_len = 0;
     char index[ULONGBUFSIZE];
     size_t i = 0;
-    char resource_path[256];
 
-    memset(fields, 0x00, sizeof(fields));
-    fields[0].path = "/commandID";
-    fields[0].type = KII_JSON_FIELD_TYPE_STRING;
-    fields[0].field_copy.string = NULL;
-    fields[1].path = "/actions";
-    fields[1].type = KII_JSON_FIELD_TYPE_ARRAY;
-    fields[1].field_copy.string = NULL;
-    fields[2].path = NULL;
+    /*
+      1. Get start position of alias action array
+      2. Start to make request to update command result with kii_api_call_start.
+    */
+    {
+        kii_json_field_t fields[3];
+        char resource_path[256];
+        memset(fields, 0x00, sizeof(fields));
+        fields[0].path = "/commandID";
+        fields[0].type = KII_JSON_FIELD_TYPE_STRING;
+        fields[0].field_copy.string = NULL;
+        fields[1].path = "/actions";
+        fields[1].type = KII_JSON_FIELD_TYPE_ARRAY;
+        fields[1].field_copy.string = NULL;
+        fields[2].path = NULL;
 
-    switch(prv_kii_thing_if_json_read_object(
-            kii, buffer, buffer_size, fields)) {
-        case KII_JSON_PARSE_SUCCESS:
-            break;
-        case KII_JSON_PARSE_PARTIAL_SUCCESS:
-            if (fields[0].result != KII_JSON_FIELD_PARSE_SUCCESS) {
-                /* no command ID. */
+        switch(prv_kii_thing_if_json_read_object(
+                kii, buffer, buffer_size, fields)) {
+            case KII_JSON_PARSE_SUCCESS:
+                break;
+            case KII_JSON_PARSE_PARTIAL_SUCCESS:
+                if (fields[0].result != KII_JSON_FIELD_PARSE_SUCCESS) {
+                    /* no command ID. */
+                    return;
+                }
+                break;
+            default:
+                M_KII_LOG(kii->kii_core.logger_cb(
+                        "fail to parse received message.\n"));
                 return;
-            }
-            break;
-        default:
+        }
+
+        if (sizeof(resource_path) / sizeof(resource_path[0]) <=
+                CONST_STRLEN(THING_IF_APP_PATH) +
+                strlen(kii->kii_core.app_id) + CONST_STRLEN(TARGET_PART) +
+                strlen(kii->kii_core.author.author_id) +
+                CONST_STRLEN(COMMAND_PART) +
+                (fields[2].end - fields[2].start - 1) +
+                CONST_STRLEN(RESULTS_PART)) {
             M_KII_LOG(kii->kii_core.logger_cb(
-                    "fail to parse received message.\n"));
+                    "resource path is longer than expected.\n"));
             return;
+        }
+
+        resource_path[0] = '\0';
+        strcat(resource_path, THING_IF_APP_PATH);
+        strcat(resource_path, kii->kii_core.app_id);
+        strcat(resource_path, TARGET_PART);
+        strcat(resource_path, kii->kii_core.author.author_id);
+        strcat(resource_path, COMMAND_PART);
+        strncat(resource_path, buffer + fields[2].start,
+                fields[2].end - fields[2].start);
+        strcat(resource_path, RESULTS_PART);
+        /* TODO: Check properties. */
+
+        if (kii_api_call_start(kii, "PUT", resource_path, "application/json",
+                        KII_TRUE) != 0) {
+            M_KII_LOG(kii->kii_core.logger_cb("fail to start api call.\n"));
+            return;
+        }
+
+        alias_actons_str = buffer + fields[1].start;
+        alias_actons_len = fields[1].end - fields[1].start;
     }
 
-    if (sizeof(resource_path) / sizeof(resource_path[0]) <=
-            CONST_STRLEN(THING_IF_APP_PATH) +
-            strlen(kii->kii_core.app_id) + CONST_STRLEN(TARGET_PART) +
-            strlen(kii->kii_core.author.author_id) +
-            CONST_STRLEN(COMMAND_PART) + (fields[2].end - fields[2].start - 1) +
-            CONST_STRLEN(RESULTS_PART)) {
-        M_KII_LOG(kii->kii_core.logger_cb(
-                "resource path is longer than expected.\n"));
-        return;
-    }
-
-    resource_path[0] = '\0';
-    strcat(resource_path, THING_IF_APP_PATH);
-    strcat(resource_path, kii->kii_core.app_id);
-    strcat(resource_path, TARGET_PART);
-    strcat(resource_path, kii->kii_core.author.author_id);
-    strcat(resource_path, COMMAND_PART);
-    strncat(resource_path, buffer + fields[2].start,
-            fields[2].end - fields[2].start);
-    strcat(resource_path, RESULTS_PART);
-    /* TODO: Check properties. */
-
-    if (kii_api_call_start(kii, "PUT", resource_path, "application/json",
-                    KII_TRUE) != 0) {
-        M_KII_LOG(kii->kii_core.logger_cb("fail to start api call.\n"));
-        return;
-    }
     if (kii_api_call_append_body(kii, "{\"actionResults\":[",
-                    sizeof("{\"actionResults\":[") - 1) != 0) {
+                    CONST_STRLEN("{\"actionResults\":[")) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+        return;
     }
 
-    alias_actons_str = buffer + fields[1].start;
-    alias_actons_len = fields[1].end - fields[1].start;
     memset(alias_acton, 0x00, sizeof(alias_acton));
     alias_acton[0].path = index;
     alias_acton[0].type = KII_JSON_FIELD_TYPE_OBJECT;
