@@ -423,7 +423,8 @@ kii_bool_t update_firmware_version(
  * is called, the returned value might be broken.
  *
  * @param [in] kii_thing_if_t This SDK instance.
- * @return current firmware version. This is null terminated string.
+ * @return current firmware version. Contents of the return value is
+ * one of the followings:
  * - If succeed to get current firmware version, this function
  *   returnes null terminated string denoting firmware version.
  * - If thing does not have firmware version, this function returns
