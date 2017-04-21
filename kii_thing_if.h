@@ -266,7 +266,7 @@ kii_bool_t init_kii_thing_if(
         kii_thing_if_state_updater_resource_t* state_updater_resource,
         KII_JSON_RESOURCE_CB resource_cb);
 
-/** Activate kii_thing_if_t instance.
+/** Start kii_thing_if_t instance.
  *
  * thing-if ThingSDK starts to receive command and update states with
  * this function.
@@ -279,7 +279,7 @@ kii_bool_t init_kii_thing_if(
  * @param [in] kii_thing_if_t This SDK instance.
  * @return KII_TRUE when succeeded, KII_FALSE when failed.
  */
-kii_bool_t activate(kii_thing_if_t* kii_thing_if);
+kii_bool_t start(kii_thing_if_t* kii_thing_if);
 
 /** Onboard to Thing_If Cloud with specified vendor thing ID.
  * kii_thing_if_t#command_handler and kii_thing_if_t#state_updater instances are
@@ -396,7 +396,7 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
 
 /** Upate firmware version of a thing.
  *
- * This function must be called between ::activate and one of
+ * This function must be called between ::start and one of
  * following functions:
  * - ::onboard_with_vendor_thing_id,
  * - ::onboard_with_thing_id
@@ -412,7 +412,7 @@ kii_bool_t update_firmware_version(
 
 /** Get current firmware version of a thing.
  *
- * This function must be called between ::activate and one of
+ * This function must be called between ::start and one of
  * following functions:
  * - ::onboard_with_vendor_thing_id,
  * - ::onboard_with_thing_id
@@ -438,7 +438,7 @@ const char* get_current_firmware_version(kii_thing_if_t* kii_thing_if);
 
 /** Upate thing type of a thing.
  *
- * This function must be called between ::activate and one of
+ * This function must be called between ::start and one of
  * following functions:
  * - ::onboard_with_vendor_thing_id,
  * - ::onboard_with_thing_id
@@ -454,7 +454,7 @@ kii_bool_t update_thing_type(
 
 /** Get current thing type of a thing.
  *
- * This function must be called between ::activate and one of
+ * This function must be called between ::start and one of
  * following functions:
  * - ::onboard_with_vendor_thing_id,
  * - ::onboard_with_thing_id
