@@ -22,7 +22,9 @@ typedef enum kii_thing_if_error_t {
     /** A buffer size provided from applications is shorter than a
      * function can copy the information got from Kii Cloud.
      */
-    KII_THING_IF_ERROR_LENGTH_EXCEEDED
+    KII_THING_IF_ERROR_LENGTH_EXCEEDED,
+    /** thing-if ThingSDK is alreday started. */
+    KII_THING_IF_ERROR_ALREADY_STARTED
 } kii_thing_if_error_t;
 
 #define KII_THING_IF_TASK_NAME_STATUS_UPDATE "status_update_task"
@@ -430,6 +432,7 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
  * | ::KII_THING_IF_ERROR_NO_ERROR | execution succeed. |
  * | ::KII_THING_IF_ERROR_THING_NOT_FOUND | There is no thing in Kii Cloud. |
  * | ::KII_THING_IF_ERROR_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
+ * | ::KII_THING_IF_ERROR_ALREADY_STARTED | thing-if ThingSDK is already started.|
  */
 kii_thing_if_error_t update_firmware_version(
         kii_thing_if_t* kii_thing_if,
@@ -456,6 +459,7 @@ kii_thing_if_error_t update_firmware_version(
  * | ::KII_THING_IF_ERROR_THING_NOT_FOUND | There is no thing in Kii Cloud. |
  * | ::KII_THING_IF_ERROR_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
  * | ::KII_THING_IF_ERROR_LENGTH_EXCEEDED | Length of firmware version exceed by firmware_version_len. |
+ * | ::KII_THING_IF_ERROR_ALREADY_STARTED | thing-if ThingSDK is already started.|
  */
 kii_thing_if_error_t get_firmware_version(
         kii_thing_if_t* kii_thing_if,
@@ -478,6 +482,7 @@ kii_thing_if_error_t get_firmware_version(
  * | ::KII_THING_IF_ERROR_NO_ERROR | execution succeed. |
  * | ::KII_THING_IF_ERROR_THING_NOT_FOUND | There is no thing in Kii Cloud. |
  * | ::KII_THING_IF_ERROR_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
+ * | ::KII_THING_IF_ERROR_ALREADY_STARTED | thing-if ThingSDK is already started.|
  */
 kii_thing_if_error_t update_thing_type(
         kii_thing_if_t* kii_thing_if,
@@ -504,6 +509,7 @@ kii_thing_if_error_t update_thing_type(
  * | ::KII_THING_IF_ERROR_THING_NOT_FOUND | There is no thing in Kii Cloud. |
  * | ::KII_THING_IF_ERROR_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
  * | ::KII_THING_IF_ERROR_LENGTH_EXCEEDED | Length of thing type exceed by thing_type_len. |
+ * | ::KII_THING_IF_ERROR_ALREADY_STARTED | thing-if ThingSDK is already started.|
  */
 kii_thing_if_error_t get_thing_type(
         kii_thing_if_t* kii_thing_if,
