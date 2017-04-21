@@ -418,15 +418,19 @@ kii_bool_t update_firmware_version(
  * - ::onboard_with_thing_id
  * - ::init_kii_thing_if_with_onboarded_thing
  *
+ * Applications <b> must not free </b> the returned value. The
+ * returned value is valid until other API is called. After other API
+ * is called, the returned value might be broken.
+ *
  * @param [in] kii_thing_if_t This SDK instance.
- * @param [out] current_firmware_version current firmware
- * version. This is null terminated string. Application must not free
- * this memory. If execution fails, NULL is assigned.
- * @return KII_TRUE when succeeded, KII_FALSE when failed.
+ * @return current firmware version. This is null terminated string.
+ * - If succeed to get current firmware version, this function
+ *   returnes null terminated string denoting firmware version.
+ * - If thing does not have firmware version, this function returns
+ *   empty string. This string also null terminated.
+ * - Otherwise, returns NULL.
  */
-kii_bool_t get_current_firmware_version(
-        kii_thing_if_t* kii_thing_if,
-        char** current_firmware_version);
+const char* get_current_firmware_version(kii_thing_if_t* kii_thing_if);
 
 #ifdef __cplusplus
 }
