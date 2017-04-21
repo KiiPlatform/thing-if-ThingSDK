@@ -498,7 +498,7 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
         for (alias_action_index = 0;
                 alias_action[0].result == KII_JSON_FIELD_PARSE_SUCCESS;
                 ++alias_action_index) {
-            sprintf(index, "/[%lu]", alias_action_index);
+            sprintf(alias_action[0].path, "/[%lu]", alias_action_index);
             switch (prv_kii_thing_if_json_read_object(kii, alias_actions_str,
                             alias_actions_len, alias_action)) {
                 case KII_JSON_PARSE_SUCCESS:
