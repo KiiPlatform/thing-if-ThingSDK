@@ -24,7 +24,9 @@ typedef enum kii_thing_if_error_t {
      */
     KII_THING_IF_ERROR_LENGTH_EXCEEDED,
     /** thing-if ThingSDK is alreday started. */
-    KII_THING_IF_ERROR_ALREADY_STARTED
+    KII_THING_IF_ERROR_ALREADY_STARTED,
+    /** Length of HTTP request exceeded request buffer. */
+    KII_THING_IF_ERROR_REQUEST_BUFFER_OVER_FLOW
 } kii_thing_if_error_t;
 
 #define KII_THING_IF_TASK_NAME_STATUS_UPDATE "status_update_task"
@@ -328,9 +330,16 @@ kii_thing_if_error_t start(kii_thing_if_t* kii_thing_if);
  * the format. If the thing is already registered, this value would be
  * ignored by Kii Cloud. If this value is NULL or empty string this
  * value is ignored.
- * @return KII_TRUE when succeeded, KII_FALSE when failed.
+ * @return This function returns following elements of ::kii_thing_if_error_t:
+ * | Element | Description |
+ * | :------ | :---------- |
+ * | ::KII_THING_IF_ERROR_NO_ERROR | execution succeed. |
+ * | ::KII_THING_IF_ERROR_THING_NOT_FOUND | There is no thing in Kii Cloud. |
+ * | ::KII_THING_IF_ERROR_ALREADY_STARTED | thing-if ThingSDK is already started.|
+ * | ::KII_THING_IF_ERROR_REQUEST_BUFFER_OVER_FLOW | Request buffer is small to send request. |
+ * | ::KII_THING_IF_ERROR_LENGTH_EXCEEDED | Length of access token exceed. |
  */
-kii_bool_t onboard_with_vendor_thing_id(
+kii_thing_if_error_t onboard_with_vendor_thing_id(
         kii_thing_if_t* kii_thing_if,
         const char* vendor_thing_id,
         const char* password,
@@ -364,9 +373,16 @@ kii_bool_t onboard_with_vendor_thing_id(
  * the format. If the thing is already registered, this value would be
  * ignored by Kii Cloud. If this value is NULL or empty string this
  * value is ignored.
- * @return KII_TRUE when succeeded, KII_FALSE when failed.
+ * @return This function returns following elements of ::kii_thing_if_error_t:
+ * | Element | Description |
+ * | :------ | :---------- |
+ * | ::KII_THING_IF_ERROR_NO_ERROR | execution succeed. |
+ * | ::KII_THING_IF_ERROR_THING_NOT_FOUND | There is no thing in Kii Cloud. |
+ * | ::KII_THING_IF_ERROR_ALREADY_STARTED | thing-if ThingSDK is already started.|
+ * | ::KII_THING_IF_REQUEST_BUFFER_OVER_FLOW | Request buffer is small to send request. |
+ * | ::KII_THING_IF_ERROR_LENGTH_EXCEEDED | Length of access token exceed. |
  */
-kii_bool_t onboard_with_thing_id(
+kii_thing_if_error_t onboard_with_thing_id(
         kii_thing_if_t* kii_thing_if,
         const char* thing_id,
         const char* password,
@@ -403,9 +419,14 @@ kii_bool_t onboard_with_thing_id(
  * argument. otherwise, you need to set kii_json_resource_t object to
  * this argument.
  *
- * @return KII_TRUE when succeeded, KII_FALSE when failed.
+ * @return This function returns following elements of ::kii_thing_if_error_t:
+ * | Element | Description |
+ * | :------ | :---------- |
+ * | ::KII_THING_IF_ERROR_NO_ERROR | execution succeed. |
+ * | ::KII_THING_IF_ERROR_ALREADY_STARTED | thing-if ThingSDK is already started.|
+ * | ::KII_THING_IF_ERROR_LENGTH_EXCEEDED | Length of access token exceed. |
  */
-kii_bool_t init_kii_thing_if_with_onboarded_thing(
+kii_thing_if_error_t init_kii_thing_if_with_onboarded_thing(
         kii_thing_if_t* kii_thing_if,
         const char* app_id,
         const char* app_key,

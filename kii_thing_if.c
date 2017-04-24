@@ -779,7 +779,7 @@ static kii_bool_t prv_set_author(
     return KII_TRUE;
 }
 
-kii_bool_t onboard_with_vendor_thing_id(
+kii_thing_if_error_t onboard_with_vendor_thing_id(
         kii_thing_if_t* kii_thing_if,
         const char* vendor_thing_id,
         const char* password,
@@ -790,7 +790,7 @@ kii_bool_t onboard_with_vendor_thing_id(
 {
     // TODO: implement me.
     M_KII_THING_IF_ASSERT(0);
-    return KII_FALSE;
+    return KII_THING_IF_ERROR_TARGET_NOT_FOUND;
     /*
     if (prv_onboard_with_vendor_thing_id(&kii_thing_if->command_handler,
                     vendor_thing_id, password, thing_type,
@@ -880,7 +880,7 @@ static kii_bool_t prv_onboard_with_thing_id(
     return KII_TRUE;
 }
 
-kii_bool_t onboard_with_thing_id(
+kii_thing_if_error_t onboard_with_thing_id(
         kii_thing_if_t* kii_thing_if,
         const char* thing_id,
         const char* password,
@@ -891,7 +891,7 @@ kii_bool_t onboard_with_thing_id(
 {
     // TODO: implement me.
     M_KII_THING_IF_ASSERT(0);
-    return KII_FALSE;
+    return KII_THING_IF_ERROR_TARGET_NOT_FOUND;
     /*
     if (prv_onboard_with_thing_id(&kii_thing_if->command_handler, thing_id,
                     password) == KII_FALSE) {
@@ -912,7 +912,7 @@ kii_bool_t onboard_with_thing_id(
     */
 }
 
-kii_bool_t init_kii_thing_if_with_onboarded_thing(
+kii_thing_if_error_t init_kii_thing_if_with_onboarded_thing(
         kii_thing_if_t* kii_thing_if,
         const char* app_id,
         const char* app_key,
@@ -923,6 +923,10 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
         kii_thing_if_state_updater_resource_t* state_updater_resource,
         KII_JSON_RESOURCE_CB resource_cb)
 {
+    // TODO: implement me.
+    M_KII_THING_IF_ASSERT(0);
+    return KII_THING_IF_ERROR_TARGET_NOT_FOUND;
+    /*
     if (prv_init_kii_thing_if(kii_thing_if, app_id, app_key, app_host,
                     command_handler_resource, state_updater_resource,
                     resource_cb) == KII_FALSE) {
@@ -950,4 +954,5 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
 
 
     return KII_TRUE;
+    */
 }
