@@ -26,7 +26,9 @@ typedef enum kii_thing_if_error_t {
     /** thing-if ThingSDK is alreday started. */
     KII_THING_IF_ERROR_ALREADY_STARTED,
     /** Length of HTTP request exceeded request buffer. */
-    KII_THING_IF_ERROR_REQUEST_BUFFER_OVER_FLOW
+    KII_THING_IF_ERROR_REQUEST_BUFFER_OVER_FLOW,
+    /** Http error. */
+    KII_THING_IF_ERROR_HTTP
 } kii_thing_if_error_t;
 
 #define KII_THING_IF_TASK_NAME_STATUS_UPDATE "status_update_task"
@@ -338,6 +340,7 @@ kii_thing_if_error_t start(kii_thing_if_t* kii_thing_if);
  * | ::KII_THING_IF_ERROR_ALREADY_STARTED | thing-if ThingSDK is already started.|
  * | ::KII_THING_IF_ERROR_REQUEST_BUFFER_OVER_FLOW | Request buffer is small to send request. |
  * | ::KII_THING_IF_ERROR_LENGTH_EXCEEDED | Length of access token exceed. |
+ * | ::KII_THING_IF_ERROR_HTTP | HTTP error. You can retrieve detail information about HTTP error with ::get_http_error_info|
  */
 kii_thing_if_error_t onboard_with_vendor_thing_id(
         kii_thing_if_t* kii_thing_if,
@@ -381,6 +384,7 @@ kii_thing_if_error_t onboard_with_vendor_thing_id(
  * | ::KII_THING_IF_ERROR_ALREADY_STARTED | thing-if ThingSDK is already started.|
  * | ::KII_THING_IF_REQUEST_BUFFER_OVER_FLOW | Request buffer is small to send request. |
  * | ::KII_THING_IF_ERROR_LENGTH_EXCEEDED | Length of access token exceed. |
+ * | ::KII_THING_IF_ERROR_HTTP | HTTP error. You can retrieve detail information about HTTP error with ::get_http_error_info|
  */
 kii_thing_if_error_t onboard_with_thing_id(
         kii_thing_if_t* kii_thing_if,
@@ -454,6 +458,7 @@ kii_thing_if_error_t init_kii_thing_if_with_onboarded_thing(
  * | ::KII_THING_IF_ERROR_THING_NOT_FOUND | There is no thing in Kii Cloud. |
  * | ::KII_THING_IF_ERROR_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
  * | ::KII_THING_IF_ERROR_ALREADY_STARTED | thing-if ThingSDK is already started.|
+ * | ::KII_THING_IF_ERROR_HTTP | HTTP error. You can retrieve detail information about HTTP error with ::get_http_error_info|
  */
 kii_thing_if_error_t update_firmware_version(
         kii_thing_if_t* kii_thing_if,
@@ -481,6 +486,7 @@ kii_thing_if_error_t update_firmware_version(
  * | ::KII_THING_IF_ERROR_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
  * | ::KII_THING_IF_ERROR_LENGTH_EXCEEDED | Length of firmware version exceed by firmware_version_len. |
  * | ::KII_THING_IF_ERROR_ALREADY_STARTED | thing-if ThingSDK is already started.|
+ * | ::KII_THING_IF_ERROR_HTTP | HTTP error. You can retrieve detail information about HTTP error with ::get_http_error_info|
  */
 kii_thing_if_error_t get_firmware_version(
         kii_thing_if_t* kii_thing_if,
@@ -504,6 +510,7 @@ kii_thing_if_error_t get_firmware_version(
  * | ::KII_THING_IF_ERROR_THING_NOT_FOUND | There is no thing in Kii Cloud. |
  * | ::KII_THING_IF_ERROR_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
  * | ::KII_THING_IF_ERROR_ALREADY_STARTED | thing-if ThingSDK is already started.|
+ * | ::KII_THING_IF_ERROR_HTTP | HTTP error. You can retrieve detail information about HTTP error with ::get_http_error_info|
  */
 kii_thing_if_error_t update_thing_type(
         kii_thing_if_t* kii_thing_if,
@@ -531,15 +538,54 @@ kii_thing_if_error_t update_thing_type(
  * | ::KII_THING_IF_ERROR_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
  * | ::KII_THING_IF_ERROR_LENGTH_EXCEEDED | Length of thing type exceed by thing_type_len. |
  * | ::KII_THING_IF_ERROR_ALREADY_STARTED | thing-if ThingSDK is already started.|
+ * | ::KII_THING_IF_ERROR_HTTP | HTTP error. You can retrieve detail information about HTTP error with ::get_http_error_info|
  */
 kii_thing_if_error_t get_thing_type(
         kii_thing_if_t* kii_thing_if,
         char* thing_type,
         size_t thing_type_len);
 
+/** Get HTTP error information detail.
+ *
+ * You can get detail of HTTP error from this functions. If you got
+ * ::KII_THING_IF_ERROR_HTTP from a function, then you can use this
+ * functions. SDK leaves HTTP error information until other function
+ * is called. You need to call this function right after a function
+ * returns ::KII_THING_IF_ERROR_HTTP if you want to check the detail.
+ *
+ * @param [in] kii_thing_if_t This SDK instance.
+ * @param [out] status_code HTTP status code
+ * @param [out] error_code Kii Cloud defined error code. This SDK
+ * makes this string null terminated. If there is no error code or,
+ * Length of error_code is shorter than required, This SDK set empty
+ * string.
+ * @param [inout] error_code_len Length of error_code which is thrid
+ * argument of this function. If this length is shorter than required,
+ * This SDK set actual required length.
+ * @param [out] error_detail Kii Cloud defined error detail. This SDK
+ * makes this string null terminated. If there is no error detail or,
+ * Length of error_detail is shorter than required, This SDK set empty
+ * string.
+ * @param [inout] error_detail_len Length of error_detail which is
+ * fifth argument of this function. If this length is shorter than
+ * required, This SDK set actual required length.
+ * @return This function returns following elements of ::kii_thing_if_error_t:
+ * | Element | Description |
+ * | :------ | :---------- |
+ * | ::KII_THING_IF_ERROR_NO_ERROR | execution succeed. |
+ * | ::KII_THING_IF_ERROR_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
+ * | ::KII_THING_IF_ERROR_LENGTH_EXCEEDED | Length of error code or error detail exceed by error_code_len or error_detail_len. |
+ */
+kii_thing_if_error_t get_http_error_info(
+        kii_thing_if_t* kii_thing_if,
+        int* status_code,
+        char* error_code,
+        size_t* error_code_len,
+        char* error_detail,
+        size_t* error_detail_len)
+
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* _KII_THING_IF_ */
-
