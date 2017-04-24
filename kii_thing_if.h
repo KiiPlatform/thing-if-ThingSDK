@@ -9,6 +9,24 @@
 extern "C" {
 #endif
 
+/** Enumeration representing error of thing-if ThingSDK. */
+typedef enum kii_thing_if_error_t {
+    /** Functions succeed. There is no error. */
+    KII_THING_IF_ERROR_NO_ERROR = 0,
+    /** Information trying to get from a function is not found. */
+    KII_THING_IF_ERROR_TARGET_NOT_FOUND,
+    /** Thing is not found in Kii Cloud. */
+    KII_THING_IF_ERROR_THING_NOT_FOUND,
+    /** kii_thing_if_t instance is not onbarded. Please onboard first. */
+    KII_THING_IF_ERROR_NOT_ONBOARDED,
+    /** A buffer size provided from applications is shorter than a
+     * function can copy the information got from Kii Cloud.
+     */
+    KII_THING_IF_ERROR_LENGTH_EXCEEDED,
+    /** thing-if ThingSDK is alreday started. */
+    KII_THING_IF_ERROR_ALREADY_STARTED
+} kii_thing_if_error_t;
+
 #define KII_THING_IF_TASK_NAME_STATUS_UPDATE "status_update_task"
 
 /** callback function for handling action.
@@ -266,6 +284,25 @@ kii_bool_t init_kii_thing_if(
         kii_thing_if_state_updater_resource_t* state_updater_resource,
         KII_JSON_RESOURCE_CB resource_cb);
 
+/** Start kii_thing_if_t instance.
+ *
+ * thing-if ThingSDK starts to receive command and update states with
+ * this function.
+ *
+ * This function must be called after one of following functions
+ * - ::onboard_with_vendor_thing_id,
+ * - ::onboard_with_thing_id
+ * - ::init_kii_thing_if_with_onboarded_thing
+ *
+ * @param [in] kii_thing_if_t This SDK instance.
+ * @return This function returns following elements of ::kii_thing_if_error_t:
+ * | Element | Description |
+ * | :------ | :---------- |
+ * | ::KII_THING_IF_ERROR_NO_ERROR | execution succeed. |
+ * | ::KII_THING_IF_ERROR_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
+ */
+kii_thing_if_error_t start(kii_thing_if_t* kii_thing_if);
+
 /** Onboard to Thing_If Cloud with specified vendor thing ID.
  * kii_thing_if_t#command_handler and kii_thing_if_t#state_updater instances are
  * used to call api.
@@ -378,6 +415,106 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
         kii_thing_if_command_handler_resource_t* command_handler_resource,
         kii_thing_if_state_updater_resource_t* state_updater_resource,
         KII_JSON_RESOURCE_CB resource_cb);
+
+/** Upate firmware version of a thing.
+ *
+ * This function must be called between ::start and one of
+ * following functions:
+ * - ::onboard_with_vendor_thing_id,
+ * - ::onboard_with_thing_id
+ * - ::init_kii_thing_if_with_onboarded_thing
+ *
+ * @param [in] kii_thing_if_t This SDK instance.
+ * @param [in] firmware_version firmware version to update.
+ * @return This function returns following elements of ::kii_thing_if_error_t:
+ * | Element | Description |
+ * | :------ | :---------- |
+ * | ::KII_THING_IF_ERROR_NO_ERROR | execution succeed. |
+ * | ::KII_THING_IF_ERROR_THING_NOT_FOUND | There is no thing in Kii Cloud. |
+ * | ::KII_THING_IF_ERROR_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
+ * | ::KII_THING_IF_ERROR_ALREADY_STARTED | thing-if ThingSDK is already started.|
+ */
+kii_thing_if_error_t update_firmware_version(
+        kii_thing_if_t* kii_thing_if,
+        const char* firmware_version);
+
+/** Get firmware version of a thing.
+ *
+ * This function must be called between ::start and one of
+ * following functions:
+ * - ::onboard_with_vendor_thing_id,
+ * - ::onboard_with_thing_id
+ * - ::init_kii_thing_if_with_onboarded_thing
+ *
+ * @param [in] kii_thing_if_t This SDK instance.
+ * @param [out] firmware_version a buffer to copy firmware version got
+ * from Kii Cloud. This SDK makes the buffer null terminated string.
+ * @param [in] firmware_version_len length of firmware_version which
+ * is second argument of this function.
+ * @return This function returns following elements of ::kii_thing_if_error_t:
+ * | Element | Description |
+ * | :------ | :---------- |
+ * | ::KII_THING_IF_ERROR_NO_ERROR | execution succeed. |
+ * | ::KII_THING_IF_ERROR_TARGET_NOT_FOUND | Thing has no firmware version. |
+ * | ::KII_THING_IF_ERROR_THING_NOT_FOUND | There is no thing in Kii Cloud. |
+ * | ::KII_THING_IF_ERROR_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
+ * | ::KII_THING_IF_ERROR_LENGTH_EXCEEDED | Length of firmware version exceed by firmware_version_len. |
+ * | ::KII_THING_IF_ERROR_ALREADY_STARTED | thing-if ThingSDK is already started.|
+ */
+kii_thing_if_error_t get_firmware_version(
+        kii_thing_if_t* kii_thing_if,
+        char* firmware_version,
+        size_t firmware_version_len);
+
+/** Upate thing type of a thing.
+ *
+ * This function must be called between ::start and one of
+ * following functions:
+ * - ::onboard_with_vendor_thing_id,
+ * - ::onboard_with_thing_id
+ * - ::init_kii_thing_if_with_onboarded_thing
+ *
+ * @param [in] kii_thing_if_t This SDK instance.
+ * @param [in] thing_type thing type to update.
+ * @return This function returns following elements of ::kii_thing_if_error_t:
+ * | Element | Description |
+ * | :------ | :---------- |
+ * | ::KII_THING_IF_ERROR_NO_ERROR | execution succeed. |
+ * | ::KII_THING_IF_ERROR_THING_NOT_FOUND | There is no thing in Kii Cloud. |
+ * | ::KII_THING_IF_ERROR_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
+ * | ::KII_THING_IF_ERROR_ALREADY_STARTED | thing-if ThingSDK is already started.|
+ */
+kii_thing_if_error_t update_thing_type(
+        kii_thing_if_t* kii_thing_if,
+        const char* thing_type);
+
+/** Get current thing type of a thing.
+ *
+ * This function must be called between ::start and one of
+ * following functions:
+ * - ::onboard_with_vendor_thing_id,
+ * - ::onboard_with_thing_id
+ * - ::init_kii_thing_if_with_onboarded_thing
+ *
+ * @param [in] kii_thing_if_t This SDK instance.
+ * @param [out] thing_type a buffer to copy thing type got
+ * from Kii Cloud. This SDK makes the buffer null terminated string.
+ * @param [in] thing_type_len length of thing_type which
+ * is second argument of this function.
+ * @return This function returns following elements of ::kii_thing_if_error_t:
+ * | Element | Description |
+ * | :------ | :---------- |
+ * | ::KII_THING_IF_ERROR_NO_ERROR | execution succeed. |
+ * | ::KII_THING_IF_ERROR_TARGET_NOT_FOUND | Thing has no thing type. |
+ * | ::KII_THING_IF_ERROR_THING_NOT_FOUND | There is no thing in Kii Cloud. |
+ * | ::KII_THING_IF_ERROR_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
+ * | ::KII_THING_IF_ERROR_LENGTH_EXCEEDED | Length of thing type exceed by thing_type_len. |
+ * | ::KII_THING_IF_ERROR_ALREADY_STARTED | thing-if ThingSDK is already started.|
+ */
+kii_thing_if_error_t get_thing_type(
+        kii_thing_if_t* kii_thing_if,
+        char* thing_type,
+        size_t thing_type_len);
 
 #ifdef __cplusplus
 }
