@@ -311,10 +311,7 @@ kii_bool_t init_kii_thing_if(
  * - ::init_kii_thing_if_with_onboarded_thing
  *
  * @param [in] kii_thing_if_t This SDK instance.
- * @return This function returns following elements of ::kii_thing_if_error_reason_t:
- * | Element | Description |
- * | :------ | :---------- |
- * | ::KII_THING_IF_ERROR_REASON_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
+ * @return KII_TRUE when succeeded, KII_FALSE when failed.
  */
 kii_bool_t start(kii_thing_if_t* kii_thing_if);
 
@@ -441,12 +438,11 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
  *
  * @param [in] kii_thing_if_t This SDK instance.
  * @param [in] firmware_version firmware version to update.
- * @return This function returns following elements of ::kii_thing_if_error_reason_t:
- * | Element | Description |
- * | :------ | :---------- |
- * | ::KII_THING_IF_ERROR_REASON_THING_NOT_FOUND | There is no thing in Kii Cloud. |
- * | ::KII_THING_IF_ERROR_REASON_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
- * | ::KII_THING_IF_ERROR_REASON_ALREADY_STARTED | thing-if ThingSDK is already started.|
+ * @param [out] error Error infomation. If NULL, This SDK does not
+ * return error information
+ * @return KII_TRUE when succeeded, KII_FALSE when failed. If returned
+ * value is KII_FALSE and error is not NULL, this SDK set error
+ * information to the error.
  */
 kii_bool_t update_firmware_version(
         kii_thing_if_t* kii_thing_if,
@@ -466,14 +462,11 @@ kii_bool_t update_firmware_version(
  * from Kii Cloud. This SDK makes the buffer null terminated string.
  * @param [in] firmware_version_len length of firmware_version which
  * is second argument of this function.
- * @return This function returns following elements of ::kii_thing_if_error_reason_t:
- * | Element | Description |
- * | :------ | :---------- |
- * | ::KII_THING_IF_ERROR_REASON_TARGET_NOT_FOUND | Thing has no firmware version. |
- * | ::KII_THING_IF_ERROR_REASON_THING_NOT_FOUND | There is no thing in Kii Cloud. |
- * | ::KII_THING_IF_ERROR_REASON_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
- * | ::KII_THING_IF_ERROR_REASON_LENGTH_EXCEEDED | Length of firmware version exceed by firmware_version_len. |
- * | ::KII_THING_IF_ERROR_REASON_ALREADY_STARTED | thing-if ThingSDK is already started.|
+ * @param [out] error Error infomation. If NULL, This SDK does not
+ * return error information
+ * @return KII_TRUE when succeeded, KII_FALSE when failed. If returned
+ * value is KII_FALSE and error is not NULL, this SDK set error
+ * information to the error.
  */
 kii_bool_t get_firmware_version(
         kii_thing_if_t* kii_thing_if,
@@ -491,12 +484,11 @@ kii_bool_t get_firmware_version(
  *
  * @param [in] kii_thing_if_t This SDK instance.
  * @param [in] thing_type thing type to update.
- * @return This function returns following elements of ::kii_thing_if_error_reason_t:
- * | Element | Description |
- * | :------ | :---------- |
- * | ::KII_THING_IF_ERROR_REASON_THING_NOT_FOUND | There is no thing in Kii Cloud. |
- * | ::KII_THING_IF_ERROR_REASON_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
- * | ::KII_THING_IF_ERROR_REASON_ALREADY_STARTED | thing-if ThingSDK is already started.|
+ * @param [out] error Error infomation. If NULL, This SDK does not
+ * return error information
+ * @return KII_TRUE when succeeded, KII_FALSE when failed. If returned
+ * value is KII_FALSE and error is not NULL, this SDK set error
+ * information to the error.
  */
 kii_bool_t update_thing_type(
         kii_thing_if_t* kii_thing_if,
@@ -516,14 +508,11 @@ kii_bool_t update_thing_type(
  * from Kii Cloud. This SDK makes the buffer null terminated string.
  * @param [in] thing_type_len length of thing_type which
  * is second argument of this function.
- * @return This function returns following elements of ::kii_thing_if_error_reason_t:
- * | Element | Description |
- * | :------ | :---------- |
- * | ::KII_THING_IF_ERROR_REASON_TARGET_NOT_FOUND | Thing has no thing type. |
- * | ::KII_THING_IF_ERROR_REASON_THING_NOT_FOUND | There is no thing in Kii Cloud. |
- * | ::KII_THING_IF_ERROR_REASON_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
- * | ::KII_THING_IF_ERROR_REASON_LENGTH_EXCEEDED | Length of thing type exceed by thing_type_len. |
- * | ::KII_THING_IF_ERROR_REASON_ALREADY_STARTED | thing-if ThingSDK is already started.|
+ * @param [out] error Error infomation. If NULL, This SDK does not
+ * return error information
+ * @return KII_TRUE when succeeded, KII_FALSE when failed. If returned
+ * value is KII_FALSE and error is not NULL, this SDK set error
+ * information to the error.
  */
 kii_bool_t get_thing_type(
         kii_thing_if_t* kii_thing_if,
