@@ -9,23 +9,41 @@
 extern "C" {
 #endif
 
-/** Enumeration representing error of thing-if ThingSDK. */
+#define KII_THING_IF_TASK_NAME_STATUS_UPDATE "status_update_task"
+
+/** Error reasons of thing-if ThingSDK. */
 typedef enum kii_thing_if_error_reason_t {
-    /** Information trying to get from a function is not found. */
-    KII_THING_IF_ERROR_REASON_TARGET_NOT_FOUND,
-    /** Thing is not found in Kii Cloud. */
-    KII_THING_IF_ERROR_REASON_THING_NOT_FOUND,
     /** kii_thing_if_t instance is not onbarded. Please onboard first. */
     KII_THING_IF_ERROR_REASON_NOT_ONBOARDED,
-    /** A buffer size provided from applications is shorter than a
-     * function can copy the information got from Kii Cloud.
-     */
-    KII_THING_IF_ERROR_REASON_LENGTH_EXCEEDED,
     /** thing-if ThingSDK is alreday started. */
-    KII_THING_IF_ERROR_REASON_ALREADY_STARTED
+    KII_THING_IF_ERROR_REASON_ALREADY_STARTED,
+    /** HTTP error. */
+    KII_THING_IF_ERROR_REASON_HTTP,
+    /** Socket error. */
+    KII_THING_IF_ERROR_REASON_SOCKET
 } kii_thing_if_error_reason_t;
 
-#define KII_THING_IF_TASK_NAME_STATUS_UPDATE "status_update_task"
+/** Error information of thing-if ThingSDK. */
+typedef struct kii_thing_if_error_t {
+    /** Error reason. */
+    kii_thing_if_error_reason_t reason;
+
+    /** HTTP status code.
+     *
+     * If ::kii_thing_if_error_t::reason is
+     * ::KII_THING_IF_ERROR_REASON_HTTP, this value is set. Otherwise,
+     * this value is meaningless.
+     */
+    int http_status_code;
+
+    /** Error code.
+     *
+     * If ::kii_thing_if_error_t::reason is
+     * ::KII_THING_IF_ERROR_REASON_HTTP, this value is set. Otherwise,
+     * this value is meaningless.
+     */
+    char http_error_code[32];
+} kii_thing_if_error_t;
 
 /** callback function for handling action.
  * @param [in] alias name of alias.
@@ -298,7 +316,7 @@ kii_bool_t init_kii_thing_if(
  * | :------ | :---------- |
  * | ::KII_THING_IF_ERROR_REASON_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
  */
-kii_thing_if_error_reason_t start(kii_thing_if_t* kii_thing_if);
+kii_bool_t start(kii_thing_if_t* kii_thing_if);
 
 /** Onboard to Thing_If Cloud with specified vendor thing ID.
  * kii_thing_if_t#command_handler and kii_thing_if_t#state_updater instances are
@@ -430,9 +448,10 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
  * | ::KII_THING_IF_ERROR_REASON_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
  * | ::KII_THING_IF_ERROR_REASON_ALREADY_STARTED | thing-if ThingSDK is already started.|
  */
-kii_thing_if_error_reason_t update_firmware_version(
+kii_bool_t update_firmware_version(
         kii_thing_if_t* kii_thing_if,
-        const char* firmware_version);
+        const char* firmware_version,
+        kii_thing_if_error_t* error);
 
 /** Get firmware version of a thing.
  *
@@ -456,10 +475,11 @@ kii_thing_if_error_reason_t update_firmware_version(
  * | ::KII_THING_IF_ERROR_REASON_LENGTH_EXCEEDED | Length of firmware version exceed by firmware_version_len. |
  * | ::KII_THING_IF_ERROR_REASON_ALREADY_STARTED | thing-if ThingSDK is already started.|
  */
-kii_thing_if_error_reason_t get_firmware_version(
+kii_bool_t get_firmware_version(
         kii_thing_if_t* kii_thing_if,
         char* firmware_version,
-        size_t firmware_version_len);
+        size_t firmware_version_len,
+        kii_thing_if_error_t* error);
 
 /** Upate thing type of a thing.
  *
@@ -478,9 +498,10 @@ kii_thing_if_error_reason_t get_firmware_version(
  * | ::KII_THING_IF_ERROR_REASON_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
  * | ::KII_THING_IF_ERROR_REASON_ALREADY_STARTED | thing-if ThingSDK is already started.|
  */
-kii_thing_if_error_reason_t update_thing_type(
+kii_bool_t update_thing_type(
         kii_thing_if_t* kii_thing_if,
-        const char* thing_type);
+        const char* thing_type,
+        kii_thing_if_error_t* error);
 
 /** Get current thing type of a thing.
  *
@@ -504,10 +525,11 @@ kii_thing_if_error_reason_t update_thing_type(
  * | ::KII_THING_IF_ERROR_REASON_LENGTH_EXCEEDED | Length of thing type exceed by thing_type_len. |
  * | ::KII_THING_IF_ERROR_REASON_ALREADY_STARTED | thing-if ThingSDK is already started.|
  */
-kii_thing_if_error_reason_t get_thing_type(
+kii_bool_t get_thing_type(
         kii_thing_if_t* kii_thing_if,
         char* thing_type,
-        size_t thing_type_len);
+        size_t thing_type_len,
+        kii_thing_if_error_t* error);
 
 #ifdef __cplusplus
 }
