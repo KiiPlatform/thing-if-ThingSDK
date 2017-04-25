@@ -11,8 +11,6 @@ extern "C" {
 
 /** Enumeration representing error of thing-if ThingSDK. */
 typedef enum kii_thing_if_error_reason_t {
-    /** Functions succeed. There is no error. */
-    KII_THING_IF_ERROR_REASON_NO_ERROR = 0,
     /** Information trying to get from a function is not found. */
     KII_THING_IF_ERROR_REASON_TARGET_NOT_FOUND,
     /** Thing is not found in Kii Cloud. */
@@ -298,7 +296,6 @@ kii_bool_t init_kii_thing_if(
  * @return This function returns following elements of ::kii_thing_if_error_reason_t:
  * | Element | Description |
  * | :------ | :---------- |
- * | ::KII_THING_IF_ERROR_REASON_NO_ERROR | execution succeed. |
  * | ::KII_THING_IF_ERROR_REASON_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
  */
 kii_thing_if_error_reason_t start(kii_thing_if_t* kii_thing_if);
@@ -429,7 +426,6 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
  * @return This function returns following elements of ::kii_thing_if_error_reason_t:
  * | Element | Description |
  * | :------ | :---------- |
- * | ::KII_THING_IF_ERROR_REASON_NO_ERROR | execution succeed. |
  * | ::KII_THING_IF_ERROR_REASON_THING_NOT_FOUND | There is no thing in Kii Cloud. |
  * | ::KII_THING_IF_ERROR_REASON_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
  * | ::KII_THING_IF_ERROR_REASON_ALREADY_STARTED | thing-if ThingSDK is already started.|
@@ -454,7 +450,6 @@ kii_thing_if_error_reason_t update_firmware_version(
  * @return This function returns following elements of ::kii_thing_if_error_reason_t:
  * | Element | Description |
  * | :------ | :---------- |
- * | ::KII_THING_IF_ERROR_REASON_NO_ERROR | execution succeed. |
  * | ::KII_THING_IF_ERROR_REASON_TARGET_NOT_FOUND | Thing has no firmware version. |
  * | ::KII_THING_IF_ERROR_REASON_THING_NOT_FOUND | There is no thing in Kii Cloud. |
  * | ::KII_THING_IF_ERROR_REASON_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
@@ -479,7 +474,6 @@ kii_thing_if_error_reason_t get_firmware_version(
  * @return This function returns following elements of ::kii_thing_if_error_reason_t:
  * | Element | Description |
  * | :------ | :---------- |
- * | ::KII_THING_IF_ERROR_REASON_NO_ERROR | execution succeed. |
  * | ::KII_THING_IF_ERROR_REASON_THING_NOT_FOUND | There is no thing in Kii Cloud. |
  * | ::KII_THING_IF_ERROR_REASON_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
  * | ::KII_THING_IF_ERROR_REASON_ALREADY_STARTED | thing-if ThingSDK is already started.|
@@ -504,7 +498,6 @@ kii_thing_if_error_reason_t update_thing_type(
  * @return This function returns following elements of ::kii_thing_if_error_reason_t:
  * | Element | Description |
  * | :------ | :---------- |
- * | ::KII_THING_IF_ERROR_REASON_NO_ERROR | execution succeed. |
  * | ::KII_THING_IF_ERROR_REASON_TARGET_NOT_FOUND | Thing has no thing type. |
  * | ::KII_THING_IF_ERROR_REASON_THING_NOT_FOUND | There is no thing in Kii Cloud. |
  * | ::KII_THING_IF_ERROR_REASON_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
