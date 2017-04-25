@@ -340,7 +340,11 @@ kii_bool_t start(kii_thing_if_t* kii_thing_if);
  * the format. If the thing is already registered, this value would be
  * ignored by Kii Cloud. If this value is NULL or empty string this
  * value is ignored.
- * @return KII_TRUE when succeeded, KII_FALSE when failed.
+ * @return KII_TRUE when succeeded, KII_FALSE when failed. If returned
+ * value is KII_FALSE and error is not NULL, this SDK set error
+ * information to the error. This function does not set
+ * ::KII_THING_IF_ERROR_REASON_NOT_ONBOARDED to
+ * ::kii_thing_if_error_t::reason.
  */
 kii_bool_t onboard_with_vendor_thing_id(
         kii_thing_if_t* kii_thing_if,
@@ -349,7 +353,8 @@ kii_bool_t onboard_with_vendor_thing_id(
         const char* thing_type,
         const char* firmware_version,
         const char* layout_position,
-        const char* thing_properties);
+        const char* thing_properties,
+        kii_thing_if_error_t* error);
 
 /** Onboard to Thing_If Cloud with specified thing ID.
  * kii_thing_if_t#command_handler and kii_thing_if_t#state_updater instances are
@@ -376,7 +381,11 @@ kii_bool_t onboard_with_vendor_thing_id(
  * the format. If the thing is already registered, this value would be
  * ignored by Kii Cloud. If this value is NULL or empty string this
  * value is ignored.
- * @return KII_TRUE when succeeded, KII_FALSE when failed.
+ * @return KII_TRUE when succeeded, KII_FALSE when failed. If returned
+ * value is KII_FALSE and error is not NULL, this SDK set error
+ * information to the error. This function does not set
+ * ::KII_THING_IF_ERROR_REASON_NOT_ONBOARDED to
+ * ::kii_thing_if_error_t::reason.
  */
 kii_bool_t onboard_with_thing_id(
         kii_thing_if_t* kii_thing_if,
@@ -385,7 +394,8 @@ kii_bool_t onboard_with_thing_id(
         const char* thing_type,
         const char* firmware_version,
         const char* layout_position,
-        const char* thing_properties);
+        const char* thing_properties,
+        kii_thing_if_error_t* error);
 
 
 /** Initialize kii_thing_if_t object with onboarded thing information.
