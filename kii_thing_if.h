@@ -582,7 +582,7 @@ kii_thing_if_error_t get_http_error_info(
         char* error_code,
         size_t* error_code_len,
         char* error_detail,
-        size_t* error_detail_len);
+        size_t* error_detail_len)
 
 #ifdef __cplusplus
 }
