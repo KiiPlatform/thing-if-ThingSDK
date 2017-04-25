@@ -26,16 +26,7 @@ typedef enum kii_thing_if_error_t {
     /** thing-if ThingSDK is alreday started. */
     KII_THING_IF_ERROR_ALREADY_STARTED,
     /** Length of HTTP request exceeded request buffer. */
-    KII_THING_IF_ERROR_REQUEST_BUFFER_OVER_FLOW,
-    /** Socket error.
-     *
-     * Implementation of socket is application dependent. This error
-     * is returned when your socket functions return error. If you
-     * want to know detail of the socket error, you should record the
-     * error in your socket functions. You can record the error with
-     * app_context in kii_http_context_t, external variable and so on.
-     */
-    KII_THING_IF_ERROR_SOCKET
+    KII_THING_IF_ERROR_REQUEST_BUFFER_OVER_FLOW
 } kii_thing_if_error_t;
 
 #define KII_THING_IF_TASK_NAME_STATUS_UPDATE "status_update_task"
@@ -347,7 +338,6 @@ kii_thing_if_error_t start(kii_thing_if_t* kii_thing_if);
  * | ::KII_THING_IF_ERROR_ALREADY_STARTED | thing-if ThingSDK is already started.|
  * | ::KII_THING_IF_ERROR_REQUEST_BUFFER_OVER_FLOW | Request buffer is small to send request. |
  * | ::KII_THING_IF_ERROR_LENGTH_EXCEEDED | Length of access token exceed. |
- * : ::KII_THING_IF_ERROR_SOCKET | Socket error. |
  */
 kii_thing_if_error_t onboard_with_vendor_thing_id(
         kii_thing_if_t* kii_thing_if,
@@ -391,7 +381,6 @@ kii_thing_if_error_t onboard_with_vendor_thing_id(
  * | ::KII_THING_IF_ERROR_ALREADY_STARTED | thing-if ThingSDK is already started.|
  * | ::KII_THING_IF_REQUEST_BUFFER_OVER_FLOW | Request buffer is small to send request. |
  * | ::KII_THING_IF_ERROR_LENGTH_EXCEEDED | Length of access token exceed. |
- * : ::KII_THING_IF_ERROR_SOCKET | Socket error. |
  */
 kii_thing_if_error_t onboard_with_thing_id(
         kii_thing_if_t* kii_thing_if,
@@ -465,7 +454,6 @@ kii_thing_if_error_t init_kii_thing_if_with_onboarded_thing(
  * | ::KII_THING_IF_ERROR_THING_NOT_FOUND | There is no thing in Kii Cloud. |
  * | ::KII_THING_IF_ERROR_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
  * | ::KII_THING_IF_ERROR_ALREADY_STARTED | thing-if ThingSDK is already started.|
- * : ::KII_THING_IF_ERROR_SOCKET | Socket error. |
  */
 kii_thing_if_error_t update_firmware_version(
         kii_thing_if_t* kii_thing_if,
@@ -493,7 +481,6 @@ kii_thing_if_error_t update_firmware_version(
  * | ::KII_THING_IF_ERROR_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
  * | ::KII_THING_IF_ERROR_LENGTH_EXCEEDED | Length of firmware version exceed by firmware_version_len. |
  * | ::KII_THING_IF_ERROR_ALREADY_STARTED | thing-if ThingSDK is already started.|
- * : ::KII_THING_IF_ERROR_SOCKET | Socket error. |
  */
 kii_thing_if_error_t get_firmware_version(
         kii_thing_if_t* kii_thing_if,
@@ -517,7 +504,6 @@ kii_thing_if_error_t get_firmware_version(
  * | ::KII_THING_IF_ERROR_THING_NOT_FOUND | There is no thing in Kii Cloud. |
  * | ::KII_THING_IF_ERROR_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
  * | ::KII_THING_IF_ERROR_ALREADY_STARTED | thing-if ThingSDK is already started.|
- * : ::KII_THING_IF_ERROR_SOCKET | Socket error. |
  */
 kii_thing_if_error_t update_thing_type(
         kii_thing_if_t* kii_thing_if,
@@ -545,7 +531,6 @@ kii_thing_if_error_t update_thing_type(
  * | ::KII_THING_IF_ERROR_NOT_ONBOARDED | Thing is not onboarded. Please onboard first.|
  * | ::KII_THING_IF_ERROR_LENGTH_EXCEEDED | Length of thing type exceed by thing_type_len. |
  * | ::KII_THING_IF_ERROR_ALREADY_STARTED | thing-if ThingSDK is already started.|
- * : ::KII_THING_IF_ERROR_SOCKET | Socket error. |
  */
 kii_thing_if_error_t get_thing_type(
         kii_thing_if_t* kii_thing_if,
