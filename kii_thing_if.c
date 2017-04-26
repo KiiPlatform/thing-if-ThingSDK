@@ -420,8 +420,44 @@ static prv_get_alias_result_t get_alias_name_and_actions_at_index(
         char** actions,
         size_t* actions_len)
 {
-    // TODO: implement me.
-    return PRV_GET_ALIAS_RESULT_SUCCESS;
+    kii_json_field_t alias_action[2];
+    char index_str[ULONGBUFSIZE];
+    size_t alias_action_index = 0;
+    memset(alias_action, 0x00, sizeof(alias_action));
+    alias_action[0].path = index_str;
+    alias_action[0].type = KII_JSON_FIELD_TYPE_OBJECT;
+    alias_action[0].field_copy.string = NULL;
+    alias_action[0].result = KII_JSON_FIELD_PARSE_SUCCESS;
+    alias_action[1].path = NULL;
+    sprintf(index_str, "/[%lu]", index);
+
+    switch (prv_kii_thing_if_json_read_object(kii, alias_actions_str,
+                    alias_actions_len, alias_action)) {
+        case KII_JSON_PARSE_SUCCESS:
+            if (prv_kii_thing_if_get_key_and_value_from_json(
+                        kii,
+                        alias_actions_str + alias_action[0].start,
+                        alias_action[0].end - alias_action[0].start,
+                        alias_name,
+                        actions,
+                        alias_name_len,
+                        actions_len) != 0) {
+                *(alias_actions_str + alias_action[0].end) = '\0';
+                M_KII_LOG(kii->kii_core.logger_cb(
+                        "fail to parse alias_action: %s.\n",
+                        alias_actions_str + alias_action[0].start));
+                return PRV_GET_ALIAS_RESULT_FAIL;
+            }
+            return PRV_GET_ALIAS_RESULT_SUCCESS;
+        case KII_JSON_PARSE_PARTIAL_SUCCESS:
+            /* This must be end of array. */
+            return PRV_GET_ALIAS_RESULT_FINISH;
+        case KII_JSON_PARSE_ROOT_TYPE_ERROR:
+        case KII_JSON_PARSE_INVALID_INPUT:
+        default:
+            M_KII_LOG(kii->kii_core.logger_cb("unexpected error.\n"));
+            return PRV_GET_ALIAS_RESULT_FAIL;
+    }
 }
 
 static prv_notify_actions(
