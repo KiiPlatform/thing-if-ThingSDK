@@ -42,6 +42,12 @@ typedef enum prv_bool_t {
     FALSE
 } prv_bool_t;
 
+typedef enum prv_get_alias_result_t {
+    PRV_GET_ALIAS_RESULT_SUCCESS,
+    PRV_GET_ALIAS_RESULT_FAIL,
+    PRV_GET_ALIAS_RESULT_FINISH
+} prv_get_alias_result_t;
+
 static int prv_append_key_value(
         kii_t* kii,
         const char* key,
@@ -404,10 +410,36 @@ static kii_bool_t prv_send_state(kii_t* kii)
     return KII_TRUE;
 }
 
+static prv_get_alias_result_t get_alias_name_and_actions_at_index(
+        kii_t* kii,
+        const char* alias_actions_str,
+        size_t alias_actions_len,
+        size_t index,
+        char** alias_name,
+        size_t* alias_name_len,
+        char** actions,
+        size_t* actions_len)
+{
+    // TODO: implement me.
+    return PRV_GET_ALIAS_RESULT_SUCCESS;
+}
+
+static prv_notify_actions(
+        kii_t* kii,
+        const char* alias_name,
+        const char* actions,
+        size_t actions_len)
+{
+    // TODO: implement me.
+    return FALSE;
+}
+
 static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
 {
     char* alias_actions_str = NULL;
     size_t alias_actions_len = 0;
+    size_t index = 0;
+    prv_get_alias_result_t result;
 
     /*
       1. Get start position of alias action array
@@ -480,11 +512,56 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
         return;
     }
 
-    /*
-      1. Parse alias actions.
-      2. Send each alias action to application.
-      3. Make request to update command result.
-     */
+    do {
+        char* alias_name;
+        char* actions;
+        size_t alias_name_len, actions_len;
+        result = get_alias_name_and_actions_at_index(
+                kii,
+                alias_actions_str,
+                alias_actions_len,
+                index,
+                &alias_name,
+                &alias_name_len,
+                &actions,
+                &actions_len);
+        switch (result) {
+            case PRV_GET_ALIAS_RESULT_FAIL:
+                M_KII_LOG(kii->kii_core.logger_cb("fail to get alias.\n"));
+                return;
+            case PRV_GET_ALIAS_RESULT_SUCCESS:
+              {
+                  char alias_name_swap, actions_swap;
+
+                  alias_name_swap = alias_name[alias_name_len];
+                  alias_name[alias_name_len] = '\0';
+                  actions_swap = actions[actions_len];
+                  actions[actions_len] = '\0';
+
+                  if (prv_notify_actions(
+                          kii,
+                          alias_name,
+                          actions,
+                          actions_len) == FALSE) {
+                      M_KII_LOG(kii->kii_core.logger_cb("fail to notify.\n"));
+                      return;
+                  }
+
+                  alias_name[alias_name_len] = alias_name_swap;
+                  actions[actions_len] = actions_swap;
+              }
+              break;
+            case PRV_GET_ALIAS_RESULT_FINISH:
+                /* finished to parse aliases. */
+                break;
+            default:
+                M_KII_LOG(
+                    kii->kii_core.logger_cb("unknown result %d.\n",result));
+                M_KII_THING_IF_ASSERT(0);
+                return;
+        }
+    } while (result == PRV_GET_ALIAS_RESULT_SUCCESS);
+
     {
         kii_json_field_t alias_action[2];
         char index[ULONGBUFSIZE];
