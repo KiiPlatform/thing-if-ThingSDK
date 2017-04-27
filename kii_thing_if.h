@@ -39,7 +39,7 @@ typedef struct kii_thing_if_error_t {
      *
      * If ::kii_thing_if_error_t::reason is
      * ::KII_THING_IF_ERROR_REASON_HTTP, this value is set. Otherwise
-     * empty string.
+     * functions does not change this value.
      */
     char error_code[64];
 } kii_thing_if_error_t;
