@@ -137,7 +137,7 @@ static int prv_append_key_value_object_optional(
     return prv_append_key_value(kii, key, value, is_successor, FALSE);
 }
 
-static prv_append_key_value_bool(
+static int prv_append_key_value_bool(
         kii_t* kii,
         const char* key,
         kii_bool_t value,
