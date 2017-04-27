@@ -31,16 +31,15 @@ typedef struct kii_thing_if_error_t {
     /** HTTP status code.
      *
      * If ::kii_thing_if_error_t::reason is
-     * ::KII_THING_IF_ERROR_REASON_HTTP, this value is set. Otherwise,
-     * this value is meaningless.
+     * ::KII_THING_IF_ERROR_REASON_HTTP, this value is set. Otherwise -1.
      */
     int http_status_code;
 
     /** Error code.
      *
      * If ::kii_thing_if_error_t::reason is
-     * ::KII_THING_IF_ERROR_REASON_HTTP, this value is set. Otherwise,
-     * this value is meaningless.
+     * ::KII_THING_IF_ERROR_REASON_HTTP, this value is set. Otherwise
+     * empty string.
      */
     char error_code[64];
 } kii_thing_if_error_t;
