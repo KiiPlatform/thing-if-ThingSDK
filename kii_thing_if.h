@@ -42,7 +42,7 @@ typedef struct kii_thing_if_error_t {
      * ::KII_THING_IF_ERROR_REASON_HTTP, this value is set. Otherwise,
      * this value is meaningless.
      */
-    char http_error_code[32];
+    char error_code[64];
 } kii_thing_if_error_t;
 
 /** callback function for handling action.
