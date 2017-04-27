@@ -23,6 +23,10 @@
 #define ULONGBUFSIZE (sizeof(ULONG_MAX_STR) / sizeof(char))
 
 #define CONST_STRLEN(str) sizeof(str) - 1
+
+#define APPEND_BODY_CONST(kii, str) kii_api_call_append_body(kii, str, CONST_STRLEN(str))
+#define APPEND_BODY(kii, str) kii_api_call_append_body(kii, str, strlen(str))
+
 #define APP_PATH "api/apps"
 #define OAUTH_PATH "oauth2/token"
 #define THING_IF_APP_PATH "thing-if/apps/"
@@ -42,11 +46,11 @@ typedef enum prv_bool_t {
     FALSE
 } prv_bool_t;
 
-typedef enum prv_get_alias_result_t {
-    PRV_GET_ALIAS_RESULT_SUCCESS,
-    PRV_GET_ALIAS_RESULT_FAIL,
-    PRV_GET_ALIAS_RESULT_FINISH
-} prv_get_alias_result_t;
+typedef enum prv_get_key_and_value_t {
+    PRV_GET_KEY_AND_VALUE_SUCCESS,
+    PRV_GET_KEY_AND_VALUE_FAIL,
+    PRV_GET_KEY_AND_VALUE_FINISH
+} prv_get_key_and_value_t;
 
 static int prv_append_key_value(
         kii_t* kii,
@@ -131,6 +135,20 @@ static int prv_append_key_value_object_optional(
         return 0;
     }
     return prv_append_key_value(kii, key, value, is_successor, FALSE);
+}
+
+static prv_append_key_value_bool(
+        kii_t* kii,
+        const char* key,
+        kii_bool_t value,
+        prv_bool_t is_successor)
+{
+    return prv_append_key_value(
+            kii,
+            key,
+            value == KII_TRUE ? "true" : "false",
+            is_successor,
+            FALSE);
 }
 
 static kii_json_parse_result_t prv_kii_thing_if_json_read_object(
@@ -410,72 +428,61 @@ static kii_bool_t prv_send_state(kii_t* kii)
     return KII_TRUE;
 }
 
-static prv_get_alias_result_t get_alias_name_and_actions_at_index(
+static prv_get_key_and_value_t get_key_and_value_at_index(
         kii_t* kii,
-        const char* alias_actions_str,
-        size_t alias_actions_len,
+        const char* array_str,
+        size_t array_len,
         size_t index,
-        char** alias_name,
-        size_t* alias_name_len,
-        char** actions,
-        size_t* actions_len)
+        char** key,
+        size_t* key_len,
+        char** value,
+        size_t* value_len)
 {
-    kii_json_field_t alias_action[2];
+    kii_json_field_t item[2];
     char index_str[ULONGBUFSIZE];
-    size_t alias_action_index = 0;
-    memset(alias_action, 0x00, sizeof(alias_action));
-    alias_action[0].path = index_str;
-    alias_action[0].type = KII_JSON_FIELD_TYPE_OBJECT;
-    alias_action[0].field_copy.string = NULL;
-    alias_action[0].result = KII_JSON_FIELD_PARSE_SUCCESS;
-    alias_action[1].path = NULL;
+    memset(item, 0x00, sizeof(item));
+    item[0].path = index_str;
+    item[0].type = KII_JSON_FIELD_TYPE_OBJECT;
+    item[0].field_copy.string = NULL;
+    item[0].result = KII_JSON_FIELD_PARSE_SUCCESS;
+    item[1].path = NULL;
     sprintf(index_str, "/[%lu]", index);
 
-    switch (prv_kii_thing_if_json_read_object(kii, alias_actions_str,
-                    alias_actions_len, alias_action)) {
+    switch (prv_kii_thing_if_json_read_object(
+                kii,
+                array_str,
+                array_len,
+                item)) {
         case KII_JSON_PARSE_SUCCESS:
             if (prv_kii_thing_if_get_key_and_value_from_json(
                         kii,
-                        alias_actions_str + alias_action[0].start,
-                        alias_action[0].end - alias_action[0].start,
-                        alias_name,
-                        actions,
-                        alias_name_len,
-                        actions_len) != 0) {
-                *(alias_actions_str + alias_action[0].end) = '\0';
-                M_KII_LOG(kii->kii_core.logger_cb(
-                        "fail to parse alias_action: %s.\n",
-                        alias_actions_str + alias_action[0].start));
-                return PRV_GET_ALIAS_RESULT_FAIL;
+                        array_str + item[0].start,
+                        item[0].end - item[0].start,
+                        key,
+                        value,
+                        key_len,
+                        value_len) != 0) {
+                M_KII_LOG(kii->kii_core.logger_cb("fail to parse item."))
+                return PRV_GET_KEY_AND_VALUE_FAIL;
             }
-            return PRV_GET_ALIAS_RESULT_SUCCESS;
+            return PRV_GET_KEY_AND_VALUE_SUCCESS;
         case KII_JSON_PARSE_PARTIAL_SUCCESS:
             /* This must be end of array. */
-            return PRV_GET_ALIAS_RESULT_FINISH;
+            return PRV_GET_KEY_AND_VALUE_FINISH;
         case KII_JSON_PARSE_ROOT_TYPE_ERROR:
         case KII_JSON_PARSE_INVALID_INPUT:
         default:
             M_KII_LOG(kii->kii_core.logger_cb("unexpected error.\n"));
-            return PRV_GET_ALIAS_RESULT_FAIL;
+            return PRV_GET_KEY_AND_VALUE_FAIL;
     }
-}
-
-static prv_notify_actions(
-        kii_t* kii,
-        const char* alias_name,
-        const char* actions,
-        size_t actions_len)
-{
-    // TODO: implement me.
-    return FALSE;
 }
 
 static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
 {
     char* alias_actions_str = NULL;
     size_t alias_actions_len = 0;
-    size_t index = 0;
-    prv_get_alias_result_t result;
+    size_t alias_index = 0;
+    prv_get_key_and_value_t alias_result;
 
     /*
       1. Get start position of alias action array
@@ -548,46 +555,110 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
         return;
     }
 
-    do {
+    for (alias_index = 0, alias_result = PRV_GET_KEY_AND_VALUE_SUCCESS;
+            alias_result == PRV_GET_KEY_AND_VALUE_SUCCESS;
+            ++alias_index) {
+        KII_THING_IF_ACTION_HANDLER handler =
+            ((kii_thing_if_t*)kii->app_context)->action_handler;
         char* alias_name;
         char* actions;
         size_t alias_name_len, actions_len;
-        result = get_alias_name_and_actions_at_index(
+        alias_result = get_key_and_value_at_index(
                 kii,
                 alias_actions_str,
                 alias_actions_len,
-                index,
+                alias_index++,
                 &alias_name,
                 &alias_name_len,
                 &actions,
                 &actions_len);
-        switch (result) {
-            case PRV_GET_ALIAS_RESULT_FAIL:
+        switch (alias_result) {
+            case PRV_GET_KEY_AND_VALUE_FAIL:
                 M_KII_LOG(kii->kii_core.logger_cb("fail to get alias.\n"));
                 return;
-            case PRV_GET_ALIAS_RESULT_SUCCESS:
-              {
-                  char alias_name_swap, actions_swap;
+            case PRV_GET_KEY_AND_VALUE_SUCCESS:
+            {
+                char alias_name_swap;
+                size_t action_index;
+                prv_get_key_and_value_t action_result;
 
-                  alias_name_swap = alias_name[alias_name_len];
-                  alias_name[alias_name_len] = '\0';
-                  actions_swap = actions[actions_len];
-                  actions[actions_len] = '\0';
+                alias_name_swap = alias_name[alias_name_len];
+                alias_name[alias_name_len] = '\0';
 
-                  if (prv_notify_actions(
-                          kii,
-                          alias_name,
-                          actions,
-                          actions_len) == FALSE) {
-                      M_KII_LOG(kii->kii_core.logger_cb("fail to notify.\n"));
-                      return;
-                  }
+                for (action_index = 0,
+                            action_result = PRV_GET_KEY_AND_VALUE_SUCCESS;
+                        action_result == PRV_GET_KEY_AND_VALUE_SUCCESS;
+                        ++action_index) {
+                    char* name;
+                    char* value;
+                    size_t name_len, value_len;
+                    action_result = get_key_and_value_at_index(
+                            kii,
+                            actions,
+                            actions_len,
+                            action_index++,
+                            &name,
+                            &name_len,
+                            &value,
+                            &value_len);
+                    switch (action_result) {
+                        case PRV_GET_KEY_AND_VALUE_FAIL:
+                            M_KII_LOG(kii->kii_core.logger_cb(
+                                    "fail to get action.\n"));
+                            return;
+                        case PRV_GET_KEY_AND_VALUE_SUCCESS:
+                        {
+                            char name_swap, value_swap;
+                            char error[EMESSAGE_SIZE + 1];
+                            kii_bool_t succeeded;
+                            name_swap = name[name_len];
+                            value_swap = value[value_len];
+                            name[name_len] = '\0';
+                            value[value_len] = '\0';
 
-                  alias_name[alias_name_len] = alias_name_swap;
-                  actions[actions_len] = actions_swap;
-              }
-              break;
-            case PRV_GET_ALIAS_RESULT_FINISH:
+                            succeeded =
+                              (*handler)(alias_name, name, value, error);
+
+                            if (alias_index > 0 || action_index > 0) {
+                                if (APPEND_BODY_CONST(kii, ",") != 0) {
+                                    M_KII_LOG(kii->kii_core.logger_cb(
+                                            "request size overflowed.\n"));
+                                }
+                            }
+                            if (APPEND_BODY_CONST(kii, "{\"") != 0 ||
+                                    APPEND_BODY(kii, name) != 0 ||
+                                    APPEND_BODY_CONST(kii, ":{") != 0 ||
+                                    prv_append_key_value_bool(
+                                        kii,
+                                        "succeeded",
+                                        succeeded,
+                                        FALSE) != 0 ||
+                                    prv_append_key_value_string_optional(
+                                        kii,
+                                        "errorMessage",
+                                        succeeded == FALSE ? error : NULL,
+                                        TRUE) != 0 ||
+                                    APPEND_BODY_CONST(kii, "}}\"") != 0) {
+                                M_KII_LOG(kii->kii_core.logger_cb(
+                                        "request size overflowed.\n"));
+                                return;
+                            }
+                            break;
+                        }
+                        case PRV_GET_KEY_AND_VALUE_FINISH:
+                            /* finished to parse aliases. */
+                            break;
+                        default:
+                            M_KII_LOG(kii->kii_core.logger_cb(
+                                    "unknown result %d.\n",result));
+                            M_KII_THING_IF_ASSERT(0);
+                            return;
+                    }
+                }
+                alias_name[alias_name_len] = alias_name_swap;
+                break;
+            }
+            case PRV_GET_KEY_AND_VALUE_FINISH:
                 /* finished to parse aliases. */
                 break;
             default:
@@ -595,125 +666,6 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
                     kii->kii_core.logger_cb("unknown result %d.\n",result));
                 M_KII_THING_IF_ASSERT(0);
                 return;
-        }
-    } while (result == PRV_GET_ALIAS_RESULT_SUCCESS);
-
-    {
-        kii_json_field_t alias_action[2];
-        char index[ULONGBUFSIZE];
-        size_t alias_action_index = 0;
-        memset(alias_action, 0x00, sizeof(alias_action));
-        alias_action[0].path = index;
-        alias_action[0].type = KII_JSON_FIELD_TYPE_OBJECT;
-        alias_action[0].field_copy.string = NULL;
-        alias_action[0].result = KII_JSON_FIELD_PARSE_SUCCESS;
-        alias_action[1].path = NULL;
-        for (alias_action_index = 0;
-                alias_action[0].result == KII_JSON_FIELD_PARSE_SUCCESS;
-                ++alias_action_index) {
-            sprintf(alias_action[0].path, "/[%lu]", alias_action_index);
-            switch (prv_kii_thing_if_json_read_object(kii, alias_actions_str,
-                            alias_actions_len, alias_action)) {
-                case KII_JSON_PARSE_SUCCESS:
-                {
-                    KII_THING_IF_ACTION_HANDLER handler =
-                        ((kii_thing_if_t*)kii->app_context)->action_handler;
-                    char* key;
-                    char* value;
-                    size_t key_len, value_len;
-                    char key_swap, value_swap;
-                    char error[EMESSAGE_SIZE + 1];
-                    if (alias_action_index >= 1) {
-                        if (kii_api_call_append_body(kii, ",", sizeof(",") - 1)
-                                != 0) {
-                            M_KII_LOG(kii->kii_core.logger_cb(
-                                    "request size overflowed.\n"));
-                            return;
-                        }
-                    }
-                    if (prv_kii_thing_if_get_key_and_value_from_json(kii,
-                                alias_actions_str + alias_action[0].start,
-                                alias_action[0].end - alias_action[0].start,
-                                &key, &value, &key_len, &value_len) != 0) {
-                        *(alias_actions_str + alias_action[0].end) = '\0';
-                        M_KII_LOG(kii->kii_core.logger_cb(
-                                "fail to parse alias_action: %s.\n",
-                                alias_actions_str + alias_action[0].start));
-                        return;
-                    }
-                    key_swap = key[key_len];
-                    value_swap = value[value_len];
-                    key[key_len] = '\0';
-                    value[value_len] = '\0';
-
-                    /* TODO: implement me. */
-                    M_KII_THING_IF_ASSERT(0);
-                    /*
-                    if ((*handler)(schema, schema_version, key, value, error)
-                            != KII_FALSE) {
-                        if (kii_api_call_append_body(kii,
-                                        "{\"", sizeof("{\"") - 1) != 0) {
-                            M_KII_LOG(kii->kii_core.logger_cb(
-                                    "request size overflowed.\n"));
-                            return;
-                        }
-                        if (kii_api_call_append_body(kii, key, strlen(key)) != 0) {
-                            M_KII_LOG(kii->kii_core.logger_cb(
-                                    "request size overflowed.\n"));
-                            return;
-                        }
-                        if (kii_api_call_append_body(kii, "\":{\"succeeded\":true}}",
-                                        sizeof("\":{\"succeeded\":true}}") - 1) != 0) {
-                            M_KII_LOG(kii->kii_core.logger_cb(
-                                    "request size overflowed.\n"));
-                            return;
-                        }
-                    } else {
-                        if (kii_api_call_append_body(kii,
-                                        "{\"", sizeof("{\"") - 1) != 0) {
-                            M_KII_LOG(kii->kii_core.logger_cb(
-                                    "request size overflowed.\n"));
-                            return;
-                        }
-                        if (kii_api_call_append_body(kii, key, strlen(key)) != 0) {
-                            M_KII_LOG(kii->kii_core.logger_cb(
-                                    "request size overflowed.\n"));
-                            return;
-                        }
-                        if (kii_api_call_append_body(kii,
-                                        "\":{\"succeeded\":false,\"errorMessage\":\"",
-                                        sizeof("\":{\"succeeded\":false,\"errorMessage\":\"") - 1)
-                                != 0) {
-                            M_KII_LOG(kii->kii_core.logger_cb(
-                                    "request size overflowed.\n"));
-                            return;
-                        }
-                        if (kii_api_call_append_body(kii, error, strlen(error))
-                                != 0) {
-                            M_KII_LOG(kii->kii_core.logger_cb(
-                                    "request size overflowed.\n"));
-                            return;
-                        }
-                        if (kii_api_call_append_body(kii,
-                                        "\"}}", sizeof("\"}}") - 1) != 0) {
-                            M_KII_LOG(kii->kii_core.logger_cb(
-                                    "request size overflowed.\n"));
-                            return;
-                        }
-                    }
-                    key[key_len] = key_swap;
-                    value[value_len] = value_swap;
-                    */
-                }
-                case KII_JSON_PARSE_PARTIAL_SUCCESS:
-                    /* This must be end of array. */
-                    break;
-                case KII_JSON_PARSE_ROOT_TYPE_ERROR:
-                case KII_JSON_PARSE_INVALID_INPUT:
-                default:
-                    M_KII_LOG(kii->kii_core.logger_cb("unexpected error.\n"));
-                    return ;
-            }
         }
     }
 
