@@ -448,8 +448,8 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
  *
  * @param [in] kii_thing_if_t This SDK instance.
  * @param [in] firmware_version firmware version to update.
- * @param [out] error Error infomation. If NULL, This SDK does not
- * return error information
+ * @param [out] error Error infomation. This is optional. If NULL,
+ * error information is not set.
  * @return KII_TRUE when succeeded, KII_FALSE when failed. If returned
  * value is KII_FALSE and error is not NULL, this SDK set error
  * information to the error.
@@ -472,8 +472,8 @@ kii_bool_t update_firmware_version(
  * from Kii Cloud. This SDK makes the buffer null terminated string.
  * @param [in] firmware_version_len length of firmware_version which
  * is second argument of this function.
- * @param [out] error Error infomation. If NULL, This SDK does not
- * return error information
+ * @param [out] error Error infomation. This is optional. If NULL,
+ * error information is not set.
  * @return KII_TRUE when succeeded, KII_FALSE when failed. If returned
  * value is KII_FALSE and error is not NULL, this SDK set error
  * information to the error.
@@ -494,8 +494,8 @@ kii_bool_t get_firmware_version(
  *
  * @param [in] kii_thing_if_t This SDK instance.
  * @param [in] thing_type thing type to update.
- * @param [out] error Error infomation. If NULL, This SDK does not
- * return error information
+ * @param [out] error Error infomation. This is optional. If NULL,
+ * error information is not set.
  * @return KII_TRUE when succeeded, KII_FALSE when failed. If returned
  * value is KII_FALSE and error is not NULL, this SDK set error
  * information to the error.
@@ -518,8 +518,8 @@ kii_bool_t update_thing_type(
  * from Kii Cloud. This SDK makes the buffer null terminated string.
  * @param [in] thing_type_len length of thing_type which
  * is second argument of this function.
- * @param [out] error Error infomation. If NULL, This SDK does not
- * return error information
+ * @param [out] error Error infomation. This is optional. If NULL,
+ * error information is not set.
  * @return KII_TRUE when succeeded, KII_FALSE when failed. If returned
  * value is KII_FALSE and error is not NULL, this SDK set error
  * information to the error.
