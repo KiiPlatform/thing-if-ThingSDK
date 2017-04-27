@@ -786,7 +786,8 @@ kii_bool_t onboard_with_vendor_thing_id(
         const char* thing_type,
         const char* firmware_version,
         const char* layout_position,
-        const char* thing_properties)
+        const char* thing_properties,
+        kii_thing_if_error_t* error)
 {
     // TODO: implement me.
     M_KII_THING_IF_ASSERT(0);
@@ -887,7 +888,8 @@ kii_bool_t onboard_with_thing_id(
         const char* thing_type,
         const char* firmware_version,
         const char* layout_position,
-        const char* thing_properties)
+        const char* thing_properties,
+        kii_thing_if_error_t* error)
 {
     // TODO: implement me.
     M_KII_THING_IF_ASSERT(0);
