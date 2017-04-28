@@ -521,7 +521,7 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
                 strlen(kii->kii_core.app_id) + CONST_STRLEN(TARGET_PART) +
                 strlen(kii->kii_core.author.author_id) +
                 CONST_STRLEN(COMMAND_PART) +
-                (fields[2].end - fields[2].start - 1) +
+                (fields[0].end - fields[0].start - 1) +
                 CONST_STRLEN(RESULTS_PART)) {
             M_KII_LOG(kii->kii_core.logger_cb(
                     "resource path is longer than expected.\n"));
@@ -534,8 +534,8 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
         strcat(resource_path, TARGET_PART);
         strcat(resource_path, kii->kii_core.author.author_id);
         strcat(resource_path, COMMAND_PART);
-        strncat(resource_path, buffer + fields[2].start,
-                fields[2].end - fields[2].start);
+        strncat(resource_path, buffer + fields[0].start,
+                fields[0].end - fields[0].start);
         strcat(resource_path, RESULTS_PART);
         /* TODO: Check properties. */
 
@@ -567,7 +567,7 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
                 kii,
                 alias_actions_str,
                 alias_actions_len,
-                alias_index++,
+                alias_index,
                 &alias_name,
                 &alias_name_len,
                 &actions,
@@ -596,7 +596,7 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
                             kii,
                             actions,
                             actions_len,
-                            action_index++,
+                            action_index,
                             &name,
                             &name_len,
                             &value,
@@ -636,13 +636,15 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
                                     prv_append_key_value_string_optional(
                                         kii,
                                         "errorMessage",
-                                        succeeded == FALSE ? error : NULL,
+                                        succeeded == KII_FALSE ? error : NULL,
                                         TRUE) != 0 ||
                                     APPEND_BODY_CONST(kii, "}}\"") != 0) {
                                 M_KII_LOG(kii->kii_core.logger_cb(
                                         "request size overflowed.\n"));
                                 return;
                             }
+                            name[name_len] = name_swap;
+                            value[value_len] = value_swap;
                             break;
                         }
                         case PRV_GET_KEY_AND_VALUE_FINISH:
@@ -650,7 +652,7 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
                             break;
                         default:
                             M_KII_LOG(kii->kii_core.logger_cb(
-                                    "unknown result %d.\n",result));
+                                    "unknown result %d.\n", action_result));
                             M_KII_THING_IF_ASSERT(0);
                             return;
                     }
@@ -663,7 +665,8 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
                 break;
             default:
                 M_KII_LOG(
-                    kii->kii_core.logger_cb("unknown result %d.\n",result));
+                    kii->kii_core.logger_cb("unknown result %d.\n",
+                            alias_result));
                 M_KII_THING_IF_ASSERT(0);
                 return;
         }
