@@ -4,3 +4,8 @@ linux-sample/exampleapp
 *.dSYM
 doc
 .DS_Store
+gtest-all.o
+gtest_main.o
+libgtest.a
+testapp
+tmp

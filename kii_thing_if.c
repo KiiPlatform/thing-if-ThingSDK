@@ -1085,3 +1085,12 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
 
     return KII_TRUE;
 }
+
+#ifdef KII_THING_IF_TEST_BUILD
+
+void test_handle_command(kii_t* kii, char* buffer, size_t buffer_size)
+{
+    handle_command(kii, buffer, buffer_size);
+}
+
+#endif /* KII_THING_IF_TEST_BUILD */
