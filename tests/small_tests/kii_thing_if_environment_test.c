@@ -10,7 +10,7 @@ kii_socket_code_t socket_connect_cb_impl(
         unsigned int port)
 {
     kii_socket_test_context_t* test_context =
-        (kii_socket_test_context_t*)socket_context;
+        (kii_socket_test_context_t*)(socket_context->app_context);
 
     return (*(test_context->CONNECT))(test_context->context, host, port);
 }
@@ -21,7 +21,7 @@ kii_socket_code_t socket_send_cb_impl(
         size_t length)
 {
     kii_socket_test_context_t* test_context =
-        (kii_socket_test_context_t*)socket_context;
+        (kii_socket_test_context_t*)(socket_context->app_context);
 
     return (*(test_context->SEND))(test_context->context, buffer, length);
 }
@@ -33,7 +33,7 @@ kii_socket_code_t socket_recv_cb_impl(
         size_t* out_actual_length)
 {
     kii_socket_test_context_t* test_context =
-        (kii_socket_test_context_t*)socket_context;
+        (kii_socket_test_context_t*)(socket_context->app_context);
 
     return (*(test_context->RECV))(
             test_context->context, buffer, length_to_read, out_actual_length);
@@ -42,7 +42,7 @@ kii_socket_code_t socket_recv_cb_impl(
 kii_socket_code_t socket_close_cb_impl(kii_socket_context_t* socket_context)
 {
     kii_socket_test_context_t* test_context =
-        (kii_socket_test_context_t*)socket_context;
+        (kii_socket_test_context_t*)(socket_context->app_context);
 
     return (*(test_context->CLOSE))(test_context->context);
 }

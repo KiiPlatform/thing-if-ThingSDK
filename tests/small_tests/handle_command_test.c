@@ -1,3 +1,5 @@
+#include "kii_thing_if_environment_test.h"
+
 #include <kii_thing_if.h>
 #include <kii_thing_if_test.h>
 
@@ -23,6 +25,40 @@ static kii_bool_t state_handler_returning_true(
     return KII_TRUE;
 }
 
+static kii_socket_code_t test_connect(
+        void* context,
+        const char* host,
+        unsigned int port)
+{
+    assert(0);
+    return KII_SOCKETC_OK;
+}
+
+static kii_socket_code_t test_send(
+        void* context,
+        const char* buffer,
+        size_t length)
+{
+    assert(0);
+    return KII_SOCKETC_OK;
+}
+
+static kii_socket_code_t test_recv(
+        void* context,
+        char* buffer,
+        size_t length_to_read,
+        size_t* out_actual_length)
+{
+    assert(0);
+    return KII_SOCKETC_OK;
+}
+
+static kii_socket_code_t test_close(void* context)
+{
+    assert(0);
+    return KII_SOCKETC_OK;
+}
+
 TEST(kiiThingIfTest, handle_command)
 {
     kii_thing_if_t kii_thing_if;
@@ -33,6 +69,12 @@ TEST(kiiThingIfTest, handle_command)
     char mqtt_buff[1024];
 
     char command_payload[] = "{\"commandID\":\"XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX\",\"actions\":[{\"AirConditionerAlias\":[{\"turnPower\":true},{\"setPresetTemperature\":25}]},{\"HumidityAlias\":[{\"setPresetHumidity\":45}]}],\"issuer\":\"user:XXXXXXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX\"}";
+
+    kii_socket_test_context_t test_context;
+    test_context.CONNECT = test_connect;
+    test_context.SEND = test_send;
+    test_context.RECV = test_recv;
+    test_context.CLOSE = test_close;
 
     command_handler_resource.buffer = command_handler_buff;
     command_handler_resource.buffer_size =
@@ -59,6 +101,9 @@ TEST(kiiThingIfTest, handle_command)
             &command_handler_resource,
             &state_updater_resource,
             NULL));
+
+    kii_thing_if.command_handler.kii_core.http_context.
+        socket_context.app_context = &test_context;
 
     strcpy(kii_thing_if.command_handler.kii_core.author.author_id, "owenr");
     strcpy(kii_thing_if.state_updater.kii_core.author.author_id, "owenr");
