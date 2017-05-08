@@ -4,7 +4,7 @@ ifdef DEBUG
 
 endif
 override CFLAGS += -Wall -pedantic -pthread -fPIC -shared
-override LIBTHINGIF_CFLAGS += -DKII_THING_IF_TEST_BUILD -DKII_PUSH_KEEP_ALIVE_INTERVAL_SECONDS=300
+override LIBTHINGIF_CFLAGS += -DKII_THING_IF_TEST_BUILD -DKII_PUSH_KEEP_ALIVE_INTERVAL_SECONDS=300 -DKII_JSON_FIXED_TOKEN_NUM=128
 
 DEFAULT_LIBS = -lssl -lcrypto -lpthread
 LIBS = $(DEFAULT_LIBS) -lkiithingifsdk
@@ -51,5 +51,7 @@ clean:
 
 test:
 	export LD_LIBRARY_PATH=. && ./$(TARGET)
+
+run: build test
 
 .PHONY: clean
