@@ -134,6 +134,6 @@ For example, [Ti CC3200 environment implementation](./cc3200-sample/freertos_thi
 ## Execute tests
 
 ```sh
-# cd test/small_tests
+# cd tests/small_tests
 # make run
 ```
