@@ -8,13 +8,11 @@
 
 #include <gtest/gtest.h>
 
-typedef struct sended_requests_t {
-    int num;
-    char** data_array;
-} sended_requests_t;
-
 typedef struct test_context_t {
-    sended_requests_t sended_requests;
+    int num;
+    char** sended_requests;
+    const char** receiving_requests;
+    int receiving_count;
 } test_context_t;
 
 typedef struct expected_action_t {
@@ -49,8 +47,7 @@ static kii_bool_t state_handler_returning_true(
         kii_t *kii,
         KII_THING_IF_WRITER writer)
 {
-    assert(0);
-    return KII_TRUE;
+    return (*writer)(kii, "{\"power\":true}");
 }
 
 static kii_socket_code_t test_connect(
@@ -58,17 +55,17 @@ static kii_socket_code_t test_connect(
         const char* host,
         unsigned int port)
 {
-    sended_requests_t* sended_requests =
-      &(((test_context_t*)context)->sended_requests);
-    int num = sended_requests->num + 1;
-    char** data_array = (char**)realloc(
-            sended_requests->data_array,
+    test_context_t* test_context = (test_context_t*)context;
+    int num = test_context->num + 1;
+    char** sended_requests = (char**)realloc(
+            test_context->sended_requests,
             sizeof(char**) * num);
     char* data = (char*)malloc(sizeof(char));
     data[0] = '\0';
-    data_array[num - 1] = data;
-    sended_requests->num = num;
-    sended_requests->data_array = data_array;
+    sended_requests[num - 1] = data;
+    test_context->num = num;
+    test_context->sended_requests = sended_requests;
+    test_context->receiving_count = 0;
     return KII_SOCKETC_OK;
 }
 
@@ -77,13 +74,12 @@ static kii_socket_code_t test_send(
         const char* buffer,
         size_t length)
 {
-    sended_requests_t* sended_requests =
-        &(((test_context_t*)context)->sended_requests);
-    int index = sended_requests->num - 1;
-    sended_requests->data_array[index] = (char*)realloc(
-            sended_requests->data_array[index],
-            strlen(sended_requests->data_array[index]) + length + 1);
-    strncat(sended_requests->data_array[index], buffer, length);
+    test_context_t* test_context = (test_context_t*)context;
+    int index = test_context->num - 1;
+    test_context->sended_requests[index] = (char*)realloc(
+            test_context->sended_requests[index],
+            strlen(test_context->sended_requests[index]) + length + 1);
+    strncat(test_context->sended_requests[index], buffer, length);
 
     return KII_SOCKETC_OK;
 }
@@ -94,6 +90,21 @@ static kii_socket_code_t test_recv(
         size_t length_to_read,
         size_t* out_actual_length)
 {
+    test_context_t* test_context = (test_context_t*)context;
+    int index = test_context->num - 1;
+    const char* receiving_requests = test_context->receiving_requests[index];
+    int start_index = test_context->receiving_count;
+    int actual_read_length = length_to_read;
+    int rest_length = strlen(receiving_requests) - start_index;
+
+    if (actual_read_length > rest_length) {
+        actual_read_length = rest_length;
+    }
+
+    memcpy(buffer, receiving_requests + start_index, actual_read_length);
+    test_context->receiving_count += actual_read_length;
+    *out_actual_length = actual_read_length;
+
     return KII_SOCKETC_OK;
 }
 
@@ -116,6 +127,10 @@ TEST(kiiThingIfTest, handle_command)
 
     kii_socket_test_context_t socket_test_context;
     test_context_t test_context;
+    const char* receiving_requests[2];
+    receiving_requests[0] = "HTTP/1.1 201\r\n\r\n";
+    receiving_requests[1] = "HTTP/1.1 201\r\n\r\n";
+
     memset(&socket_test_context, 0, sizeof(socket_test_context));
     memset(&test_context, 0, sizeof(test_context));
 
@@ -124,6 +139,7 @@ TEST(kiiThingIfTest, handle_command)
     socket_test_context.RECV = test_recv;
     socket_test_context.CLOSE = test_close;
     socket_test_context.context = &test_context;
+    test_context.receiving_requests = receiving_requests;
 
     command_handler_resource.buffer = command_handler_buff;
     command_handler_resource.buffer_size =
@@ -174,7 +190,7 @@ TEST(kiiThingIfTest, handle_command)
             command_payload, strlen(command_payload));
 
     ASSERT_STREQ(
-        test_context.sended_requests.data_array[0],
+        test_context.sended_requests[0],
         "PUT https://api-jp.kii.com/thing-if/apps/app_id/targets/thing:owenr/commands/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/action-results HTTP/1.1\r\n"
         "host:api-jp.kii.com\r\n"
         "x-kii-appid:app_id\r\n"
@@ -186,4 +202,21 @@ TEST(kiiThingIfTest, handle_command)
         "\r\n"
         "{\"actionResults\":[{\"turnPower:{\"succeeded\":true}}\",{\"setPresetTemperature:{\"succeeded\":true}}\",{\"setPresetHumidity:{\"succeeded\":true}}\"]}");
 
+    ASSERT_STREQ(
+        test_context.sended_requests[1],
+        "PUT https://api-jp.kii.com/thing-if/apps/app_id/targets/thing:owenr/states HTTP/1.1\r\n"
+        "host:api-jp.kii.com\r\n"
+        "x-kii-appid:app_id\r\n"
+        "x-kii-appkey:app_key\r\n"
+        "x-kii-sdk:sn=tic;sv=0.9.6\r\n"
+        "content-type:application/json\r\n"
+        "authorization:bearer token\r\n"
+        "content-length:14\r\n"
+        "\r\n"
+        "{\"power\":true}");
+
+    for (i = 0; i < test_context.num; ++i) {
+        free(test_context.sended_requests[i]);
+    }
+    free(test_context.sended_requests);
 }
