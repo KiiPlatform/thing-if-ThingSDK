@@ -131,3 +131,9 @@ You'll specify stack size, depth and priority, etc depending on the environment.
 Please check samples for reference.
 For example, [Ti CC3200 environment implementation](./cc3200-sample/freertos_thingsdk_demo/kii_thing_if_environment_cc3200.c).
 
+## Execute tests
+
+```sh
+# cd tests/small_tests
+# make run
+```
