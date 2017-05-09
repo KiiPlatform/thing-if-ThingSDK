@@ -716,6 +716,9 @@ static int prv_kii_thing_if_get_anonymous_token(
             strlen(kii->kii_core.app_id) + CONST_STRLEN(OAUTH_PATH)) {
         M_KII_LOG(kii->kii_core.logger_cb(
                 "resource path is longer than expected.\n"));
+        if (error != NULL) {
+            error->reason = KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
+        }
         return -1;
     }
     sprintf(resource_path, "%s/%s/%s", APP_PATH, kii->kii_core.app_id,
@@ -724,33 +727,24 @@ static int prv_kii_thing_if_get_anonymous_token(
     if (kii_api_call_start(kii, "POST", resource_path, "application/json",
                     KII_FALSE) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to start api call.\n"));
+        if (error != NULL) {
+            error->reason = KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
+        }
+        return -1;
     }
 
-    if (kii_api_call_append_body(kii,
-                    "{\"grant_type\":\"client_credentials\",\"client_id\":\"",
-                    CONST_STRLEN(
-                        "{\"grant_type\":\"client_credentials\",\"client_id\":\""))
-            != 0) {
+    if (APPEND_BODY_CONST(kii, "{") != 0 ||
+            prv_append_key_value_string(
+                kii, "grant_type", "client_credentials", FALSE) != 0 ||
+            prv_append_key_value_string(
+                kii, "client_id", kii->kii_core.app_id, TRUE) != 0 ||
+            prv_append_key_value_string(
+                kii, "client_secret", kii->kii_core.app_key, TRUE) != 0 ||
+            APPEND_BODY_CONST(kii, "}") != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
-        return -1;
-    }
-    if (kii_api_call_append_body(kii, kii->kii_core.app_id,
-                    strlen(kii->kii_core.app_id)) != 0) {
-        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
-        return -1;
-    }
-    if (kii_api_call_append_body(kii, "\",\"client_secret\": \"",
-                    CONST_STRLEN("\",\"client_secret\": \"")) != 0) {
-        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
-        return -1;
-    }
-    if (kii_api_call_append_body(kii, kii->kii_core.app_key,
-                    strlen(kii->kii_core.app_key)) != 0) {
-        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
-        return -1;
-    }
-    if (kii_api_call_append_body(kii, "\"}", CONST_STRLEN("\"}")) != 0) {
-        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
+        if (error != NULL) {
+            error->reason = KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
+        }
         return -1;
     }
     if (kii_api_call_run(kii) != 0) {

@@ -20,7 +20,9 @@ typedef enum kii_thing_if_error_reason_t {
     /** HTTP error. */
     KII_THING_IF_ERROR_REASON_HTTP,
     /** Socket error. */
-    KII_THING_IF_ERROR_REASON_SOCKET
+    KII_THING_IF_ERROR_REASON_SOCKET,
+    /** HTTP buffer overflow. */
+    KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW
 } kii_thing_if_error_reason_t;
 
 /** Error information of thing-if ThingSDK. */
