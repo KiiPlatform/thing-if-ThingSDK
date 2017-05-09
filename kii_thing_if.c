@@ -309,6 +309,8 @@ static kii_bool_t prv_init_kii_thing_if(
     kii_thing_if->state_updater.delay_ms_cb = delay_ms_cb_impl;
     kii_thing_if->state_updater.kii_core.logger_cb = logger_cb_impl;
 
+    kii_thing_if->is_started = KII_FALSE;
+
     return KII_TRUE;
 }
 
