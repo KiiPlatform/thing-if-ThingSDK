@@ -846,9 +846,10 @@ kii_bool_t onboard_with_vendor_thing_id(
         const char* vendor_thing_id,
         const char* password,
         const char* thing_type,
-        const char* thing_properties,
         const char* firmware_version,
-        const char* layout_position)
+        const char* layout_position,
+        const char* thing_properties,
+        kii_thing_if_error_t* error)
 {
     if (prv_onboard_with_vendor_thing_id(&kii_thing_if->command_handler,
                     vendor_thing_id, password, thing_type,
@@ -951,10 +952,10 @@ kii_bool_t onboard_with_thing_id(
         const char* thing_id,
         const char* password,
         const char* thing_type,
-        const char* thing_properties,
         const char* firmware_version,
-        const char* layout_position)
-
+        const char* layout_position,
+        const char* thing_properties,
+        kii_thing_if_error_t* error)
 {
     if (prv_onboard_with_thing_id(&kii_thing_if->command_handler, thing_id,
                     password, thing_type, thing_properties, firmware_version,
