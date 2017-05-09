@@ -681,7 +681,7 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
         return;
     }
 
-    if (prv_send_state(kii) != KII_FALSE) {
+    if (prv_send_state(kii) != KII_TRUE) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to send state.\n"));
     }
 
