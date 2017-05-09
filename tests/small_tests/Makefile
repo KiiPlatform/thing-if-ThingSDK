@@ -9,7 +9,7 @@ override LIBTHINGIF_CFLAGS += -DKII_THING_IF_TEST_BUILD -DKII_PUSH_KEEP_ALIVE_IN
 DEFAULT_LIBS = -lssl -lcrypto -lpthread
 LIBS = $(DEFAULT_LIBS) -lkiithingifsdk
 THINGIF_LIBS= $(DEFAULT_LIBS)
-LD_FLAG = -L. -L/usr/local/opt/openssl/lib
+LD_FLAG = -L.
 LIBTHINGIF=libkiithingifsdk.so
 INCLUDES = -I../../ -I../../kii/kii -I../../kii/kii-core -I../../kii/kii_json/include -I../../kii/lib/jsmn
 
