@@ -270,7 +270,11 @@ typedef struct kii_thing_if_t {
     KII_THING_IF_CUSTOM_PUSH_HANDLER custom_push_handler;
     /** Specify the period of updating state in seconds. */
     int state_update_period;
-    /** Represent kii_thing_if_t is started or not. */
+
+    /**
+     * Represent kii_thing_if_t is started or not. Application must
+     * not change this value.
+     */
     kii_bool_t is_started;
 } kii_thing_if_t;
 
