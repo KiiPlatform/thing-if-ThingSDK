@@ -373,6 +373,8 @@ int main(int argc, char** argv)
         print_help();
         exit(0);
     }
+
+    start(&kii_thing_if);
     while(1){}; /* run forever. */
 
     /*
