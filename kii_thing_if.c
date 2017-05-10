@@ -1143,6 +1143,24 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
     return KII_TRUE;
 }
 
+kii_bool_t start(kii_thing_if_t* kii_thing_if)
+{
+    if (kii_thing_if == NULL) {
+        return KII_FALSE;
+    }
+
+    if (kii_push_start_routine(
+            &kii_thing_if->command_handler, received_callback) != 0) {
+        return KII_FALSE;
+    }
+
+    kii_thing_if->state_updater.task_create_cb(
+        KII_THING_IF_TASK_NAME_STATUS_UPDATE,
+        prv_update_status, (void*)&kii_thing_if->state_updater);
+
+    return KII_TRUE;
+}
+
 #ifdef KII_THING_IF_TEST_BUILD
 
 void test_handle_command(kii_t* kii, char* buffer, size_t buffer_size)
