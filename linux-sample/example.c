@@ -79,97 +79,23 @@ static kii_bool_t prv_set_smartlight_info(const prv_smartlight_t* smartlight)
 }
 
 static kii_bool_t action_handler(
-        const char* schema,
-        int schema_version,
+        const char* alias,
         const char* action_name,
         const char* action_params,
         char error[EMESSAGE_SIZE + 1])
 {
     prv_smartlight_t smartlight;
 
-    printf("schema=%s, schema_version=%d, action name=%s, action params=%s\n",
-            schema, schema_version, action_name, action_params);
+    printf("alias=%s, action name=%s, action params=%s\n",
+            alias, action_name, action_params);
 
-    if (strcmp(schema, "SmartLight-Demo") != 0 || schema_version != 1) {
-        printf("invalid schema: %s %d\n", schema, schema_version);
-        snprintf(error, EMESSAGE_SIZE + 1, "invalid schema: %s %d",
-                schema, schema_version);
+    if (strcmp(alias, "AirConditionerAlias") != 0 ||
+            strcmp(alias, "HumidityAlias") != 0) {
+        snprintf(error, EMESSAGE_SIZE + 1, "invalid alias: %s", alias);
         return KII_FALSE;
     }
 
-    memset(&smartlight, 0x00, sizeof(smartlight));
-    if (prv_get_smartlight_info(&smartlight) == KII_FALSE) {
-        printf("fail to lock.\n");
-        strcpy(error, "fail to lock.");
-        return KII_FALSE;
-    }
-    if (strcmp(action_name, "turnPower") == 0) {
-        kii_json_field_t fields[2];
-
-        memset(fields, 0x00, sizeof(fields));
-        fields[0].path = "/power";
-        fields[0].type = KII_JSON_FIELD_TYPE_BOOLEAN;
-        fields[1].path = NULL;
-        if(prv_json_read_object(action_params, strlen(action_params),
-                        fields, error) !=  KII_JSON_PARSE_SUCCESS) {
-            printf("invalid turnPower json\n");
-            return KII_FALSE;
-        }
-        smartlight.power = fields[0].field_copy.boolean_value;
-    } else if (strcmp(action_name, "setBrightness") == 0) {
-        kii_json_field_t fields[2];
-
-        memset(fields, 0x00, sizeof(fields));
-        fields[0].path = "/brightness";
-        fields[0].type = KII_JSON_FIELD_TYPE_INTEGER;
-        fields[1].path = NULL;
-        if(prv_json_read_object(action_params, strlen(action_params),
-                        fields, error) !=  KII_JSON_PARSE_SUCCESS) {
-            printf("invalid brightness json\n");
-            return KII_FALSE;
-        }
-        smartlight.brightness = fields[0].field_copy.int_value;
-    } else if (strcmp(action_name, "setColor") == 0) {
-        kii_json_field_t fields[4];
-
-        memset(fields, 0x00, sizeof(fields));
-        fields[0].path = "/color/[0]";
-        fields[0].type = KII_JSON_FIELD_TYPE_INTEGER;
-        fields[1].path = "/color/[1]";
-        fields[1].type = KII_JSON_FIELD_TYPE_INTEGER;
-        fields[2].path = "/color/[2]";
-        fields[2].type = KII_JSON_FIELD_TYPE_INTEGER;
-        fields[3].path = NULL;
-        if(prv_json_read_object(action_params, strlen(action_params),
-                         fields, error) !=  KII_JSON_PARSE_SUCCESS) {
-            printf("invalid color json\n");
-            return KII_FALSE;
-        }
-        smartlight.color[0] = fields[0].field_copy.int_value;
-        smartlight.color[1] = fields[1].field_copy.int_value;
-        smartlight.color[2] = fields[2].field_copy.int_value;
-    } else if (strcmp(action_name, "setColorTemperature") == 0) {
-        kii_json_field_t fields[2];
-
-        memset(fields, 0x00, sizeof(fields));
-        fields[0].path = "/colorTemperature";
-        fields[0].type = KII_JSON_FIELD_TYPE_INTEGER;
-        fields[1].path = NULL;
-        if(prv_json_read_object(action_params, strlen(action_params),
-                        fields, error) !=  KII_JSON_PARSE_SUCCESS) {
-            printf("invalid colorTemperature json\n");
-            return KII_FALSE;
-        }
-        smartlight.color_temperature = fields[0].field_copy.int_value;
-    } else {
-        printf("invalid action: %s\n", action_name);
-        return KII_FALSE;
-    }
-
-    if (prv_set_smartlight_info(&smartlight) == KII_FALSE) {
-        printf("fail to unlock.\n");
-        return KII_FALSE;
-    }
+    // TODO: implement me.
     return KII_TRUE;
 }
 
@@ -394,11 +320,25 @@ int main(int argc, char** argv)
                     exit(1);
                 }
                 if (vendorThingID != NULL) {
-                    result = onboard_with_vendor_thing_id(&kii_thing_if, vendorThingID,
-                            password, NULL, NULL, NULL, NULL);
+                    result = onboard_with_vendor_thing_id(
+                            &kii_thing_if,
+                            vendorThingID,
+                            password,
+                            NULL,
+                            NULL,
+                            NULL,
+                            NULL,
+                            NULL);
                 } else {
-                    result = onboard_with_thing_id(&kii_thing_if, thingID,
-                            password, NULL, NULL, NULL, NULL);
+                    result = onboard_with_thing_id(
+                            &kii_thing_if,
+                            thingID,
+                            password,
+                            NULL,
+                            NULL,
+                            NULL,
+                            NULL,
+                            NULL);
                 }
                 if (result == KII_FALSE) {
                     printf("failed to onboard.\n");
