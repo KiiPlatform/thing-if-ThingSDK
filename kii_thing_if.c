@@ -220,8 +220,8 @@ static prv_bool_t prv_execute_http_session(
             }
             error->reason = KII_THING_IF_ERROR_REASON_HTTP;
             error->http_status_code = kii->kii_core.response_code;
-            return FALSE;
         }
+        return FALSE;
     }
     return TRUE;
 }
