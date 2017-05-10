@@ -20,7 +20,11 @@ typedef enum kii_thing_if_error_reason_t {
     /** HTTP error. */
     KII_THING_IF_ERROR_REASON_HTTP,
     /** Socket error. */
-    KII_THING_IF_ERROR_REASON_SOCKET
+    KII_THING_IF_ERROR_REASON_SOCKET,
+    /** HTTP buffer overflow. */
+    KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW,
+    /** Fail to parse HTTP response. */
+    KII_THING_IF_ERROR_REASON_PARSE_RESPONSE
 } kii_thing_if_error_reason_t;
 
 /** Error information of thing-if ThingSDK. */
@@ -266,6 +270,12 @@ typedef struct kii_thing_if_t {
     KII_THING_IF_CUSTOM_PUSH_HANDLER custom_push_handler;
     /** Specify the period of updating state in seconds. */
     int state_update_period;
+
+    /**
+     * Represent kii_thing_if_t is started or not. Application must
+     * not change this value.
+     */
+    kii_bool_t is_started;
 } kii_thing_if_t;
 
 /** Initialize kii_thing_if_t object.
