@@ -1094,6 +1094,13 @@ kii_bool_t onboard_with_thing_id(
         const char* thing_properties,
         kii_thing_if_error_t* error)
 {
+    if (kii_thing_if->is_started == KII_TRUE) {
+        if (error != NULL) {
+            error->reason = KII_THING_IF_ERROR_REASON_ALREADY_STARTED;
+        }
+        return KII_FALSE;
+    }
+
     if (prv_onboard_with_thing_id(&kii_thing_if->command_handler, thing_id,
                     password, thing_type, thing_properties, firmware_version,
                     layout_position) == KII_FALSE) {
@@ -1106,9 +1113,8 @@ kii_bool_t onboard_with_thing_id(
             == KII_FALSE) {
         return KII_FALSE;
     }
-    kii_thing_if->state_updater.task_create_cb(
-            KII_THING_IF_TASK_NAME_STATUS_UPDATE,
-            prv_update_status, (void*)&kii_thing_if->state_updater);
+
+    kii_thing_if->is_started = KII_TRUE;
 
     return KII_TRUE;
 }
