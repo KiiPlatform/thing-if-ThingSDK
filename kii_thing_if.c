@@ -356,7 +356,7 @@ static kii_bool_t prv_init_kii_thing_if(
     kii_thing_if->state_updater.delay_ms_cb = delay_ms_cb_impl;
     kii_thing_if->state_updater.kii_core.logger_cb = logger_cb_impl;
 
-    kii_thing_if->is_started = KII_FALSE;
+    kii_thing_if->state = KII_THING_IF_STATE_INITIALIZED;
 
     return KII_TRUE;
 }
@@ -972,7 +972,7 @@ kii_bool_t onboard_with_vendor_thing_id(
         const char* thing_properties,
         kii_thing_if_error_t* error)
 {
-    if (kii_thing_if->is_started == KII_TRUE) {
+    if (kii_thing_if->state == KII_THING_IF_STATE_STARTED) {
         if (error != NULL) {
             error->reason = KII_THING_IF_ERROR_REASON_ALREADY_STARTED;
         }
@@ -993,7 +993,7 @@ kii_bool_t onboard_with_vendor_thing_id(
         return KII_FALSE;
     }
 
-    kii_thing_if->is_started = KII_TRUE;
+    kii_thing_if->state = KII_THING_IF_STATE_ONBOARDED;
 
     return KII_TRUE;
 }
@@ -1072,7 +1072,7 @@ kii_bool_t onboard_with_thing_id(
         const char* thing_properties,
         kii_thing_if_error_t* error)
 {
-    if (kii_thing_if->is_started == KII_TRUE) {
+    if (kii_thing_if->state == KII_THING_IF_STATE_STARTED) {
         if (error != NULL) {
             error->reason = KII_THING_IF_ERROR_REASON_ALREADY_STARTED;
         }
@@ -1092,7 +1092,7 @@ kii_bool_t onboard_with_thing_id(
         return KII_FALSE;
     }
 
-    kii_thing_if->is_started = KII_TRUE;
+    kii_thing_if->state = KII_THING_IF_STATE_ONBOARDED;
 
     return KII_TRUE;
 }
@@ -1124,12 +1124,14 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
         return KII_FALSE;
     }
 
+    kii_thing_if->state = KII_THING_IF_STATE_ONBOARDED;
+
     return KII_TRUE;
 }
 
 kii_bool_t start(kii_thing_if_t* kii_thing_if)
 {
-    if (kii_thing_if == NULL) {
+    if (kii_thing_if->state != KII_THING_IF_STATE_ONBOARDED) {
         return KII_FALSE;
     }
 
