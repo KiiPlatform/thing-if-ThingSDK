@@ -1147,6 +1147,17 @@ kii_bool_t start(kii_thing_if_t* kii_thing_if)
     return KII_TRUE;
 }
 
+kii_bool_t get_firmware_version(
+        kii_thing_if_t* kii_thing_if,
+        char* firmware_version,
+        size_t firmware_version_len,
+        kii_thing_if_error_t* error)
+{
+    M_KII_THING_IF_ASSERT(0);
+    return KII_FALSE;
+}
+
+
 #ifdef KII_THING_IF_TEST_BUILD
 
 void test_handle_command(kii_t* kii, char* buffer, size_t buffer_size)
