@@ -183,6 +183,48 @@ static kii_json_parse_result_t prv_kii_thing_if_json_read_object(
     return retval;
 }
 
+static prv_bool_t prv_execute_http_session(
+        kii_t* kii,
+        kii_thing_if_error_t* error)
+{
+    assert(kii != NULL);
+
+    /* TODO: we should fix kii_api_call_run to detec socket error. */
+    if (kii_api_call_run(kii) != 0) {
+        M_KII_LOG(kii->kii_core.logger_cb("fail to run api.\n"));
+        if (error != NULL) {
+            error->reason = KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
+        }
+        return FALSE;
+    }
+
+    /* check http status */
+    if (kii->kii_core.response_code >= 200 &&
+            kii->kii_core.response_code < 300) {
+        if (error != NULL) {
+            kii_json_field_t fields[2];
+            memset(fields, 0x00, sizeof(fields));
+            fields[0].path = "/errorCode";
+            fields[0].type = KII_JSON_FIELD_TYPE_STRING;
+            fields[0].field_copy.string = error->error_code;
+            fields[0].field_copy_buff_size = sizeof(error->error_code) /
+                sizeof(error->error_code[0]);
+            fields[1].path = NULL;
+            if (prv_kii_thing_if_json_read_object(
+                    kii,
+                    kii->kii_core.response_body,
+                    strlen(kii->kii_core.response_body),
+                    fields) != KII_JSON_PARSE_SUCCESS) {
+                M_KII_LOG(kii->kii_core.logger_cb(
+                    "fail to parse received message.\n"));
+            }
+            error->reason = KII_THING_IF_ERROR_REASON_HTTP;
+            error->http_status_code = kii->kii_core.response_code;
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
 
 static int prv_thing_if_parse_onboarding_response(kii_t* kii)
 {
@@ -747,7 +789,8 @@ static int prv_kii_thing_if_get_anonymous_token(
         }
         return -1;
     }
-    if (kii_api_call_run(kii) != 0) {
+
+    if (prv_execute_http_session(kii, error) != TRUE) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to run api.\n"));
         return -1;
     }
@@ -764,6 +807,9 @@ static int prv_kii_thing_if_get_anonymous_token(
                     strlen(kii->kii_core.response_body), fields)
             != KII_JSON_PARSE_SUCCESS) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to parse received message.\n"));
+        if (error != NULL) {
+            error->reason KII_THING_IF_ERROR_REASON_PARSE_RESPONSE;
+        }
         return -1;
     }
 

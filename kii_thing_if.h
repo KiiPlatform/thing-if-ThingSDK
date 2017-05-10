@@ -22,7 +22,9 @@ typedef enum kii_thing_if_error_reason_t {
     /** Socket error. */
     KII_THING_IF_ERROR_REASON_SOCKET,
     /** HTTP buffer overflow. */
-    KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW
+    KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW,
+    /** Fail to parse HTTP response. */
+    KII_THING_IF_ERROR_REASON_PARSE_RESPONSE
 } kii_thing_if_error_reason_t;
 
 /** Error information of thing-if ThingSDK. */
