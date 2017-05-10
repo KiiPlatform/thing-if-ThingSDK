@@ -199,8 +199,8 @@ static prv_bool_t prv_execute_http_session(
     }
 
     /* check http status */
-    if (kii->kii_core.response_code >= 200 &&
-            kii->kii_core.response_code < 300) {
+    if (kii->kii_core.response_code < 200 ||
+            kii->kii_core.response_code >= 300) {
         if (error != NULL) {
             kii_json_field_t fields[2];
             memset(fields, 0x00, sizeof(fields));
