@@ -1077,16 +1077,6 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
         return KII_FALSE;
     }
 
-    if (kii_push_start_routine(&kii_thing_if->command_handler,
-                    received_callback) != 0) {
-        return KII_FALSE;
-    }
-
-    kii_thing_if->state_updater.task_create_cb(
-            KII_THING_IF_TASK_NAME_STATUS_UPDATE,
-            prv_update_status, (void*)&kii_thing_if->state_updater);
-
-
     return KII_TRUE;
 }
 
