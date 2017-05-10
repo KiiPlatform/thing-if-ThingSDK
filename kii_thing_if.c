@@ -187,7 +187,7 @@ static prv_bool_t prv_execute_http_session(
         kii_t* kii,
         kii_thing_if_error_t* error)
 {
-    assert(kii != NULL);
+    M_KII_THING_IF_ASSERT(kii != NULL);
 
     /* TODO: we should fix kii_api_call_run to detec socket error. */
     if (kii_api_call_run(kii) != 0) {
@@ -220,8 +220,8 @@ static prv_bool_t prv_execute_http_session(
             }
             error->reason = KII_THING_IF_ERROR_REASON_HTTP;
             error->http_status_code = kii->kii_core.response_code;
-            return FALSE;
         }
+        return FALSE;
     }
     return TRUE;
 }
@@ -882,7 +882,7 @@ static kii_bool_t prv_onboard_with_vendor_thing_id(
         return KII_FALSE;
     }
 
-    if (prv_execute_http_session(kii, error) != 0) {
+    if (prv_execute_http_session(kii, error) != TRUE) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to run api.\n"));
         return KII_FALSE;
     }
@@ -1005,15 +1005,12 @@ static kii_bool_t prv_onboard_with_thing_id(
         const char* thing_type,
         const char* thing_properties,
         const char* firmware_version,
-        const char* layout_position)
-
+        const char* layout_position,
+        kii_thing_if_error_t* error)
 {
-    // TODO: implement me.
-    /*
-
     char resource_path[64];
 
-    if (prv_kii_thing_if_get_anonymous_token(kii) != 0) {
+    if (prv_kii_thing_if_get_anonymous_token(kii, error) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to get anonymous token.\n"));
         return KII_FALSE;
     }
@@ -1033,18 +1030,10 @@ static kii_bool_t prv_onboard_with_thing_id(
         M_KII_LOG(kii->kii_core.logger_cb(
             "fail to start api call.\n"));
     }
-    */
 
-    /* Open to write JSON object. */
-    /*
-    if (kii_api_call_append_body(kii, "{", CONST_STRLEN("{")) != 0) {
-        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
-        return KII_FALSE;
-    }
-    */
     /* Append key value pairs. */
-    /*
-    if (prv_append_key_value_string(kii, "thingID", thing_id, FALSE) != 0 ||
+    if (APPEND_BODY_CONST(kii, "{") != 0 ||
+            prv_append_key_value_string(kii, "thingID", thing_id, FALSE) != 0 ||
             prv_append_key_value_string(
                 kii, "thingPassword", password, TRUE) != 0 ||
             prv_append_key_value_string_optional(
@@ -1054,32 +1043,21 @@ static kii_bool_t prv_onboard_with_thing_id(
             prv_append_key_value_string_optional(
                 kii, "firmwareVersion", firmware_version, TRUE) != 0 ||
             prv_append_key_value_string_optional(
-                kii, "layoutPosition", layout_position, TRUE) != 0) {
-        M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
-        return KII_FALSE;
-    }
-    */
-    /* Close JSON object. */
-    /*
-    if (kii_api_call_append_body(kii, "}", CONST_STRLEN("}")) != 0) {
+                kii, "layoutPosition", layout_position, TRUE) != 0 ||
+            APPEND_BODY_CONST(kii, "}") != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
         return KII_FALSE;
     }
 
-    if (kii_api_call_run(kii) != 0) {
+    if (prv_execute_http_session(kii, error) != TRUE) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to run api.\n"));
         return KII_FALSE;
     }
 
-    if (prv_thing_if_parse_onboarding_response(kii) != 0) {
+    if (prv_thing_if_parse_onboarding_response(kii, error) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to parse resonse.\n"));
         return KII_FALSE;
     }
-
-    if (kii_push_start_routine(kii, received_callback) != 0) {
-        return KII_FALSE;
-    }
-    */
 
     return KII_TRUE;
 }
@@ -1094,9 +1072,16 @@ kii_bool_t onboard_with_thing_id(
         const char* thing_properties,
         kii_thing_if_error_t* error)
 {
+    if (kii_thing_if->is_started == KII_TRUE) {
+        if (error != NULL) {
+            error->reason = KII_THING_IF_ERROR_REASON_ALREADY_STARTED;
+        }
+        return KII_FALSE;
+    }
+
     if (prv_onboard_with_thing_id(&kii_thing_if->command_handler, thing_id,
                     password, thing_type, thing_properties, firmware_version,
-                    layout_position) == KII_FALSE) {
+                    layout_position, error) == KII_FALSE) {
         return KII_FALSE;
     }
 
@@ -1106,9 +1091,8 @@ kii_bool_t onboard_with_thing_id(
             == KII_FALSE) {
         return KII_FALSE;
     }
-    kii_thing_if->state_updater.task_create_cb(
-            KII_THING_IF_TASK_NAME_STATUS_UPDATE,
-            prv_update_status, (void*)&kii_thing_if->state_updater);
+
+    kii_thing_if->is_started = KII_TRUE;
 
     return KII_TRUE;
 }
