@@ -179,18 +179,25 @@ static kii_bool_t custom_push_handler(
 }
 
 static void print_help() {
-    printf("sub commands: [onboard|onboard-with-token]\n\n");
+    printf("sub commands: [onboard|onboard-with-token|get]\n\n");
     printf("to see detail usage of sub command, execute ./exampleapp {subcommand} --help\n\n");
 
     printf("onboard with vendor-thing-id\n");
     printf("./exampleapp onboard --vendor-thing-id={vendor thing id} --password={password}\n\n");
 
     printf("onboard with thing-id\n");
-    printf("./exampleapp onboard --thing-id={vendor thing id} --password={password}\n\n");
+    printf("./exampleapp onboard --thing-id={thing id} --password={password}\n\n");
 
     printf("onboard-with-token.\n");
     printf("./exampleapp onboard-with-token --thing-id={thing id} --access-token={access token}\n\n");
     printf("to configure app to use, edit example.h\n\n");
+
+    printf("get.\n"
+            "./exampleapp get --firmware-version --vendor-thing-id={vendor thing id} --password={password} \n\n");
+
+    printf("get.\n"
+            "./exampleapp get --firmware-version --thing-id={thing id} --password={password} \n\n");
+
 }
 
 int main(int argc, char** argv)
@@ -360,7 +367,7 @@ int main(int argc, char** argv)
                 case 3:
                     printf("usage: \n");
                     printf("onboard --thing-id={ID of the thing} --password={password of the thing} or\n");
-                    printf("onboard --vendor-thing-id={ID of the thing} --password={password of the thing} or\n");
+                    printf("onboard --vendor-thing-id={ID of the thing} --password={password of the thing}\n");
                     break;
                 default:
                     printf("unexpected usage.\n");
@@ -369,6 +376,122 @@ int main(int argc, char** argv)
                 break;
             }
         }
+
+    } else if (strcmp(subc, "get") == 0) {
+        char* vendorThingID = NULL;
+        char* thingID = NULL;
+        char* password = NULL;
+        int getFirmwareVersion = 0;
+        while (1) {
+            struct option longOptions[] = {
+                {"vendor-thing-id", required_argument, 0, 0},
+                {"thing-thing-id", required_argument, 0, 1},
+                {"password", required_argument, 0, 2},
+                {"firmware-version", no_argument, 0, 3},
+                {"help", no_argument, 0, 4},
+                {0, 0, 0, 0}
+            };
+            int optIndex = 0;
+            int c = getopt_long(argc, argv, "", longOptions, &optIndex);
+            if (c == -1) {
+                break;
+            }
+            switch (c) {
+                case 0:
+                    vendorThingID = optarg;
+                    break;
+                case 1:
+                    thingID = optarg;
+                    break;
+                case 2:
+                    password = optarg;
+                    break;
+                case 3:
+                    getFirmwareVersion = 1;
+                    break;
+                case 4:
+                    printf("usage: \n"
+                            "get --vendor-thing-id={ID of the thing} "
+                            "--password={password of the thing} "
+                            "--firmware-version\n");
+                    exit(0);
+                    break;
+            }
+        }
+        if (vendorThingID == NULL && thingID == NULL) {
+            printf("neither vendor-thing-id and thing-id are specified.\n");
+            exit(1);
+        }
+        if (password == NULL) {
+            printf("password is not specifeid.\n");
+            exit(1);
+        }
+        if (vendorThingID != NULL && thingID != NULL) {
+            printf("both vendor-thing-id and thing-id is specified.  either of one should be specified.\n");
+            exit(1);
+        }
+        if (getFirmwareVersion == 0) {
+            printf("--firmware-version must be specified..\n");
+            exit(1);
+        }
+        if (init_kii_thing_if(
+                &kii_thing_if,
+                EX_APP_ID,
+                EX_APP_KEY,
+                EX_APP_SITE,
+                &command_handler_resource,
+                &state_updater_resource,
+                NULL) == KII_FALSE) {
+            printf("fail to initialize.\n");
+            exit(1);
+        }
+        if (vendorThingID != NULL) {
+            if (onboard_with_vendor_thing_id(
+                    &kii_thing_if,
+                    vendorThingID,
+                    password,
+                    NULL,
+                    NULL,
+                    NULL,
+                    NULL,
+                    NULL) == KII_FALSE) {
+                printf("fail to onboard.\n");
+                exit(1);
+            }
+        } else {
+            if (onboard_with_thing_id(
+                    &kii_thing_if,
+                    thingID,
+                    password,
+                    NULL,
+                    NULL,
+                    NULL,
+                    NULL,
+                    NULL) == KII_FALSE) {
+                printf("fail to onboard.\n");
+                exit(1);
+            }
+        }
+
+        if (getFirmwareVersion != 0) {
+            char firmwareVersion[64];
+            kii_thing_if_error_t error;
+            if (get_firmware_version(
+                    &kii_thing_if,
+                    firmwareVersion,
+                    sizeof(firmwareVersion) / sizeof(firmwareVersion[0]),
+                    &error) == KII_FALSE) {
+                printf("get_firmware_version is failed: %d\n", error.reason);
+                if (error.reason == KII_THING_IF_ERROR_REASON_HTTP) {
+                    printf("status code=%d, error code=%s\n",
+                            error.http_status_code,
+                            error.error_code);
+                }
+                exit(0);
+            }
+            printf("firmware version=%s\n", firmwareVersion);
+        }
+        exit(0);
     } else {
         print_help();
         exit(0);

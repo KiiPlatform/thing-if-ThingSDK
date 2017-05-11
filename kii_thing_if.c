@@ -35,7 +35,7 @@
 #define COMMAND_PART "/commands/"
 #define RESULTS_PART "/action-results"
 #define STATES_PART "/states"
-#define THINGS_PART "/things"
+#define THINGS_PART "/things/"
 #define FIRMWARE_VERSION_PART "/firmware-version"
 #define CONTENT_TYPE_VENDOR_THING_ID "application/vnd.kii.OnboardingWithVendorThingIDByThing+json"
 #define CONTENT_TYPE_THING_ID "application/vnd.kii.OnboardingWithThingIDByThing+json"
@@ -1191,7 +1191,7 @@ kii_bool_t get_firmware_version(
             return KII_FALSE;
         case KII_THING_IF_STATE_ONBOARDED:
         {
-            char resource_path[64];
+            char resource_path[128];
             kii_t* kii = &(kii_thing_if->command_handler);
 
             if (sizeof(resource_path) / sizeof(resource_path[0]) <=
@@ -1225,7 +1225,7 @@ kii_bool_t get_firmware_version(
                 fields[0].type = KII_JSON_FIELD_TYPE_STRING;
                 fields[0].field_copy.string = firmware_version;
                 fields[0].field_copy_buff_size = firmware_version_len;
-                fields[0].path = NULL;
+                fields[1].path = NULL;
                 if (prv_kii_thing_if_json_read_object(
                         kii,
                         kii->kii_core.response_body,
@@ -1246,7 +1246,6 @@ kii_bool_t get_firmware_version(
             return KII_FALSE;
     }
 }
-
 
 #ifdef KII_THING_IF_TEST_BUILD
 
