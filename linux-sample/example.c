@@ -193,10 +193,10 @@ static void print_help() {
     printf("to configure app to use, edit example.h\n\n");
 
     printf("get.\n"
-            "./exampleapp get --firmware-version --vendor-thing-id={vendor thing id} --password={password} \n\n");
+            "./exampleapp get --firmware-version --thing-type --vendor-thing-id={vendor thing id} --password={password} \n\n");
 
     printf("get.\n"
-            "./exampleapp get --firmware-version --thing-id={thing id} --password={password} \n\n");
+            "./exampleapp get --firmware-version --thing-type --thing-id={thing id} --password={password} \n\n");
 
 }
 
@@ -382,13 +382,15 @@ int main(int argc, char** argv)
         char* thingID = NULL;
         char* password = NULL;
         int getFirmwareVersion = 0;
+        int getThingType = 0;
         while (1) {
             struct option longOptions[] = {
                 {"vendor-thing-id", required_argument, 0, 0},
                 {"thing-id", required_argument, 0, 1},
                 {"password", required_argument, 0, 2},
                 {"firmware-version", no_argument, 0, 3},
-                {"help", no_argument, 0, 4},
+                {"thing-type", no_argument, 0, 4},
+                {"help", no_argument, 0, 5},
                 {0, 0, 0, 0}
             };
             int optIndex = 0;
@@ -410,9 +412,13 @@ int main(int argc, char** argv)
                     getFirmwareVersion = 1;
                     break;
                 case 4:
+                    getThingType = 1;
+                    break;
+                case 5:
                     printf("usage: \n"
                             "get --vendor-thing-id={ID of the thing} "
                             "--password={password of the thing} "
+                            "--thing-type "
                             "--firmware-version\n");
                     exit(0);
                     break;
@@ -430,8 +436,8 @@ int main(int argc, char** argv)
             printf("both vendor-thing-id and thing-id is specified.  either of one should be specified.\n");
             exit(1);
         }
-        if (getFirmwareVersion == 0) {
-            printf("--firmware-version must be specified..\n");
+        if (getFirmwareVersion == 0 && getThingType == 0) {
+            printf("--firmware-version or --thing-type must be specified.\n");
             exit(1);
         }
         if (init_kii_thing_if(
@@ -490,6 +496,24 @@ int main(int argc, char** argv)
                 exit(0);
             }
             printf("firmware version=%s\n", firmwareVersion);
+        }
+        if (getThingType != 0) {
+            char thingType[64];
+            kii_thing_if_error_t error;
+            if (get_thing_type(
+                    &kii_thing_if,
+                    thingType,
+                    sizeof(thingType) / sizeof(thingType[0]),
+                    &error) == KII_FALSE) {
+                printf("get_thing_type is failed: %d\n", error.reason);
+                if (error.reason == KII_THING_IF_ERROR_REASON_HTTP) {
+                    printf("status code=%d, error code=%s\n",
+                            error.http_status_code,
+                            error.error_code);
+                }
+                exit(0);
+            }
+            printf("thing type=%s\n", thingType);
         }
         exit(0);
     } else {
