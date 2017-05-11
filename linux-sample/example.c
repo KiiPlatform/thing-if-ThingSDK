@@ -385,7 +385,7 @@ int main(int argc, char** argv)
         while (1) {
             struct option longOptions[] = {
                 {"vendor-thing-id", required_argument, 0, 0},
-                {"thing-thing-id", required_argument, 0, 1},
+                {"thing-id", required_argument, 0, 1},
                 {"password", required_argument, 0, 2},
                 {"firmware-version", no_argument, 0, 3},
                 {"help", no_argument, 0, 4},
