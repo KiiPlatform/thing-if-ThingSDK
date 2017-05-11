@@ -35,6 +35,8 @@
 #define COMMAND_PART "/commands/"
 #define RESULTS_PART "/action-results"
 #define STATES_PART "/states"
+#define THINGS_PART "/things/"
+#define FIRMWARE_VERSION_PART "/firmware-version"
 #define CONTENT_TYPE_VENDOR_THING_ID "application/vnd.kii.OnboardingWithVendorThingIDByThing+json"
 #define CONTENT_TYPE_THING_ID "application/vnd.kii.OnboardingWithThingIDByThing+json"
 #define CONTENT_TYPE_JSON "application/json"
@@ -51,6 +53,29 @@ typedef enum prv_get_key_and_value_t {
     PRV_GET_KEY_AND_VALUE_FAIL,
     PRV_GET_KEY_AND_VALUE_FINISH
 } prv_get_key_and_value_t;
+
+static int prv_kii_api_call_start(
+        kii_t* kii,
+        const char* http_method,
+        const char* resource_path,
+        const char* content_type,
+        kii_bool_t set_authentication_header,
+        kii_thing_if_error_t* error)
+{
+    int retval = kii_api_call_start(
+            kii,
+            http_method,
+            resource_path,
+            content_type,
+            set_authentication_header);
+    if (retval != 0) {
+        M_KII_LOG("fail to start api call");
+        if (error != NULL){
+            error->reason = KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
+        }
+    }
+    return retval;
+}
 
 static int prv_append_key_value(
         kii_t* kii,
@@ -1145,6 +1170,81 @@ kii_bool_t start(kii_thing_if_t* kii_thing_if)
         prv_update_status, (void*)&kii_thing_if->state_updater);
 
     return KII_TRUE;
+}
+
+kii_bool_t get_firmware_version(
+        kii_thing_if_t* kii_thing_if,
+        char* firmware_version,
+        size_t firmware_version_len,
+        kii_thing_if_error_t* error)
+{
+    switch (kii_thing_if->state) {
+        case KII_THING_IF_STATE_INITIALIZED:
+            if (error != NULL) {
+                error->reason = KII_THING_IF_ERROR_REASON_NOT_ONBOARDED;
+            }
+            return KII_FALSE;
+        case KII_THING_IF_STATE_STARTED:
+            if (error != NULL) {
+                error->reason = KII_THING_IF_ERROR_REASON_ALREADY_STARTED;
+            }
+            return KII_FALSE;
+        case KII_THING_IF_STATE_ONBOARDED:
+        {
+            char resource_path[128];
+            kii_t* kii = &(kii_thing_if->command_handler);
+
+            if (sizeof(resource_path) / sizeof(resource_path[0]) <=
+                    CONST_STRLEN(THING_IF_APP_PATH) +
+                    strlen(kii->kii_core.app_id) + CONST_STRLEN(THINGS_PART) +
+                    strlen(kii->kii_core.author.author_id) +
+                    CONST_STRLEN(FIRMWARE_VERSION_PART)) {
+                M_KII_LOG(kii->kii_core.logger_cb(
+                        "resource path is longer than expected.\n"));
+                M_KII_THING_IF_ASSERT(0);
+                return KII_FALSE;
+            }
+            sprintf(resource_path, "%s%s%s%s%s",
+                    THING_IF_APP_PATH,
+                    kii->kii_core.app_id,
+                    THINGS_PART,
+                    kii->kii_core.author.author_id,
+                    FIRMWARE_VERSION_PART);
+            if (prv_kii_api_call_start(
+                    kii, "GET", resource_path, NULL, KII_TRUE, error) != 0) {
+                return KII_FALSE;
+            }
+            if (prv_execute_http_session(kii, error) != TRUE) {
+                return KII_FALSE;
+            } else {
+                kii_json_field_t fields[2];
+                memset(fields, 0x00, sizeof(fields));
+                memset(firmware_version, 0x00,
+                        sizeof(char) * firmware_version_len);
+                fields[0].path = "/firmwareVersion";
+                fields[0].type = KII_JSON_FIELD_TYPE_STRING;
+                fields[0].field_copy.string = firmware_version;
+                fields[0].field_copy_buff_size = firmware_version_len;
+                fields[1].path = NULL;
+                if (prv_kii_thing_if_json_read_object(
+                        kii,
+                        kii->kii_core.response_body,
+                        strlen(kii->kii_core.response_body),
+                        fields) != KII_JSON_PARSE_SUCCESS) {
+                    if (error != NULL) {
+                        error->reason =
+                          KII_THING_IF_ERROR_REASON_PARSE_RESPONSE;
+                    }
+                    return KII_FALSE;
+                }
+                return KII_TRUE;
+            }
+        }
+        default:
+            /* Unexpected error*/
+            M_KII_THING_IF_ASSERT(0);
+            return KII_FALSE;
+    }
 }
 
 #ifdef KII_THING_IF_TEST_BUILD
