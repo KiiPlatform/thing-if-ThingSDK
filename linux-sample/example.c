@@ -179,7 +179,7 @@ static kii_bool_t custom_push_handler(
 }
 
 static void print_help() {
-    printf("sub commands: [onboard|onboard-with-token|get]\n\n");
+    printf("sub commands: [onboard|onboard-with-token|get|update]\n\n");
     printf("to see detail usage of sub command, execute ./exampleapp {subcommand} --help\n\n");
 
     printf("onboard with vendor-thing-id\n");
@@ -197,6 +197,12 @@ static void print_help() {
 
     printf("get.\n"
             "./exampleapp get --firmware-version --thing-type --thing-id={thing id} --password={password} \n\n");
+
+    printf("update.\n"
+            "./exampleapp update --firmware-version --thing-type --vendor-thing-id={vendor thing id} --password={password} \n\n");
+
+    printf("update.\n"
+            "./exampleapp update --firmware-version --thing-type --thing-id={thing id} --password={password} \n\n");
 
 }
 
@@ -514,6 +520,119 @@ int main(int argc, char** argv)
                 exit(0);
             }
             printf("thing type=%s\n", thingType);
+        }
+        exit(0);
+    } else if (strcmp(subc, "update") == 0) {
+        char* vendorThingID = NULL;
+        char* thingID = NULL;
+        char* password = NULL;
+        char* firmwareVersion = NULL;
+        while (1) {
+            struct option longOptions[] = {
+                {"vendor-thing-id", required_argument, 0, 0},
+                {"thing-id", required_argument, 0, 1},
+                {"password", required_argument, 0, 2},
+                {"firmware-version", required_argument, 0, 3},
+                {"help", no_argument, 0, 4},
+                {0, 0, 0, 0}
+            };
+            int optIndex = 0;
+            int c = getopt_long(argc, argv, "", longOptions, &optIndex);
+            if (c == -1) {
+                break;
+            }
+            switch (c) {
+                case 0:
+                    vendorThingID = optarg;
+                    break;
+                case 1:
+                    thingID = optarg;
+                    break;
+                case 2:
+                    password = optarg;
+                    break;
+                case 3:
+                    firmwareVersion = optarg;
+                    break;
+                case 4:
+                    printf("usage: \n"
+                            "update --vendor-thing-id={ID of the thing} "
+                            "--password={password of the thing} "
+                            "--firmware-version={firmware version}\n");
+                    exit(0);
+                    break;
+            }
+        }
+        if (vendorThingID == NULL && thingID == NULL) {
+            printf("neither vendor-thing-id and thing-id are specified.\n");
+            exit(1);
+        }
+        if (password == NULL) {
+            printf("password is not specifeid.\n");
+            exit(1);
+        }
+        if (vendorThingID != NULL && thingID != NULL) {
+            printf("both vendor-thing-id and thing-id is specified.  either of one should be specified.\n");
+            exit(1);
+        }
+        if (firmwareVersion == NULL) {
+            printf("--firmware-version must be specified.\n");
+            exit(1);
+        }
+        if (init_kii_thing_if(
+                &kii_thing_if,
+                EX_APP_ID,
+                EX_APP_KEY,
+                EX_APP_SITE,
+                &command_handler_resource,
+                &state_updater_resource,
+                NULL) == KII_FALSE) {
+            printf("fail to initialize.\n");
+            exit(1);
+        }
+        if (vendorThingID != NULL) {
+            if (onboard_with_vendor_thing_id(
+                    &kii_thing_if,
+                    vendorThingID,
+                    password,
+                    NULL,
+                    NULL,
+                    NULL,
+                    NULL,
+                    NULL) == KII_FALSE) {
+                printf("fail to onboard.\n");
+                exit(1);
+            }
+        } else {
+            if (onboard_with_thing_id(
+                    &kii_thing_if,
+                    thingID,
+                    password,
+                    NULL,
+                    NULL,
+                    NULL,
+                    NULL,
+                    NULL) == KII_FALSE) {
+                printf("fail to onboard.\n");
+                exit(1);
+            }
+        }
+
+        if (firmwareVersion != NULL) {
+            kii_thing_if_error_t error;
+            if (update_firmware_version(
+                    &kii_thing_if,
+                    firmwareVersion,
+                    &error) == KII_FALSE) {
+                printf("update_firmware_version is failed: %d\n", error.reason);
+                if (error.reason == KII_THING_IF_ERROR_REASON_HTTP) {
+                    printf("status code=%d, error code=%s\n",
+                            error.http_status_code,
+                            error.error_code);
+                }
+                exit(0);
+            }
+            printf("firmware version successfully updated.\n");
         }
         exit(0);
     } else {
