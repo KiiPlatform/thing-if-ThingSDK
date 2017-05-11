@@ -37,6 +37,7 @@
 #define STATES_PART "/states"
 #define THINGS_PART "/things/"
 #define FIRMWARE_VERSION_PART "/firmware-version"
+#define THING_TYPE_PART "/thing-type"
 #define CONTENT_TYPE_VENDOR_THING_ID "application/vnd.kii.OnboardingWithVendorThingIDByThing+json"
 #define CONTENT_TYPE_THING_ID "application/vnd.kii.OnboardingWithThingIDByThing+json"
 #define CONTENT_TYPE_JSON "application/json"
@@ -1225,6 +1226,80 @@ kii_bool_t get_firmware_version(
                 fields[0].type = KII_JSON_FIELD_TYPE_STRING;
                 fields[0].field_copy.string = firmware_version;
                 fields[0].field_copy_buff_size = firmware_version_len;
+                fields[1].path = NULL;
+                if (prv_kii_thing_if_json_read_object(
+                        kii,
+                        kii->kii_core.response_body,
+                        strlen(kii->kii_core.response_body),
+                        fields) != KII_JSON_PARSE_SUCCESS) {
+                    if (error != NULL) {
+                        error->reason =
+                          KII_THING_IF_ERROR_REASON_PARSE_RESPONSE;
+                    }
+                    return KII_FALSE;
+                }
+                return KII_TRUE;
+            }
+        }
+        default:
+            /* Unexpected error*/
+            M_KII_THING_IF_ASSERT(0);
+            return KII_FALSE;
+    }
+}
+
+kii_bool_t get_thing_type(
+        kii_thing_if_t* kii_thing_if,
+        char* thing_type,
+        size_t thing_type_len,
+        kii_thing_if_error_t* error)
+{
+    switch (kii_thing_if->state) {
+        case KII_THING_IF_STATE_INITIALIZED:
+            if (error != NULL) {
+                error->reason = KII_THING_IF_ERROR_REASON_NOT_ONBOARDED;
+            }
+            return KII_FALSE;
+        case KII_THING_IF_STATE_STARTED:
+            if (error != NULL) {
+                error->reason = KII_THING_IF_ERROR_REASON_ALREADY_STARTED;
+            }
+            return KII_FALSE;
+        case KII_THING_IF_STATE_ONBOARDED:
+        {
+            char resource_path[128];
+            kii_t* kii = &(kii_thing_if->command_handler);
+
+            if (sizeof(resource_path) / sizeof(resource_path[0]) <=
+                    CONST_STRLEN(THING_IF_APP_PATH) +
+                    strlen(kii->kii_core.app_id) + CONST_STRLEN(THINGS_PART) +
+                    strlen(kii->kii_core.author.author_id) +
+                    CONST_STRLEN(THING_TYPE_PART)) {
+                M_KII_LOG(kii->kii_core.logger_cb(
+                        "resource path is longer than expected.\n"));
+                M_KII_THING_IF_ASSERT(0);
+                return KII_FALSE;
+            }
+            sprintf(resource_path, "%s%s%s%s%s",
+                    THING_IF_APP_PATH,
+                    kii->kii_core.app_id,
+                    THINGS_PART,
+                    kii->kii_core.author.author_id,
+                    THING_TYPE_PART);
+            if (prv_kii_api_call_start(
+                    kii, "GET", resource_path, NULL, KII_TRUE, error) != 0) {
+                return KII_FALSE;
+            }
+            if (prv_execute_http_session(kii, error) != TRUE) {
+                return KII_FALSE;
+            } else {
+                kii_json_field_t fields[2];
+                memset(fields, 0x00, sizeof(fields));
+                memset(thing_type, 0x00, sizeof(char) * thing_type_len);
+                fields[0].path = "/thingType";
+                fields[0].type = KII_JSON_FIELD_TYPE_STRING;
+                fields[0].field_copy.string = thing_type;
+                fields[0].field_copy_buff_size = thing_type_len;
                 fields[1].path = NULL;
                 if (prv_kii_thing_if_json_read_object(
                         kii,
