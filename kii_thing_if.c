@@ -98,16 +98,16 @@ static int prv_append_key_value(
     }
 
     if (is_successor == TRUE) {
-        if (kii_api_call_append_body(kii, ",", CONST_STRLEN(",") != 0)) {
+        if (APPEND_BODY_CONST(kii, ",") != 0) {
             M_KII_LOG(kii->kii_core.logger_cb(
                 "request size overflowed: (%s, %s).\n", key, value));
             return -1;
         }
     }
     /* Write key. */
-    if (kii_api_call_append_body(kii, "\"", CONST_STRLEN("\"")) != 0 ||
-            kii_api_call_append_body(kii, key, strlen(key)) != 0 ||
-            kii_api_call_append_body(kii, "\":", CONST_STRLEN("\":")) != 0) {
+    if (APPEND_BODY_CONST(kii, "\"") != 0 ||
+            APPEND_BODY(kii, key) != 0 ||
+            APPEND_BODY_CONST(kii, "\":") != 0) {
         M_KII_LOG(kii->kii_core.logger_cb(
             "request size overflowed: (%s, %s).\n", key, value));
         return -1;
@@ -115,15 +115,15 @@ static int prv_append_key_value(
 
     /* Write value. */
     if (is_string == TRUE) {
-        if (kii_api_call_append_body(kii, "\"", CONST_STRLEN("\"")) != 0 ||
-                kii_api_call_append_body(kii, value, strlen(value)) != 0 ||
-                kii_api_call_append_body(kii, "\"", CONST_STRLEN("\"")) != 0) {
+        if (APPEND_BODY_CONST(kii, "\"") != 0 ||
+                APPEND_BODY(kii, value) != 0 ||
+                APPEND_BODY_CONST(kii, "\"") != 0) {
             M_KII_LOG(kii->kii_core.logger_cb(
                     "request size overflowed: (%s, %s).\n", key, value));
             return -1;
         }
     } else {
-        if (kii_api_call_append_body(kii, value, strlen(value)) != 0) {
+        if (APPEND_BODY(kii, value) != 0) {
             M_KII_LOG(kii->kii_core.logger_cb(
                     "request size overflowed: (%s, %s).\n", key, value));
             return -1;
@@ -507,7 +507,7 @@ static int prv_kii_thing_if_get_key_and_value_from_json(
 
 static kii_bool_t prv_writer(kii_t* kii, const char* buff)
 {
-    if (kii_api_call_append_body(kii, buff, strlen(buff)) != 0) {
+    if (APPEND_BODY(kii, buff) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
         return KII_FALSE;
     }
@@ -674,8 +674,7 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
         alias_actions_len = fields[1].end - fields[1].start;
     }
 
-    if (kii_api_call_append_body(kii, "{\"actionResults\":[",
-                    CONST_STRLEN("{\"actionResults\":[")) != 0) {
+    if (APPEND_BODY_CONST(kii, "{\"actionResults\":[") != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
         return;
     }
@@ -797,7 +796,7 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
         }
     }
 
-    if (kii_api_call_append_body(kii, "]}", sizeof("]}") - 1) != 0) {
+    if (APPEND_BODY_CONST(kii, "]}") != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
         return;
     }
@@ -847,12 +846,9 @@ static int prv_kii_thing_if_get_anonymous_token(
     sprintf(resource_path, "%s/%s/%s", APP_PATH, kii->kii_core.app_id,
             OAUTH_PATH);
 
-    if (kii_api_call_start(kii, "POST", resource_path, "application/json",
-                    KII_FALSE) != 0) {
+    if (prv_kii_api_call_start(kii, "POST", resource_path, "application/json",
+                    KII_FALSE, error) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to start api call.\n"));
-        if (error != NULL) {
-            error->reason = KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
-        }
         return -1;
     }
 
@@ -927,12 +923,9 @@ static kii_bool_t prv_onboard_with_vendor_thing_id(
     sprintf(resource_path, "%s%s%s", THING_IF_APP_PATH, kii->kii_core.app_id,
             ONBOARDING_PATH);
 
-    if (kii_api_call_start(kii, "POST", resource_path,
-                    CONTENT_TYPE_VENDOR_THING_ID, KII_TRUE) != 0) {
+    if (prv_kii_api_call_start(kii, "POST", resource_path,
+                    CONTENT_TYPE_VENDOR_THING_ID, KII_TRUE, error) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to start api call.\n"));
-        if (error != NULL) {
-            error->reason = KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
-        }
         return KII_FALSE;
     }
 
@@ -1101,10 +1094,16 @@ static kii_bool_t prv_onboard_with_thing_id(
     sprintf(resource_path, "%s%s%s", THING_IF_APP_PATH, kii->kii_core.app_id,
             ONBOARDING_PATH);
 
-    if (kii_api_call_start(kii, "POST", resource_path, CONTENT_TYPE_THING_ID,
-                    KII_TRUE) != 0) {
+    if (prv_kii_api_call_start(
+            kii,
+            "POST",
+            resource_path,
+            CONTENT_TYPE_THING_ID,
+            KII_TRUE,
+            error) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb(
             "fail to start api call.\n"));
+        return KII_FALSE;
     }
 
     /* Append key value pairs. */
