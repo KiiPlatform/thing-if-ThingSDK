@@ -41,6 +41,7 @@
 #define CONTENT_TYPE_VENDOR_THING_ID "application/vnd.kii.OnboardingWithVendorThingIDByThing+json"
 #define CONTENT_TYPE_THING_ID "application/vnd.kii.OnboardingWithThingIDByThing+json"
 #define CONTENT_UPDATE_FIRMWARE_VERSION "application/vnd.kii.ThingFirmwareVersionUpdateRequest+json"
+#define CONTENT_UPDATE_THING_TYPE "application/vnd.kii.ThingTypeUpdateRequest+json"
 #define CONTENT_TYPE_JSON "application/json"
 
 #define THING_IF_INFO "sn=tic;sv=0.9.6"
@@ -97,16 +98,16 @@ static int prv_append_key_value(
     }
 
     if (is_successor == TRUE) {
-        if (kii_api_call_append_body(kii, ",", CONST_STRLEN(",") != 0)) {
+        if (APPEND_BODY_CONST(kii, ",") != 0) {
             M_KII_LOG(kii->kii_core.logger_cb(
                 "request size overflowed: (%s, %s).\n", key, value));
             return -1;
         }
     }
     /* Write key. */
-    if (kii_api_call_append_body(kii, "\"", CONST_STRLEN("\"")) != 0 ||
-            kii_api_call_append_body(kii, key, strlen(key)) != 0 ||
-            kii_api_call_append_body(kii, "\":", CONST_STRLEN("\":")) != 0) {
+    if (APPEND_BODY_CONST(kii, "\"") != 0 ||
+            APPEND_BODY(kii, key) != 0 ||
+            APPEND_BODY_CONST(kii, "\":") != 0) {
         M_KII_LOG(kii->kii_core.logger_cb(
             "request size overflowed: (%s, %s).\n", key, value));
         return -1;
@@ -114,15 +115,15 @@ static int prv_append_key_value(
 
     /* Write value. */
     if (is_string == TRUE) {
-        if (kii_api_call_append_body(kii, "\"", CONST_STRLEN("\"")) != 0 ||
-                kii_api_call_append_body(kii, value, strlen(value)) != 0 ||
-                kii_api_call_append_body(kii, "\"", CONST_STRLEN("\"")) != 0) {
+        if (APPEND_BODY_CONST(kii, "\"") != 0 ||
+                APPEND_BODY(kii, value) != 0 ||
+                APPEND_BODY_CONST(kii, "\"") != 0) {
             M_KII_LOG(kii->kii_core.logger_cb(
                     "request size overflowed: (%s, %s).\n", key, value));
             return -1;
         }
     } else {
-        if (kii_api_call_append_body(kii, value, strlen(value)) != 0) {
+        if (APPEND_BODY(kii, value) != 0) {
             M_KII_LOG(kii->kii_core.logger_cb(
                     "request size overflowed: (%s, %s).\n", key, value));
             return -1;
@@ -274,6 +275,30 @@ static prv_bool_t prv_set_firmware_version_resource_path(
             THINGS_PART,
             kii->kii_core.author.author_id,
             FIRMWARE_VERSION_PART);
+  return TRUE;
+}
+
+static prv_bool_t prv_set_thing_type_resource_path(
+        kii_t* kii,
+        char* resource_path,
+        size_t resource_path_len)
+{
+    if (resource_path_len <=
+            CONST_STRLEN(THING_IF_APP_PATH) +
+            strlen(kii->kii_core.app_id) + CONST_STRLEN(THINGS_PART) +
+            strlen(kii->kii_core.author.author_id) +
+            CONST_STRLEN(THING_TYPE_PART)) {
+        M_KII_LOG(kii->kii_core.logger_cb(
+                "resource path is longer than expected.\n"));
+        M_KII_THING_IF_ASSERT(0);
+        return FALSE;
+    }
+    sprintf(resource_path, "%s%s%s%s%s",
+            THING_IF_APP_PATH,
+            kii->kii_core.app_id,
+            THINGS_PART,
+            kii->kii_core.author.author_id,
+            THING_TYPE_PART);
   return TRUE;
 }
 
@@ -482,7 +507,7 @@ static int prv_kii_thing_if_get_key_and_value_from_json(
 
 static kii_bool_t prv_writer(kii_t* kii, const char* buff)
 {
-    if (kii_api_call_append_body(kii, buff, strlen(buff)) != 0) {
+    if (APPEND_BODY(kii, buff) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
         return KII_FALSE;
     }
@@ -649,8 +674,7 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
         alias_actions_len = fields[1].end - fields[1].start;
     }
 
-    if (kii_api_call_append_body(kii, "{\"actionResults\":[",
-                    CONST_STRLEN("{\"actionResults\":[")) != 0) {
+    if (APPEND_BODY_CONST(kii, "{\"actionResults\":[") != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
         return;
     }
@@ -772,7 +796,7 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
         }
     }
 
-    if (kii_api_call_append_body(kii, "]}", sizeof("]}") - 1) != 0) {
+    if (APPEND_BODY_CONST(kii, "]}") != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
         return;
     }
@@ -822,12 +846,9 @@ static int prv_kii_thing_if_get_anonymous_token(
     sprintf(resource_path, "%s/%s/%s", APP_PATH, kii->kii_core.app_id,
             OAUTH_PATH);
 
-    if (kii_api_call_start(kii, "POST", resource_path, "application/json",
-                    KII_FALSE) != 0) {
+    if (prv_kii_api_call_start(kii, "POST", resource_path, "application/json",
+                    KII_FALSE, error) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to start api call.\n"));
-        if (error != NULL) {
-            error->reason = KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
-        }
         return -1;
     }
 
@@ -902,12 +923,9 @@ static kii_bool_t prv_onboard_with_vendor_thing_id(
     sprintf(resource_path, "%s%s%s", THING_IF_APP_PATH, kii->kii_core.app_id,
             ONBOARDING_PATH);
 
-    if (kii_api_call_start(kii, "POST", resource_path,
-                    CONTENT_TYPE_VENDOR_THING_ID, KII_TRUE) != 0) {
+    if (prv_kii_api_call_start(kii, "POST", resource_path,
+                    CONTENT_TYPE_VENDOR_THING_ID, KII_TRUE, error) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to start api call.\n"));
-        if (error != NULL) {
-            error->reason = KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
-        }
         return KII_FALSE;
     }
 
@@ -1076,10 +1094,16 @@ static kii_bool_t prv_onboard_with_thing_id(
     sprintf(resource_path, "%s%s%s", THING_IF_APP_PATH, kii->kii_core.app_id,
             ONBOARDING_PATH);
 
-    if (kii_api_call_start(kii, "POST", resource_path, CONTENT_TYPE_THING_ID,
-                    KII_TRUE) != 0) {
+    if (prv_kii_api_call_start(
+            kii,
+            "POST",
+            resource_path,
+            CONTENT_TYPE_THING_ID,
+            KII_TRUE,
+            error) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb(
             "fail to start api call.\n"));
+        return KII_FALSE;
     }
 
     /* Append key value pairs. */
@@ -1343,22 +1367,12 @@ kii_bool_t get_thing_type(
             char resource_path[128];
             kii_t* kii = &(kii_thing_if->command_handler);
 
-            if (sizeof(resource_path) / sizeof(resource_path[0]) <=
-                    CONST_STRLEN(THING_IF_APP_PATH) +
-                    strlen(kii->kii_core.app_id) + CONST_STRLEN(THINGS_PART) +
-                    strlen(kii->kii_core.author.author_id) +
-                    CONST_STRLEN(THING_TYPE_PART)) {
-                M_KII_LOG(kii->kii_core.logger_cb(
-                        "resource path is longer than expected.\n"));
-                M_KII_THING_IF_ASSERT(0);
+            if (prv_set_thing_type_resource_path(
+                    kii,
+                    resource_path,
+                    sizeof(resource_path) / sizeof(resource_path[0])) != TRUE) {
                 return KII_FALSE;
             }
-            sprintf(resource_path, "%s%s%s%s%s",
-                    THING_IF_APP_PATH,
-                    kii->kii_core.app_id,
-                    THINGS_PART,
-                    kii->kii_core.author.author_id,
-                    THING_TYPE_PART);
             if (prv_kii_api_call_start(
                     kii, "GET", resource_path, NULL, KII_TRUE, error) != 0) {
                 return KII_FALSE;
@@ -1387,6 +1401,64 @@ kii_bool_t get_thing_type(
                 }
                 return KII_TRUE;
             }
+        }
+        default:
+            /* Unexpected error*/
+            M_KII_THING_IF_ASSERT(0);
+            return KII_FALSE;
+    }
+}
+
+kii_bool_t update_thing_type(
+        kii_thing_if_t* kii_thing_if,
+        const char* thing_type,
+        kii_thing_if_error_t* error)
+{
+    switch (kii_thing_if->state) {
+        case KII_THING_IF_STATE_INITIALIZED:
+            if (error != NULL) {
+                error->reason = KII_THING_IF_ERROR_REASON_NOT_ONBOARDED;
+            }
+            return KII_FALSE;
+        case KII_THING_IF_STATE_STARTED:
+            if (error != NULL) {
+                error->reason = KII_THING_IF_ERROR_REASON_ALREADY_STARTED;
+            }
+            return KII_FALSE;
+        case KII_THING_IF_STATE_ONBOARDED:
+        {
+            char resource_path[128];
+            kii_t* kii = &(kii_thing_if->command_handler);
+
+            if (prv_set_thing_type_resource_path(
+                    kii,
+                    resource_path,
+                    sizeof(resource_path) / sizeof(resource_path[0])) != TRUE) {
+                return KII_FALSE;
+            }
+            if (prv_kii_api_call_start(
+                    kii,
+                    "PUT",
+                    resource_path,
+                    CONTENT_UPDATE_THING_TYPE,
+                    KII_TRUE,
+                    error) != 0) {
+                return KII_FALSE;
+            }
+            if (APPEND_BODY_CONST(kii, "{") != 0 ||
+                    prv_append_key_value_string(
+                        kii, "thingType", thing_type, FALSE) != 0 ||
+                    APPEND_BODY_CONST(kii, "}") != 0) {
+                M_KII_LOG(kii->kii_core.logger_cb(
+                        "request size overflowed.\n"));
+                if (error != NULL) {
+                    error->reason =
+                        KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
+                }
+                return KII_FALSE;
+            }
+            return prv_execute_http_session(kii, error) == TRUE ?
+                KII_TRUE : KII_FALSE;
         }
         default:
             /* Unexpected error*/
