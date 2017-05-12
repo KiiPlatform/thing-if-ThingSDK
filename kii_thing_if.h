@@ -35,6 +35,8 @@ typedef enum kii_thing_if_error_reason_t {
     KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW,
     /** HTTP response buffer overflow. */
     KII_THING_IF_ERROR_REASON_RESPONSE_BUFFER_OVERFLOW,
+    /** Output buffer overflow. */
+    KII_THING_IF_ERROR_REASON_OUTPUT_OVERFLOW,
     /** Invalid HTTP response. */
     KII_THING_IF_ERROR_REASON_INVALID_RESPONSE,
     /** Fail to parse HTTP response. */

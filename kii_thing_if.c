@@ -1339,8 +1339,14 @@ kii_bool_t get_firmware_version(
                         strlen(kii->kii_core.response_body),
                         fields) != KII_JSON_PARSE_SUCCESS) {
                     if (error != NULL) {
-                        error->reason =
-                          KII_THING_IF_ERROR_REASON_PARSE_RESPONSE;
+                        if (fields[0].result ==
+                                KII_JSON_FIELD_PARSE_COPY_FAILED) {
+                            error->reason =
+                                KII_THING_IF_ERROR_REASON_OUTPUT_OVERFLOW;
+                        } else {
+                            error->reason =
+                                KII_THING_IF_ERROR_REASON_PARSE_RESPONSE;
+                        }
                     }
                     return KII_FALSE;
                 }
@@ -1469,8 +1475,14 @@ kii_bool_t get_thing_type(
                         strlen(kii->kii_core.response_body),
                         fields) != KII_JSON_PARSE_SUCCESS) {
                     if (error != NULL) {
-                        error->reason =
-                          KII_THING_IF_ERROR_REASON_PARSE_RESPONSE;
+                        if (fields[0].result ==
+                                KII_JSON_FIELD_PARSE_COPY_FAILED) {
+                            error->reason =
+                                KII_THING_IF_ERROR_REASON_OUTPUT_OVERFLOW;
+                        } else {
+                            error->reason =
+                                KII_THING_IF_ERROR_REASON_PARSE_RESPONSE;
+                        }
                     }
                     return KII_FALSE;
                 }
