@@ -212,11 +212,32 @@ static kii_bool_t prv_execute_http_session(
 {
     M_KII_THING_IF_ASSERT(kii != NULL);
 
-    /* TODO: we should fix kii_api_call_run to detec socket error. */
     if (kii_api_call_run(kii) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to run api.\n"));
         if (error != NULL) {
-            error->reason = KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
+            switch (kii->kii_core.http_context.
+                        socket_context.default_http_client_error) {
+                case KII_DEFAULT_HTTP_CLIENT_ERROR_NONE:
+                    error->reason =
+                        KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
+                    break;
+                case KII_DEFAULT_HTTP_CLIENT_ERROR_INVALID_RESPONSE:
+                    error->reason =
+                        KII_THING_IF_ERROR_REASON_INVALID_RESPONSE;
+                    break;
+                case KII_DEFAULT_HTTP_CLIENT_ERROR_RESPONSE_BUFFER_OVERFLOW:
+                    error->reason =
+                        KII_THING_IF_ERROR_REASON_RESPONSE_BUFFER_OVERFLOW;
+                    break;
+                case KII_DEFAULT_HTTP_CLIENT_ERROR_SOCKET_FUNCTIONS:
+                    error->reason =
+                        KII_THING_IF_ERROR_REASON_SOCKET;
+                    break;
+                default:
+                    /* Unexpected case. */
+                    M_KII_THING_IF_ASSERT(0);
+                    break;
+            }
         }
         return KII_FALSE;
     }
