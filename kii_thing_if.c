@@ -27,8 +27,8 @@
 #define APPEND_BODY_CONST(kii, str) kii_api_call_append_body(kii, str, CONST_STRLEN(str))
 #define APPEND_BODY(kii, str) kii_api_call_append_body(kii, str, strlen(str))
 
-#define APP_PATH "api/apps"
-#define OAUTH_PATH "oauth2/token"
+#define APP_PATH "api/apps/"
+#define OAUTH_PATH "/oauth2/token"
 #define THING_IF_APP_PATH "thing-if/apps/"
 #define ONBOARDING_PATH "/onboardings"
 #define TARGET_PART "/targets/thing:"
@@ -67,7 +67,7 @@ static int prv_kii_api_call_start(
             content_type,
             set_authentication_header);
     if (retval != 0) {
-        M_KII_LOG("fail to start api call");
+        M_KII_LOG(kii->kii_core.logger_cb("fail to start api call"));
         if (error != NULL){
             error->reason = KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
         }
@@ -249,26 +249,77 @@ static kii_bool_t prv_execute_http_session(
     return KII_TRUE;
 }
 
-static kii_bool_t prv_set_firmware_version_resource_path(
-        kii_t* kii,
+static kii_bool_t prv_set_onboard_resource_path(
+        const char* app_id,
         char* resource_path,
         size_t resource_path_len)
 {
-    if (resource_path_len <=
-            CONST_STRLEN(THING_IF_APP_PATH) +
-            strlen(kii->kii_core.app_id) + CONST_STRLEN(THINGS_PART) +
-            strlen(kii->kii_core.author.author_id) +
-            CONST_STRLEN(FIRMWARE_VERSION_PART)) {
-        M_KII_LOG(kii->kii_core.logger_cb(
-                "resource path is longer than expected.\n"));
+    size_t onboard_resource_path_length =
+      strlen(THING_IF_APP_PATH) +
+      strlen(app_id) +
+      strlen(ONBOARDING_PATH);
+
+    if (resource_path_len <= onboard_resource_path_length) {
+        M_KII_THING_IF_ASSERT(0);
+        return KII_FALSE;
+    }
+
+    sprintf(resource_path, "%s%s%s",
+            THING_IF_APP_PATH,
+            app_id,
+            ONBOARDING_PATH);
+    return KII_TRUE;
+}
+
+static kii_bool_t prv_set_state_resource_path(
+        const char* app_id,
+        const char* author_id,
+        char* resource_path,
+        size_t resource_path_len)
+{
+    size_t state_resource_path_length =
+      strlen(THING_IF_APP_PATH) +
+      strlen(app_id) +
+      strlen(TARGET_PART) +
+      strlen(author_id) +
+      strlen(STATES_PART);
+
+    if (resource_path_len <= state_resource_path_length) {
+        M_KII_THING_IF_ASSERT(0);
+        return KII_FALSE;
+    }
+
+    sprintf(resource_path, "%s%s%s%s%s",
+            THING_IF_APP_PATH,
+            app_id,
+            TARGET_PART,
+            author_id,
+            STATES_PART);
+    return KII_TRUE;
+}
+
+static kii_bool_t prv_set_firmware_version_resource_path(
+        const char* app_id,
+        const char* author_id,
+        char* resource_path,
+        size_t resource_path_len)
+{
+    size_t firmware_version_resource_path_length =
+      strlen(THING_IF_APP_PATH) +
+      strlen(app_id) +
+      strlen(THINGS_PART) +
+      strlen(author_id) +
+      strlen(FIRMWARE_VERSION_PART);
+
+    if (resource_path_len <= firmware_version_resource_path_length) {
         M_KII_THING_IF_ASSERT(0);
         return KII_FALSE;
     }
     sprintf(resource_path, "%s%s%s%s%s",
             THING_IF_APP_PATH,
-            kii->kii_core.app_id,
+            app_id,
             THINGS_PART,
-            kii->kii_core.author.author_id,
+            author_id,
             FIRMWARE_VERSION_PART);
     return KII_TRUE;
 }
@@ -279,11 +330,13 @@ static kii_bool_t prv_set_thing_type_resource_path(
         char* resource_path,
         size_t resource_path_len)
 {
-    if (resource_path_len <=
-            CONST_STRLEN(THING_IF_APP_PATH) +
-            strlen(app_id) + CONST_STRLEN(THINGS_PART) +
-            strlen(author_id) +
-            CONST_STRLEN(THING_TYPE_PART)) {
+    size_t thing_type_path_length = strlen(THING_IF_APP_PATH) +
+      strlen(app_id) +
+      strlen(THINGS_PART) +
+      strlen(author_id) +
+      strlen(THING_TYPE_PART);
+
+    if (resource_path_len <= thing_type_path_length) {
         M_KII_THING_IF_ASSERT(0);
         return KII_FALSE;
     }
@@ -511,23 +564,17 @@ static kii_bool_t prv_writer(kii_t* kii, const char* buff)
 static kii_bool_t prv_send_state(kii_t* kii)
 {
     char resource_path[256];
+    kii_bool_t succeeded = prv_set_state_resource_path(
+            kii->kii_core.app_id,
+            kii->kii_core.author.author_id,
+            resource_path,
+            sizeof(resource_path) / sizeof(resource_path[0]));
 
-    if (sizeof(resource_path) / sizeof(resource_path[0]) <=
-            CONST_STRLEN(THING_IF_APP_PATH) +
-            strlen(kii->kii_core.app_id) + CONST_STRLEN(TARGET_PART) +
-            strlen(kii->kii_core.author.author_id) +
-            CONST_STRLEN(STATES_PART)) {
+    if (succeeded == KII_FALSE) {
         M_KII_LOG(kii->kii_core.logger_cb(
                 "resource path is longer than expected.\n"));
         return KII_FALSE;
     }
-
-    resource_path[0] = '\0';
-    strcat(resource_path, THING_IF_APP_PATH);
-    strcat(resource_path, kii->kii_core.app_id);
-    strcat(resource_path, TARGET_PART);
-    strcat(resource_path, kii->kii_core.author.author_id);
-    strcat(resource_path, STATES_PART);
 
     if (kii_api_call_start(kii, "PUT", resource_path, CONTENT_TYPE_JSON,
                     KII_TRUE) != 0) {
@@ -610,6 +657,7 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
     {
         kii_json_field_t fields[3];
         char resource_path[256];
+        size_t results_path_length;
         memset(fields, 0x00, sizeof(fields));
         fields[0].path = "/commandID";
         fields[0].type = KII_JSON_FIELD_TYPE_STRING;
@@ -635,13 +683,17 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
                 return;
         }
 
+        results_path_length =
+            strlen(THING_IF_APP_PATH) +
+            strlen(kii->kii_core.app_id) +
+            strlen(TARGET_PART) +
+            strlen(kii->kii_core.author.author_id) +
+            strlen(COMMAND_PART) +
+            (fields[0].end - fields[0].start - 1) +
+            strlen(RESULTS_PART);
+
         if (sizeof(resource_path) / sizeof(resource_path[0]) <=
-                CONST_STRLEN(THING_IF_APP_PATH) +
-                strlen(kii->kii_core.app_id) + CONST_STRLEN(TARGET_PART) +
-                strlen(kii->kii_core.author.author_id) +
-                CONST_STRLEN(COMMAND_PART) +
-                (fields[0].end - fields[0].start - 1) +
-                CONST_STRLEN(RESULTS_PART)) {
+                results_path_length) {
             M_KII_LOG(kii->kii_core.logger_cb(
                     "resource path is longer than expected.\n"));
             return;
@@ -825,12 +877,14 @@ static int prv_kii_thing_if_get_anonymous_token(
 {
     char resource_path[64];
     kii_json_field_t fields[2];
+    size_t oauth_path_length =
+        strlen(APP_PATH) +
+        strlen(kii->kii_core.app_id) +
+        strlen(OAUTH_PATH);
 
     M_KII_THING_IF_ASSERT(kii);
 
-    if (sizeof(resource_path) / sizeof(resource_path[0]) <=
-            CONST_STRLEN(APP_PATH) + CONST_STRLEN("/") +
-            strlen(kii->kii_core.app_id) + CONST_STRLEN(OAUTH_PATH)) {
+    if (sizeof(resource_path) / sizeof(resource_path[0]) <= oauth_path_length) {
         M_KII_LOG(kii->kii_core.logger_cb(
                 "resource path is longer than expected.\n"));
         if (error != NULL) {
@@ -838,8 +892,8 @@ static int prv_kii_thing_if_get_anonymous_token(
         }
         return -1;
     }
-    sprintf(resource_path, "%s/%s/%s", APP_PATH, kii->kii_core.app_id,
-            OAUTH_PATH);
+    sprintf(resource_path, "%s%s%s",
+            APP_PATH, kii->kii_core.app_id, OAUTH_PATH);
 
     if (kii_api_call_start(kii, "POST", resource_path, "application/json",
                     KII_FALSE) != 0) {
@@ -902,24 +956,22 @@ static kii_bool_t prv_onboard_with_vendor_thing_id(
         kii_thing_if_error_t* error)
 {
     char resource_path[64];
+    kii_bool_t succeeded;
 
     if (prv_kii_thing_if_get_anonymous_token(kii, error) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to get anonymous token.\n"));
         return KII_FALSE;
     }
 
-    if (sizeof(resource_path) / sizeof(resource_path[0]) <=
-            CONST_STRLEN(THING_IF_APP_PATH) +
-            strlen(kii->kii_core.app_id) + CONST_STRLEN(ONBOARDING_PATH)) {
+    succeeded = prv_set_onboard_resource_path(
+            kii->kii_core.app_id,
+            resource_path,
+            sizeof(resource_path) / sizeof(resource_path[0]));
+    if (succeeded == KII_FALSE) {
         M_KII_LOG(kii->kii_core.logger_cb(
                 "resource path is longer than expected.\n"));
-        if (error != NULL) {
-            error->reason = KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
-        }
         return KII_FALSE;
     }
-    sprintf(resource_path, "%s%s%s", THING_IF_APP_PATH, kii->kii_core.app_id,
-            ONBOARDING_PATH);
 
     if (kii_api_call_start(kii, "POST", resource_path,
                     CONTENT_TYPE_VENDOR_THING_ID, KII_TRUE) != 0) {
@@ -969,23 +1021,17 @@ static void* prv_update_status(void *sdata)
 {
     kii_t* kii = (kii_t*)sdata;
     char resource_path[256];
+    kii_bool_t succeeded = prv_set_state_resource_path(
+            kii->kii_core.app_id,
+            kii->kii_core.author.author_id,
+            resource_path,
+            sizeof(resource_path) / sizeof(resource_path[0]));
 
-    if (sizeof(resource_path) / sizeof(resource_path[0]) <=
-            CONST_STRLEN(THING_IF_APP_PATH) +
-            strlen(kii->kii_core.app_id) + CONST_STRLEN(TARGET_PART) +
-            strlen(kii->kii_core.author.author_id) +
-            CONST_STRLEN(STATES_PART)) {
+    if (succeeded == KII_FALSE) {
         M_KII_LOG(kii->kii_core.logger_cb(
                 "resource path is longer than expected.\n"));
         return NULL;
     }
-
-    resource_path[0] = '\0';
-    strcat(resource_path, THING_IF_APP_PATH);
-    strcat(resource_path, kii->kii_core.app_id);
-    strcat(resource_path, TARGET_PART);
-    strcat(resource_path, kii->kii_core.author.author_id);
-    strcat(resource_path, STATES_PART);
 
     while(1) {
         kii->delay_ms_cb(
@@ -1079,21 +1125,22 @@ static kii_bool_t prv_onboard_with_thing_id(
         kii_thing_if_error_t* error)
 {
     char resource_path[64];
+    kii_bool_t succeeded;
 
     if (prv_kii_thing_if_get_anonymous_token(kii, error) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to get anonymous token.\n"));
         return KII_FALSE;
     }
 
-    if (sizeof(resource_path) / sizeof(resource_path[0]) <=
-            CONST_STRLEN(THING_IF_APP_PATH) +
-            strlen(kii->kii_core.app_id) + CONST_STRLEN(ONBOARDING_PATH)) {
+    succeeded = prv_set_onboard_resource_path(
+            kii->kii_core.app_id,
+            resource_path,
+            sizeof(resource_path) / sizeof(resource_path[0]));
+    if (succeeded == KII_FALSE) {
         M_KII_LOG(kii->kii_core.logger_cb(
                 "resource path is longer than expected.\n"));
         return KII_FALSE;
     }
-    sprintf(resource_path, "%s%s%s", THING_IF_APP_PATH, kii->kii_core.app_id,
-            ONBOARDING_PATH);
 
     if (kii_api_call_start(kii, "POST", resource_path, CONTENT_TYPE_THING_ID,
                     KII_TRUE) != 0) {
@@ -1238,12 +1285,15 @@ kii_bool_t get_firmware_version(
         {
             char resource_path[128];
             kii_t* kii = &(kii_thing_if->command_handler);
-
-            if (prv_set_firmware_version_resource_path(
-                    kii,
+            kii_bool_t succeeded = prv_set_firmware_version_resource_path(
+                    kii->kii_core.app_id,
+                    kii->kii_core.author.author_id,
                     resource_path,
-                    sizeof(resource_path) / sizeof(resource_path[0]))
-                        != KII_TRUE) {
+                    sizeof(resource_path) / sizeof(resource_path[0]));
+
+            if (succeeded != KII_TRUE) {
+                M_KII_LOG(kii->kii_core.logger_cb(
+                        "resource path is longer than expected.\n"));
                 return KII_FALSE;
             }
             if (prv_kii_api_call_start(
@@ -1303,12 +1353,15 @@ kii_bool_t update_firmware_version(
         {
             char resource_path[128];
             kii_t* kii = &(kii_thing_if->command_handler);
-
-            if (prv_set_firmware_version_resource_path(
-                    kii,
+            kii_bool_t succeeded = prv_set_firmware_version_resource_path(
+                    kii->kii_core.app_id,
+                    kii->kii_core.author.author_id,
                     resource_path,
-                    sizeof(resource_path) / sizeof(resource_path[0]))
-                        != KII_TRUE) {
+                    sizeof(resource_path) / sizeof(resource_path[0]));
+
+            if (succeeded != KII_TRUE) {
+                M_KII_LOG(kii->kii_core.logger_cb(
+                        "resource path is longer than expected.\n"));
                 return KII_FALSE;
             }
             if (prv_kii_api_call_start(
@@ -1363,14 +1416,15 @@ kii_bool_t get_thing_type(
         {
             char resource_path[128];
             kii_t* kii = &(kii_thing_if->command_handler);
-
-            if (prv_set_thing_type_resource_path(
+            kii_bool_t succeeded = prv_set_thing_type_resource_path(
                     kii->kii_core.app_id,
                     kii->kii_core.author.author_id,
                     resource_path,
-                    sizeof(resource_path) / sizeof(resource_path[0]))
-                        != KII_TRUE) {
-                M_KII_LOG(logger("resource path is longer than expected.\n"));
+                    sizeof(resource_path) / sizeof(resource_path[0]));
+
+            if (succeeded != KII_TRUE) {
+                M_KII_LOG(kii->kii_core.logger_cb(
+                        "resource path is longer than expected.\n"));
                 return KII_FALSE;
             }
             if (prv_kii_api_call_start(
@@ -1429,14 +1483,15 @@ kii_bool_t update_thing_type(
         {
             char resource_path[128];
             kii_t* kii = &(kii_thing_if->command_handler);
-
-            if (prv_set_thing_type_resource_path(
+            kii_bool_t succeeded = prv_set_thing_type_resource_path(
                     kii->kii_core.app_id,
                     kii->kii_core.author.author_id,
                     resource_path,
-                    sizeof(resource_path) / sizeof(resource_path[0]))
-                        != KII_TRUE) {
-                M_KII_LOG(logger("resource path is longer than expected.\n"));
+                    sizeof(resource_path) / sizeof(resource_path[0]));
+
+            if (succeeded != KII_TRUE) {
+                M_KII_LOG(kii->kii_core.logger_cb(
+                        "resource path is longer than expected.\n"));
                 return KII_FALSE;
             }
             if (prv_kii_api_call_start(
