@@ -656,6 +656,7 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
     {
         kii_json_field_t fields[3];
         char resource_path[256];
+        size_t results_path_length;
         memset(fields, 0x00, sizeof(fields));
         fields[0].path = "/commandID";
         fields[0].type = KII_JSON_FIELD_TYPE_STRING;
@@ -681,13 +682,17 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
                 return;
         }
 
+        results_path_length =
+            strlen(THING_IF_APP_PATH) +
+            strlen(kii->kii_core.app_id) +
+            strlen(TARGET_PART) +
+            strlen(kii->kii_core.author.author_id) +
+            strlen(COMMAND_PART) +
+            (fields[0].end - fields[0].start - 1) +
+            strlen(RESULTS_PART);
+
         if (sizeof(resource_path) / sizeof(resource_path[0]) <=
-                CONST_STRLEN(THING_IF_APP_PATH) +
-                strlen(kii->kii_core.app_id) + CONST_STRLEN(TARGET_PART) +
-                strlen(kii->kii_core.author.author_id) +
-                CONST_STRLEN(COMMAND_PART) +
-                (fields[0].end - fields[0].start - 1) +
-                CONST_STRLEN(RESULTS_PART)) {
+                results_path_length) {
             M_KII_LOG(kii->kii_core.logger_cb(
                     "resource path is longer than expected.\n"));
             return;
