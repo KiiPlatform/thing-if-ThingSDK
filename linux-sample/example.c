@@ -582,7 +582,7 @@ int main(int argc, char** argv)
             exit(1);
         }
         if (firmwareVersion == NULL && thingType == NULL) {
-            printf("--firmware-version must be specified.\n");
+            printf("--firmware-version or --thing-type must be specified.\n");
             exit(1);
         }
         if (init_kii_thing_if(
