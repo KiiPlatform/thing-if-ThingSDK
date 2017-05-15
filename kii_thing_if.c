@@ -75,6 +75,12 @@ static int prv_kii_api_call_start(
     return retval;
 }
 
+static kii_bool_t prv_append_request_body(kii_t* kii, const char* str)
+{
+    return kii_api_call_append_body(kii, str, strlen(str)) == 0 ?
+            KII_TRUE : KII_FALSE;
+}
+
 static int prv_append_key_value(
         kii_t* kii,
         const char* key,
@@ -347,6 +353,28 @@ static kii_bool_t prv_set_thing_type_resource_path(
             author_id,
             THING_TYPE_PART);
   return KII_TRUE;
+}
+
+static kii_bool_t prv_set_update_thing_type_request_to_buffer(
+        kii_t* kii,
+        const char* thing_type)
+{
+    kii_bool_t succeeded = prv_append_request_body(kii, "{");
+    if (succeeded != KII_TRUE) {
+        return KII_FALSE;
+    }
+    /* we should change return type of prv_append_key_value to kii_bool_t. */
+    succeeded = prv_append_key_value_string(
+            kii, "thingType", thing_type, KII_FALSE) == 0 ?
+        KII_TRUE : KII_FALSE;
+    if (succeeded != KII_TRUE) {
+        return KII_FALSE;
+    }
+    succeeded = prv_append_request_body(kii, "}");
+    if (succeeded != KII_TRUE) {
+        return KII_FALSE;
+    }
+    return KII_TRUE;
 }
 
 static int prv_thing_if_parse_onboarding_response(
@@ -1503,10 +1531,10 @@ kii_bool_t update_thing_type(
                     error) != 0) {
                 return KII_FALSE;
             }
-            if (APPEND_BODY_CONST(kii, "{") != 0 ||
-                    prv_append_key_value_string(
-                        kii, "thingType", thing_type, KII_FALSE) != 0 ||
-                    APPEND_BODY_CONST(kii, "}") != 0) {
+
+            succeeded = prv_set_update_thing_type_request_to_buffer(
+                    kii, thing_type);
+            if (succeeded != KII_TRUE) {
                 M_KII_LOG(kii->kii_core.logger_cb(
                         "request size overflowed.\n"));
                 if (error != NULL) {
