@@ -249,6 +249,28 @@ static kii_bool_t prv_execute_http_session(
     return KII_TRUE;
 }
 
+static kii_bool_t prv_set_onboard_resource_path(
+        const char* app_id,
+        char* resource_path,
+        size_t resource_path_len)
+{
+    size_t onboard_resource_path_length =
+      strlen(THING_IF_APP_PATH) +
+      strlen(app_id) +
+      strlen(ONBOARDING_PATH);
+
+    if (resource_path_len <= onboard_resource_path_length) {
+        M_KII_THING_IF_ASSERT(0);
+        return KII_FALSE;
+    }
+
+    sprintf(resource_path, "%s%s%s",
+            THING_IF_APP_PATH,
+            app_id,
+            ONBOARDING_PATH);
+    return KII_TRUE;
+}
+
 static kii_bool_t prv_set_state_resource_path(
         const char* app_id,
         const char* author_id,
@@ -932,18 +954,14 @@ static kii_bool_t prv_onboard_with_vendor_thing_id(
         return KII_FALSE;
     }
 
-    if (sizeof(resource_path) / sizeof(resource_path[0]) <=
-            CONST_STRLEN(THING_IF_APP_PATH) +
-            strlen(kii->kii_core.app_id) + CONST_STRLEN(ONBOARDING_PATH)) {
+    if (prv_set_onboard_resource_path(
+            kii->kii_core.app_id,
+            resource_path,
+            sizeof(resource_path) / sizeof(resource_path[0])) == KII_FALSE) {
         M_KII_LOG(kii->kii_core.logger_cb(
                 "resource path is longer than expected.\n"));
-        if (error != NULL) {
-            error->reason = KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
-        }
         return KII_FALSE;
     }
-    sprintf(resource_path, "%s%s%s", THING_IF_APP_PATH, kii->kii_core.app_id,
-            ONBOARDING_PATH);
 
     if (kii_api_call_start(kii, "POST", resource_path,
                     CONTENT_TYPE_VENDOR_THING_ID, KII_TRUE) != 0) {
@@ -1102,15 +1120,14 @@ static kii_bool_t prv_onboard_with_thing_id(
         return KII_FALSE;
     }
 
-    if (sizeof(resource_path) / sizeof(resource_path[0]) <=
-            CONST_STRLEN(THING_IF_APP_PATH) +
-            strlen(kii->kii_core.app_id) + CONST_STRLEN(ONBOARDING_PATH)) {
+    if (prv_set_onboard_resource_path(
+            kii->kii_core.app_id,
+            resource_path,
+            sizeof(resource_path) / sizeof(resource_path[0])) == KII_FALSE) {
         M_KII_LOG(kii->kii_core.logger_cb(
                 "resource path is longer than expected.\n"));
         return KII_FALSE;
     }
-    sprintf(resource_path, "%s%s%s", THING_IF_APP_PATH, kii->kii_core.app_id,
-            ONBOARDING_PATH);
 
     if (kii_api_call_start(kii, "POST", resource_path, CONTENT_TYPE_THING_ID,
                     KII_TRUE) != 0) {
