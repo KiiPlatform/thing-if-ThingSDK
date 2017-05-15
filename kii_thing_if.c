@@ -250,25 +250,27 @@ static kii_bool_t prv_execute_http_session(
 }
 
 static kii_bool_t prv_set_firmware_version_resource_path(
-        kii_t* kii,
+        const char* app_id,
+        const char* author_id,
         char* resource_path,
         size_t resource_path_len)
 {
-    if (resource_path_len <=
-            CONST_STRLEN(THING_IF_APP_PATH) +
-            strlen(kii->kii_core.app_id) + CONST_STRLEN(THINGS_PART) +
-            strlen(kii->kii_core.author.author_id) +
-            CONST_STRLEN(FIRMWARE_VERSION_PART)) {
-        M_KII_LOG(kii->kii_core.logger_cb(
-                "resource path is longer than expected.\n"));
+    size_t firmware_version_resource_path =
+      strlen(THING_IF_APP_PATH) +
+      strlen(app_id) +
+      strlen(THINGS_PART) +
+      strlen(author_id) +
+      strlen(FIRMWARE_VERSION_PART);
+
+    if (resource_path_len <= firmware_version_resource_path) {
         M_KII_THING_IF_ASSERT(0);
         return KII_FALSE;
     }
     sprintf(resource_path, "%s%s%s%s%s",
             THING_IF_APP_PATH,
-            kii->kii_core.app_id,
+            app_id,
             THINGS_PART,
-            kii->kii_core.author.author_id,
+            author_id,
             FIRMWARE_VERSION_PART);
     return KII_TRUE;
 }
@@ -1242,10 +1244,13 @@ kii_bool_t get_firmware_version(
             kii_t* kii = &(kii_thing_if->command_handler);
 
             if (prv_set_firmware_version_resource_path(
-                    kii,
+                    kii->kii_core.app_id,
+                    kii->kii_core.author.author_id,
                     resource_path,
                     sizeof(resource_path) / sizeof(resource_path[0]))
                         != KII_TRUE) {
+                M_KII_LOG(kii->kii_core.logger_cb(
+                        "resource path is longer than expected.\n"));
                 return KII_FALSE;
             }
             if (prv_kii_api_call_start(
@@ -1307,10 +1312,13 @@ kii_bool_t update_firmware_version(
             kii_t* kii = &(kii_thing_if->command_handler);
 
             if (prv_set_firmware_version_resource_path(
-                    kii,
+                    kii->kii_core.app_id,
+                    kii->kii_core.author.author_id,
                     resource_path,
                     sizeof(resource_path) / sizeof(resource_path[0]))
                         != KII_TRUE) {
+                M_KII_LOG(kii->kii_core.logger_cb(
+                        "resource path is longer than expected.\n"));
                 return KII_FALSE;
             }
             if (prv_kii_api_call_start(
