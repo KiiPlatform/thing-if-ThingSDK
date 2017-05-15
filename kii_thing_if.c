@@ -564,12 +564,13 @@ static kii_bool_t prv_writer(kii_t* kii, const char* buff)
 static kii_bool_t prv_send_state(kii_t* kii)
 {
     char resource_path[256];
-
-    if (prv_set_state_resource_path(
+    kii_bool_t succeeded = prv_set_state_resource_path(
             kii->kii_core.app_id,
             kii->kii_core.author.author_id,
             resource_path,
-            sizeof(resource_path) / sizeof(resource_path[0])) == KII_FALSE) {
+            sizeof(resource_path) / sizeof(resource_path[0]));
+
+    if (succeeded == KII_FALSE) {
         M_KII_LOG(kii->kii_core.logger_cb(
                 "resource path is longer than expected.\n"));
         return KII_FALSE;
@@ -955,16 +956,18 @@ static kii_bool_t prv_onboard_with_vendor_thing_id(
         kii_thing_if_error_t* error)
 {
     char resource_path[64];
+    kii_bool_t succeeded;
 
     if (prv_kii_thing_if_get_anonymous_token(kii, error) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to get anonymous token.\n"));
         return KII_FALSE;
     }
 
-    if (prv_set_onboard_resource_path(
+    succeeded = prv_set_onboard_resource_path(
             kii->kii_core.app_id,
             resource_path,
-            sizeof(resource_path) / sizeof(resource_path[0])) == KII_FALSE) {
+            sizeof(resource_path) / sizeof(resource_path[0]));
+    if (succeeded == KII_FALSE) {
         M_KII_LOG(kii->kii_core.logger_cb(
                 "resource path is longer than expected.\n"));
         return KII_FALSE;
@@ -1018,12 +1021,13 @@ static void* prv_update_status(void *sdata)
 {
     kii_t* kii = (kii_t*)sdata;
     char resource_path[256];
-
-    if (prv_set_state_resource_path(
+    kii_bool_t succeeded = prv_set_state_resource_path(
             kii->kii_core.app_id,
             kii->kii_core.author.author_id,
             resource_path,
-            sizeof(resource_path) / sizeof(resource_path[0])) == KII_FALSE) {
+            sizeof(resource_path) / sizeof(resource_path[0]));
+
+    if (succeeded == KII_FALSE) {
         M_KII_LOG(kii->kii_core.logger_cb(
                 "resource path is longer than expected.\n"));
         return NULL;
@@ -1121,16 +1125,18 @@ static kii_bool_t prv_onboard_with_thing_id(
         kii_thing_if_error_t* error)
 {
     char resource_path[64];
+    kii_bool_t succeeded;
 
     if (prv_kii_thing_if_get_anonymous_token(kii, error) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to get anonymous token.\n"));
         return KII_FALSE;
     }
 
-    if (prv_set_onboard_resource_path(
+    succeeded = prv_set_onboard_resource_path(
             kii->kii_core.app_id,
             resource_path,
-            sizeof(resource_path) / sizeof(resource_path[0])) == KII_FALSE) {
+            sizeof(resource_path) / sizeof(resource_path[0]));
+    if (succeeded == KII_FALSE) {
         M_KII_LOG(kii->kii_core.logger_cb(
                 "resource path is longer than expected.\n"));
         return KII_FALSE;
@@ -1279,13 +1285,13 @@ kii_bool_t get_firmware_version(
         {
             char resource_path[128];
             kii_t* kii = &(kii_thing_if->command_handler);
-
-            if (prv_set_firmware_version_resource_path(
+            kii_bool_t succeeded = prv_set_firmware_version_resource_path(
                     kii->kii_core.app_id,
                     kii->kii_core.author.author_id,
                     resource_path,
-                    sizeof(resource_path) / sizeof(resource_path[0]))
-                        != KII_TRUE) {
+                    sizeof(resource_path) / sizeof(resource_path[0]));
+
+            if (succeeded != KII_TRUE) {
                 M_KII_LOG(kii->kii_core.logger_cb(
                         "resource path is longer than expected.\n"));
                 return KII_FALSE;
@@ -1347,13 +1353,13 @@ kii_bool_t update_firmware_version(
         {
             char resource_path[128];
             kii_t* kii = &(kii_thing_if->command_handler);
-
-            if (prv_set_firmware_version_resource_path(
+            kii_bool_t succeeded = prv_set_firmware_version_resource_path(
                     kii->kii_core.app_id,
                     kii->kii_core.author.author_id,
                     resource_path,
-                    sizeof(resource_path) / sizeof(resource_path[0]))
-                        != KII_TRUE) {
+                    sizeof(resource_path) / sizeof(resource_path[0]));
+
+            if (succeeded != KII_TRUE) {
                 M_KII_LOG(kii->kii_core.logger_cb(
                         "resource path is longer than expected.\n"));
                 return KII_FALSE;
@@ -1410,13 +1416,13 @@ kii_bool_t get_thing_type(
         {
             char resource_path[128];
             kii_t* kii = &(kii_thing_if->command_handler);
-
-            if (prv_set_thing_type_resource_path(
+            kii_bool_t succeeded = prv_set_thing_type_resource_path(
                     kii->kii_core.app_id,
                     kii->kii_core.author.author_id,
                     resource_path,
-                    sizeof(resource_path) / sizeof(resource_path[0]))
-                        != KII_TRUE) {
+                    sizeof(resource_path) / sizeof(resource_path[0]));
+
+            if (succeeded != KII_TRUE) {
                 M_KII_LOG(kii->kii_core.logger_cb(
                         "resource path is longer than expected.\n"));
                 return KII_FALSE;
@@ -1477,13 +1483,13 @@ kii_bool_t update_thing_type(
         {
             char resource_path[128];
             kii_t* kii = &(kii_thing_if->command_handler);
-
-            if (prv_set_thing_type_resource_path(
+            kii_bool_t succeeded = prv_set_thing_type_resource_path(
                     kii->kii_core.app_id,
                     kii->kii_core.author.author_id,
                     resource_path,
-                    sizeof(resource_path) / sizeof(resource_path[0]))
-                        != KII_TRUE) {
+                    sizeof(resource_path) / sizeof(resource_path[0]));
+
+            if (succeeded != KII_TRUE) {
                 M_KII_LOG(kii->kii_core.logger_cb(
                         "resource path is longer than expected.\n"));
                 return KII_FALSE;
