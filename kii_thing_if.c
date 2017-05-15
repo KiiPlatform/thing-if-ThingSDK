@@ -27,8 +27,8 @@
 #define APPEND_BODY_CONST(kii, str) kii_api_call_append_body(kii, str, CONST_STRLEN(str))
 #define APPEND_BODY(kii, str) kii_api_call_append_body(kii, str, strlen(str))
 
-#define APP_PATH "api/apps"
-#define OAUTH_PATH "oauth2/token"
+#define APP_PATH "api/apps/"
+#define OAUTH_PATH "/oauth2/token"
 #define THING_IF_APP_PATH "thing-if/apps/"
 #define ONBOARDING_PATH "/onboardings"
 #define TARGET_PART "/targets/thing:"
@@ -876,12 +876,14 @@ static int prv_kii_thing_if_get_anonymous_token(
 {
     char resource_path[64];
     kii_json_field_t fields[2];
+    size_t oauth_path_length =
+        strlen(APP_PATH) +
+        strlen(kii->kii_core.app_id) +
+        strlen(OAUTH_PATH);
 
     M_KII_THING_IF_ASSERT(kii);
 
-    if (sizeof(resource_path) / sizeof(resource_path[0]) <=
-            CONST_STRLEN(APP_PATH) + CONST_STRLEN("/") +
-            strlen(kii->kii_core.app_id) + CONST_STRLEN(OAUTH_PATH)) {
+    if (sizeof(resource_path) / sizeof(resource_path[0]) <= oauth_path_length) {
         M_KII_LOG(kii->kii_core.logger_cb(
                 "resource path is longer than expected.\n"));
         if (error != NULL) {
@@ -889,8 +891,8 @@ static int prv_kii_thing_if_get_anonymous_token(
         }
         return -1;
     }
-    sprintf(resource_path, "%s/%s/%s", APP_PATH, kii->kii_core.app_id,
-            OAUTH_PATH);
+    sprintf(resource_path, "%s%s%s",
+            APP_PATH, kii->kii_core.app_id, OAUTH_PATH);
 
     if (kii_api_call_start(kii, "POST", resource_path, "application/json",
                     KII_FALSE) != 0) {
