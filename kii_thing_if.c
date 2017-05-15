@@ -278,11 +278,13 @@ static kii_bool_t prv_set_thing_type_resource_path(
         char* resource_path,
         size_t resource_path_len)
 {
-    if (resource_path_len <=
-            CONST_STRLEN(THING_IF_APP_PATH) +
-            strlen(kii->kii_core.app_id) + CONST_STRLEN(THINGS_PART) +
-            strlen(kii->kii_core.author.author_id) +
-            CONST_STRLEN(THING_TYPE_PART)) {
+    size_t thing_type_path_length = strlen(THING_IF_APP_PATH) +
+      strlen(kii->kii_core.app_id) +
+      strlen(THINGS_PART) +
+      strlen(kii->kii_core.author.author_id) +
+      strlen(THING_TYPE_PART);
+
+    if (resource_path_len <= thing_type_path_length) {
         M_KII_LOG(kii->kii_core.logger_cb(
                 "resource path is longer than expected.\n"));
         M_KII_THING_IF_ASSERT(0);
