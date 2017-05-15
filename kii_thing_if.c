@@ -67,7 +67,7 @@ static int prv_kii_api_call_start(
             content_type,
             set_authentication_header);
     if (retval != 0) {
-        M_KII_LOG("fail to start api call");
+        M_KII_LOG(kii->kii_core.logger_cb("fail to start api call"));
         if (error != NULL){
             error->reason = KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
         }
@@ -1380,7 +1380,8 @@ kii_bool_t get_thing_type(
                     resource_path,
                     sizeof(resource_path) / sizeof(resource_path[0]))
                         != KII_TRUE) {
-                M_KII_LOG(logger("resource path is longer than expected.\n"));
+                M_KII_LOG(kii->kii_core.logger_cb(
+                        "resource path is longer than expected.\n"));
                 return KII_FALSE;
             }
             if (prv_kii_api_call_start(
@@ -1446,7 +1447,8 @@ kii_bool_t update_thing_type(
                     resource_path,
                     sizeof(resource_path) / sizeof(resource_path[0]))
                         != KII_TRUE) {
-                M_KII_LOG(logger("resource path is longer than expected.\n"));
+                M_KII_LOG(kii->kii_core.logger_cb(
+                        "resource path is longer than expected.\n"));
                 return KII_FALSE;
             }
             if (prv_kii_api_call_start(
