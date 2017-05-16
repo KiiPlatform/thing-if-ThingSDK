@@ -527,13 +527,15 @@ int main(int argc, char** argv)
         char* thingID = NULL;
         char* password = NULL;
         char* firmwareVersion = NULL;
+        char* thingType = NULL;
         while (1) {
             struct option longOptions[] = {
                 {"vendor-thing-id", required_argument, 0, 0},
                 {"thing-id", required_argument, 0, 1},
                 {"password", required_argument, 0, 2},
                 {"firmware-version", required_argument, 0, 3},
-                {"help", no_argument, 0, 4},
+                {"thing-type", required_argument, 0, 4},
+                {"help", no_argument, 0, 5},
                 {0, 0, 0, 0}
             };
             int optIndex = 0;
@@ -555,9 +557,13 @@ int main(int argc, char** argv)
                     firmwareVersion = optarg;
                     break;
                 case 4:
+                    thingType = optarg;
+                    break;
+                case 5:
                     printf("usage: \n"
                             "update --vendor-thing-id={ID of the thing} "
                             "--password={password of the thing} "
+                            "--thing-type={thing type "
                             "--firmware-version={firmware version}\n");
                     exit(0);
                     break;
@@ -575,8 +581,8 @@ int main(int argc, char** argv)
             printf("both vendor-thing-id and thing-id is specified.  either of one should be specified.\n");
             exit(1);
         }
-        if (firmwareVersion == NULL) {
-            printf("--firmware-version must be specified.\n");
+        if (firmwareVersion == NULL && thingType == NULL) {
+            printf("--firmware-version or --thing-type must be specified.\n");
             exit(1);
         }
         if (init_kii_thing_if(
@@ -630,9 +636,25 @@ int main(int argc, char** argv)
                             error.http_status_code,
                             error.error_code);
                 }
-                exit(0);
+                exit(1);
             }
             printf("firmware version successfully updated.\n");
+        }
+        if (thingType != NULL) {
+            kii_thing_if_error_t error;
+            if (update_thing_type(
+                    &kii_thing_if,
+                    thingType,
+                    &error) == KII_FALSE) {
+                printf("update_thing_type is failed: %d\n", error.reason);
+                if (error.reason == KII_THING_IF_ERROR_REASON_HTTP) {
+                    printf("status code=%d, error code=%s\n",
+                            error.http_status_code,
+                            error.error_code);
+                }
+                exit(1);
+            }
+            printf("thing type successfully updated.\n");
         }
         exit(0);
     } else {
