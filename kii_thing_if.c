@@ -216,20 +216,20 @@ static kii_bool_t prv_execute_http_session(
         M_KII_LOG(kii->kii_core.logger_cb("fail to run api.\n"));
         if (error != NULL) {
             switch (kii->kii_core.http_context.
-                        socket_context.default_http_client_error) {
-                case KII_DEFAULT_HTTP_CLIENT_ERROR_NONE:
+                        socket_context.http_error) {
+                case KII_HTTP_ERROR_NONE:
                     error->reason =
                         KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
                     break;
-                case KII_DEFAULT_HTTP_CLIENT_ERROR_INVALID_RESPONSE:
+                case KII_HTTP_ERROR_INVALID_RESPONSE:
                     error->reason =
                         KII_THING_IF_ERROR_REASON_INVALID_RESPONSE;
                     break;
-                case KII_DEFAULT_HTTP_CLIENT_ERROR_RESPONSE_BUFFER_OVERFLOW:
+                case KII_HTTP_ERROR_INSUFFICIENT_BUFFER:
                     error->reason =
                         KII_THING_IF_ERROR_REASON_RESPONSE_BUFFER_OVERFLOW;
                     break;
-                case KII_DEFAULT_HTTP_CLIENT_ERROR_SOCKET_FUNCTIONS:
+                case KII_HTTP_ERROR_SOCKET:
                     error->reason =
                         KII_THING_IF_ERROR_REASON_SOCKET;
                     break;
