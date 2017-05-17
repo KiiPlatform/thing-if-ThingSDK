@@ -25,22 +25,62 @@ typedef enum kii_thing_if_state_t {
 typedef enum kii_thing_if_error_reason_t {
     /** kii_thing_if_t instance is not onbarded. Please onboard first. */
     KII_THING_IF_ERROR_REASON_NOT_ONBOARDED,
-    /** thing-if ThingSDK is alreday started. */
+
+    /** thing-if ThingSDK is alreday started.
+     *
+     * Applications can not use functions which return this error if
+     * kii_thing_if_t instance is already started.
+    */
     KII_THING_IF_ERROR_REASON_ALREADY_STARTED,
+
     /** HTTP error. */
     KII_THING_IF_ERROR_REASON_HTTP,
+
     /** Socket error. */
     KII_THING_IF_ERROR_REASON_SOCKET,
-    /** HTTP request buffer overflow. */
-    KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW,
-    /** HTTP response buffer overflow. */
-    KII_THING_IF_ERROR_REASON_RESPONSE_BUFFER_OVERFLOW,
-    /** Output buffer overflow. */
-    KII_THING_IF_ERROR_REASON_OUTPUT_OVERFLOW,
-    /** Invalid HTTP response. */
+
+    /** HTTP request buffer is too short.
+     *
+     * You need to increase size of HTTP request buffer of
+     * kii_thing_if_t::command_handler and/or
+     * kii_thing_if_t::state_updater.
+     */
+    KII_THING_IF_ERROR_REASON_SHORT_REQUEST,
+
+    /** HTTP response buffer is too short.
+     *
+     * You need to increase size of HTTP response buffer of
+     * kii_thing_if_t::command_handler and/or
+     * kii_thing_if_t::state_updater.
+     */
+    KII_THING_IF_ERROR_REASON_SHORT_RESPONSE,
+
+    /** Size of output is too short.
+     *
+     * Some functions such as ::get_thing_type receives a pointer of
+     * an array and lenght of the array to set up some entity received
+     * from server as an argument. If the array is shorter than length
+     * of the received entity, this error is raised.
+     *
+     * Applications should increase the length of the array.
+     **/
+    KII_THING_IF_ERROR_REASON_SHORT_OUTPUT,
+
+    /** Invalid HTTP response.
+     *
+     * Received HTTP response is invalid against thing-if ThingSDK
+     * expected. If you meet this error, you can not recover this
+     * error. Please inform us.
+     */
     KII_THING_IF_ERROR_REASON_INVALID_RESPONSE,
-    /** Fail to parse HTTP response. */
-    KII_THING_IF_ERROR_REASON_PARSE_RESPONSE
+
+    /** Fail to parse HTTP response.
+     *
+     * Received payload of HTTP response is invalid against thing-if
+     * ThingSDK expected. If you meet this error, you can not recover
+     * this eror. Please inform us.
+     */
+    KII_THING_IF_ERROR_REASON_JSON
 } kii_thing_if_error_reason_t;
 
 /** Error information of thing-if ThingSDK. */
