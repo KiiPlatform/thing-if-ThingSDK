@@ -75,15 +75,15 @@ typedef struct kii_thing_if_error_t {
 
     /** HTTP status code.
      *
-     * If ::kii_thing_if_error_t::reason is
-     * ::KII_THING_IF_ERROR_REASON_HTTP, this value is set. Otherwise 0.
+     * If ::kii_thing_if_error_t::code is
+     * ::KII_THING_IF_ERROR_HTTP, this value is set. Otherwise 0.
      */
     int http_status_code;
 
     /** Error code.
      *
-     * If ::kii_thing_if_error_t::reason is
-     * ::KII_THING_IF_ERROR_REASON_HTTP, this value is set. Otherwise
+     * If ::kii_thing_if_error_t::code is
+     * ::KII_THING_IF_ERROR_HTTP, this value is set. Otherwise
      * functions does not change this value.
      */
     char error_code[64];
@@ -402,8 +402,8 @@ kii_bool_t start(kii_thing_if_t* kii_thing_if);
  * @return KII_TRUE when succeeded, KII_FALSE when failed. If returned
  * value is KII_FALSE and error is not NULL, this SDK set error
  * information to the error. This function does not set
- * ::KII_THING_IF_ERROR_REASON_NOT_ONBOARDED to
- * ::kii_thing_if_error_t::reason.
+ * ::KII_THING_IF_ERROR_INVALID_STATE to
+ * ::kii_thing_if_error_t::code.
  */
 kii_bool_t onboard_with_vendor_thing_id(
         kii_thing_if_t* kii_thing_if,
@@ -447,8 +447,8 @@ kii_bool_t onboard_with_vendor_thing_id(
  * @return KII_TRUE when succeeded, KII_FALSE when failed. If returned
  * value is KII_FALSE and error is not NULL, this SDK set error
  * information to the error. This function does not set
- * ::KII_THING_IF_ERROR_REASON_NOT_ONBOARDED to
- * ::kii_thing_if_error_t::reason.
+ * ::KII_THING_IF_ERROR_INVALID_STATE to
+ * ::kii_thing_if_error_t::code.
  */
 kii_bool_t onboard_with_thing_id(
         kii_thing_if_t* kii_thing_if,
