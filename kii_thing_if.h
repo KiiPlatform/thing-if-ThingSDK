@@ -22,16 +22,9 @@ typedef enum kii_thing_if_state_t {
 } kii_thing_if_state_t;
 
 /** Error reasons of thing-if ThingSDK. */
-typedef enum kii_thing_if_error_reason_t {
-    /** kii_thing_if_t instance is not onbarded. Please onboard first. */
-    KII_THING_IF_ERROR_REASON_NOT_ONBOARDED,
-
-    /** thing-if ThingSDK is alreday started.
-     *
-     * Applications can not use functions which return this error if
-     * kii_thing_if_t instance is already started.
-    */
-    KII_THING_IF_ERROR_REASON_ALREADY_STARTED,
+typedef enum kii_thing_if_error_code_t {
+    /** State of kii_thing_if_t instance is invalid to use some functions. */
+    KII_THING_IF_ERROR_REASON_INVALID_STATE,
 
     /** HTTP error. */
     KII_THING_IF_ERROR_REASON_HTTP,
@@ -39,23 +32,15 @@ typedef enum kii_thing_if_error_reason_t {
     /** Socket error. */
     KII_THING_IF_ERROR_REASON_SOCKET,
 
-    /** HTTP request buffer is too short.
+    /** HTTP request and/or response buffer is insufficient.
      *
-     * You need to increase size of HTTP request buffer of
+     * You need to increase size of HTTP request and/or buffer of
      * kii_thing_if_t::command_handler and/or
      * kii_thing_if_t::state_updater.
      */
-    KII_THING_IF_ERROR_REASON_SHORT_REQUEST,
+    KII_THING_IF_ERROR_REASON_INSUFFICIENT_BUFFER,
 
-    /** HTTP response buffer is too short.
-     *
-     * You need to increase size of HTTP response buffer of
-     * kii_thing_if_t::command_handler and/or
-     * kii_thing_if_t::state_updater.
-     */
-    KII_THING_IF_ERROR_REASON_SHORT_RESPONSE,
-
-    /** Size of output is too short.
+    /** Size of argument buffer is insufficient.
      *
      * Some functions such as ::get_thing_type receives a pointer of
      * an array and lenght of the array to set up some entity received
@@ -64,7 +49,7 @@ typedef enum kii_thing_if_error_reason_t {
      *
      * Applications should increase the length of the array.
      **/
-    KII_THING_IF_ERROR_REASON_SHORT_OUTPUT,
+    KII_THING_IF_ERROR_REASON_INSUFFICIENT_ARG_BUFFER,
 
     /** Invalid HTTP response.
      *
@@ -81,12 +66,12 @@ typedef enum kii_thing_if_error_reason_t {
      * this eror. Please inform us.
      */
     KII_THING_IF_ERROR_REASON_JSON
-} kii_thing_if_error_reason_t;
+} kii_thing_if_error_code_t;
 
 /** Error information of thing-if ThingSDK. */
 typedef struct kii_thing_if_error_t {
-    /** Error reason. */
-    kii_thing_if_error_reason_t reason;
+    /** Error code. */
+    kii_thing_if_error_code_t code;
 
     /** HTTP status code.
      *
