@@ -24,13 +24,13 @@ typedef enum kii_thing_if_state_t {
 /** Error reasons of thing-if ThingSDK. */
 typedef enum kii_thing_if_error_code_t {
     /** State of kii_thing_if_t instance is invalid to use some functions. */
-    KII_THING_IF_ERROR_REASON_INVALID_STATE,
+    KII_THING_IF_ERROR_INVALID_STATE,
 
     /** HTTP error. */
-    KII_THING_IF_ERROR_REASON_HTTP,
+    KII_THING_IF_ERROR_HTTP,
 
     /** Socket error. */
-    KII_THING_IF_ERROR_REASON_SOCKET,
+    KII_THING_IF_ERROR_SOCKET,
 
     /** HTTP request and/or response buffer is insufficient.
      *
@@ -38,7 +38,7 @@ typedef enum kii_thing_if_error_code_t {
      * kii_thing_if_t::command_handler and/or
      * kii_thing_if_t::state_updater.
      */
-    KII_THING_IF_ERROR_REASON_INSUFFICIENT_BUFFER,
+    KII_THING_IF_ERROR_INSUFFICIENT_BUFFER,
 
     /** Size of argument buffer is insufficient.
      *
@@ -49,7 +49,7 @@ typedef enum kii_thing_if_error_code_t {
      *
      * Applications should increase the length of the array.
      **/
-    KII_THING_IF_ERROR_REASON_INSUFFICIENT_ARG_BUFFER,
+    KII_THING_IF_ERROR_INSUFFICIENT_ARG_BUFFER,
 
     /** Invalid HTTP response.
      *
@@ -57,7 +57,7 @@ typedef enum kii_thing_if_error_code_t {
      * expected. If you meet this error, you can not recover this
      * error. Please inform us.
      */
-    KII_THING_IF_ERROR_REASON_INVALID_RESPONSE,
+    KII_THING_IF_ERROR_INVALID_RESPONSE,
 
     /** Fail to parse HTTP response.
      *
@@ -65,7 +65,7 @@ typedef enum kii_thing_if_error_code_t {
      * ThingSDK expected. If you meet this error, you can not recover
      * this eror. Please inform us.
      */
-    KII_THING_IF_ERROR_REASON_JSON
+    KII_THING_IF_ERROR_JSON
 } kii_thing_if_error_code_t;
 
 /** Error information of thing-if ThingSDK. */
