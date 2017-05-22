@@ -32,9 +32,9 @@ typedef enum kii_thing_if_error_code_t {
     /** Socket error. */
     KII_THING_IF_ERROR_SOCKET,
 
-    /** HTTP request/response buffer is insufficient.
+    /** HTTP request/ response buffer is insufficient.
      *
-     * You need to increase size of HTTP request buffer of
+     * You need to increase size of HTTP request/ response buffer of
      * kii_thing_if_t::command_handler and/or
      * kii_thing_if_t::state_updater.
      */
