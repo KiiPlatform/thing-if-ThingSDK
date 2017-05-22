@@ -223,15 +223,13 @@ static kii_bool_t prv_execute_http_session(
                        elements because of insufficient buffer. */
                     error->code = KII_THING_IF_ERROR_INSUFFICIENT_BUFFER;
                     break;
-                case KII_HTTP_ERROR_INVALID_RESPONSE:
-                    error->code = KII_THING_IF_ERROR_INVALID_RESPONSE;
-                    break;
                 case KII_HTTP_ERROR_INSUFFICIENT_BUFFER:
                     error->code = KII_THING_IF_ERROR_INSUFFICIENT_BUFFER;
                     break;
                 case KII_HTTP_ERROR_SOCKET:
                     error->code = KII_THING_IF_ERROR_SOCKET;
                     break;
+                case KII_HTTP_ERROR_INVALID_RESPONSE:
                 default:
                     /* Unexpected case. */
                     M_KII_THING_IF_ASSERT(0);

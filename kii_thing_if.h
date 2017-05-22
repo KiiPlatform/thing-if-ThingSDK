@@ -51,14 +51,6 @@ typedef enum kii_thing_if_error_code_t {
      **/
     KII_THING_IF_ERROR_INSUFFICIENT_ARG_BUFFER,
 
-    /** Invalid HTTP response.
-     *
-     * Received HTTP response is invalid against thing-if ThingSDK
-     * expected. If you meet this error, you can not recover this
-     * error. Please inform us.
-     */
-    KII_THING_IF_ERROR_INVALID_RESPONSE,
-
     /** Fail to parse HTTP response.
      *
      * Received payload of HTTP response is invalid against thing-if
