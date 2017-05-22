@@ -54,7 +54,7 @@ typedef enum kii_thing_if_error_code_t {
      *
      * Received body payload in the response is unexpected form.
      * You might not see this error
-     * since the error is arrngged for contingencies such as
+     * since the error is arranged for contingencies such as
      * received broken data from the undelying network.
      * If this error constantly happens you may need to ask for support.
      */
