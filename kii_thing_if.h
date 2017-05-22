@@ -32,9 +32,9 @@ typedef enum kii_thing_if_error_code_t {
     /** Socket error. */
     KII_THING_IF_ERROR_SOCKET,
 
-    /** HTTP request and/or response buffer is insufficient.
+    /** HTTP request/ response buffer is insufficient.
      *
-     * You need to increase size of HTTP request and/or buffer of
+     * You need to increase size of HTTP request/ response buffer of
      * kii_thing_if_t::command_handler and/or
      * kii_thing_if_t::state_updater.
      */
@@ -43,19 +43,20 @@ typedef enum kii_thing_if_error_code_t {
     /** Size of argument buffer is insufficient.
      *
      * Some functions such as ::get_thing_type receives a pointer of
-     * an array and lenght of the array to set up some entity received
-     * from server as an argument. If the array is shorter than length
-     * of the received entity, this error is raised.
+     * an array.
+     * This error is raised if the length of the given array is shorter than required.
      *
-     * Applications should increase the length of the array.
+     * Application should increase the length of the array.
      **/
     KII_THING_IF_ERROR_INSUFFICIENT_ARG_BUFFER,
 
     /** Fail to parse HTTP response.
      *
-     * Received payload of HTTP response is invalid against thing-if
-     * ThingSDK expected. If you meet this error, you can not recover
-     * this eror. Please inform us.
+     * Received body payload in the response is unexpected form.
+     * You might not see this error
+     * since the error is arrngged for contingencies such as
+     * received broken data from the undelying network.
+     * If this error constantly happens you may need to ask for support.
      */
     KII_THING_IF_ERROR_INVALID_PAYLOAD
 } kii_thing_if_error_code_t;
