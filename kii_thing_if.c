@@ -218,6 +218,9 @@ static kii_bool_t prv_execute_http_session(
             switch (kii->kii_core.http_context.
                         socket_context.http_error) {
                 case KII_HTTP_ERROR_NONE:
+                    /* kii_api_call_run() set content length and so
+                       on. The request buffer can not accept such
+                       elements because of insufficient buffer. */
                     error->code = KII_THING_IF_ERROR_INSUFFICIENT_BUFFER;
                     break;
                 case KII_HTTP_ERROR_INVALID_RESPONSE:
