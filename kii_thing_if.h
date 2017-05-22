@@ -65,7 +65,7 @@ typedef enum kii_thing_if_error_code_t {
      * ThingSDK expected. If you meet this error, you can not recover
      * this eror. Please inform us.
      */
-    KII_THING_IF_ERROR_JSON
+    KII_THING_IF_ERROR_INVALID_PAYLOAD
 } kii_thing_if_error_code_t;
 
 /** Error information of thing-if ThingSDK. */

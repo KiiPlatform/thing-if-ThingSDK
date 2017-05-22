@@ -394,7 +394,7 @@ static int prv_thing_if_parse_onboarding_response(
                     strlen(kii->kii_core.response_body), fields) !=
             KII_JSON_PARSE_SUCCESS) {
         if (error != NULL) {
-            error->code = KII_THING_IF_ERROR_JSON;
+            error->code = KII_THING_IF_ERROR_INVALID_PAYLOAD;
         }
         return -1;
     }
@@ -957,7 +957,7 @@ static int prv_kii_thing_if_get_anonymous_token(
             != KII_JSON_PARSE_SUCCESS) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to parse received message.\n"));
         if (error != NULL) {
-            error->code = KII_THING_IF_ERROR_JSON;
+            error->code = KII_THING_IF_ERROR_INVALID_PAYLOAD;
         }
         return -1;
     }
@@ -1343,7 +1343,7 @@ kii_bool_t get_firmware_version(
                             error->code =
                                 KII_THING_IF_ERROR_INSUFFICIENT_ARG_BUFFER;
                         } else {
-                            error->code = KII_THING_IF_ERROR_JSON;
+                            error->code = KII_THING_IF_ERROR_INVALID_PAYLOAD;
                         }
                     }
                     return KII_FALSE;
@@ -1477,7 +1477,7 @@ kii_bool_t get_thing_type(
                             error->code =
                                 KII_THING_IF_ERROR_INSUFFICIENT_ARG_BUFFER;
                         } else {
-                            error->code = KII_THING_IF_ERROR_JSON;
+                            error->code = KII_THING_IF_ERROR_INVALID_PAYLOAD;
                         }
                     }
                     return KII_FALSE;
