@@ -69,7 +69,7 @@ static int prv_kii_api_call_start(
     if (retval != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to start api call"));
         if (error != NULL){
-            error->reason = KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
+            error->code = KII_THING_IF_ERROR_INSUFFICIENT_BUFFER;
         }
     }
     return retval;
@@ -212,11 +212,29 @@ static kii_bool_t prv_execute_http_session(
 {
     M_KII_THING_IF_ASSERT(kii != NULL);
 
-    /* TODO: we should fix kii_api_call_run to detec socket error. */
     if (kii_api_call_run(kii) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to run api.\n"));
         if (error != NULL) {
-            error->reason = KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
+            switch (kii->kii_core.http_context.
+                        socket_context.http_error) {
+                case KII_HTTP_ERROR_NONE:
+                    /* kii_api_call_run() set content length and so
+                       on. The request buffer can not accept such
+                       elements because of insufficient buffer. */
+                    error->code = KII_THING_IF_ERROR_INSUFFICIENT_BUFFER;
+                    break;
+                case KII_HTTP_ERROR_INSUFFICIENT_BUFFER:
+                    error->code = KII_THING_IF_ERROR_INSUFFICIENT_BUFFER;
+                    break;
+                case KII_HTTP_ERROR_SOCKET:
+                    error->code = KII_THING_IF_ERROR_SOCKET;
+                    break;
+                case KII_HTTP_ERROR_INVALID_RESPONSE:
+                default:
+                    /* Unexpected case. */
+                    M_KII_THING_IF_ASSERT(0);
+                    break;
+            }
         }
         return KII_FALSE;
     }
@@ -241,7 +259,7 @@ static kii_bool_t prv_execute_http_session(
                 M_KII_LOG(kii->kii_core.logger_cb(
                     "fail to parse received message.\n"));
             }
-            error->reason = KII_THING_IF_ERROR_REASON_HTTP;
+            error->code = KII_THING_IF_ERROR_HTTP;
             error->http_status_code = kii->kii_core.response_code;
         }
         return KII_FALSE;
@@ -374,7 +392,7 @@ static int prv_thing_if_parse_onboarding_response(
                     strlen(kii->kii_core.response_body), fields) !=
             KII_JSON_PARSE_SUCCESS) {
         if (error != NULL) {
-            error->reason = KII_THING_IF_ERROR_REASON_PARSE_RESPONSE;
+            error->code = KII_THING_IF_ERROR_INVALID_PAYLOAD;
         }
         return -1;
     }
@@ -888,7 +906,7 @@ static int prv_kii_thing_if_get_anonymous_token(
         M_KII_LOG(kii->kii_core.logger_cb(
                 "resource path is longer than expected.\n"));
         if (error != NULL) {
-            error->reason = KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
+            error->code = KII_THING_IF_ERROR_INSUFFICIENT_BUFFER;
         }
         return -1;
     }
@@ -899,7 +917,7 @@ static int prv_kii_thing_if_get_anonymous_token(
                     KII_FALSE) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to start api call.\n"));
         if (error != NULL) {
-            error->reason = KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
+            error->code = KII_THING_IF_ERROR_INSUFFICIENT_BUFFER;
         }
         return -1;
     }
@@ -914,7 +932,7 @@ static int prv_kii_thing_if_get_anonymous_token(
             APPEND_BODY_CONST(kii, "}") != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
         if (error != NULL) {
-            error->reason = KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
+            error->code = KII_THING_IF_ERROR_INSUFFICIENT_BUFFER;
         }
         return -1;
     }
@@ -937,7 +955,7 @@ static int prv_kii_thing_if_get_anonymous_token(
             != KII_JSON_PARSE_SUCCESS) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to parse received message.\n"));
         if (error != NULL) {
-            error->reason = KII_THING_IF_ERROR_REASON_PARSE_RESPONSE;
+            error->code = KII_THING_IF_ERROR_INVALID_PAYLOAD;
         }
         return -1;
     }
@@ -977,7 +995,7 @@ static kii_bool_t prv_onboard_with_vendor_thing_id(
                     CONTENT_TYPE_VENDOR_THING_ID, KII_TRUE) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to start api call.\n"));
         if (error != NULL) {
-            error->reason = KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
+            error->code = KII_THING_IF_ERROR_INSUFFICIENT_BUFFER;
         }
         return KII_FALSE;
     }
@@ -999,7 +1017,7 @@ static kii_bool_t prv_onboard_with_vendor_thing_id(
             APPEND_BODY_CONST(kii, "}") != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("request size overflowed.\n"));
         if (error != NULL) {
-            error->reason = KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
+            error->code = KII_THING_IF_ERROR_INSUFFICIENT_BUFFER;
         }
         return KII_FALSE;
     }
@@ -1090,7 +1108,7 @@ kii_bool_t onboard_with_vendor_thing_id(
 {
     if (kii_thing_if->state == KII_THING_IF_STATE_STARTED) {
         if (error != NULL) {
-            error->reason = KII_THING_IF_ERROR_REASON_ALREADY_STARTED;
+            error->code = KII_THING_IF_ERROR_INVALID_STATE;
         }
         return KII_FALSE;
     }
@@ -1191,7 +1209,7 @@ kii_bool_t onboard_with_thing_id(
 {
     if (kii_thing_if->state == KII_THING_IF_STATE_STARTED) {
         if (error != NULL) {
-            error->reason = KII_THING_IF_ERROR_REASON_ALREADY_STARTED;
+            error->code = KII_THING_IF_ERROR_INVALID_STATE;
         }
         return KII_FALSE;
     }
@@ -1273,12 +1291,12 @@ kii_bool_t get_firmware_version(
     switch (kii_thing_if->state) {
         case KII_THING_IF_STATE_INITIALIZED:
             if (error != NULL) {
-                error->reason = KII_THING_IF_ERROR_REASON_NOT_ONBOARDED;
+                error->code = KII_THING_IF_ERROR_INVALID_STATE;
             }
             return KII_FALSE;
         case KII_THING_IF_STATE_STARTED:
             if (error != NULL) {
-                error->reason = KII_THING_IF_ERROR_REASON_ALREADY_STARTED;
+                error->code = KII_THING_IF_ERROR_INVALID_STATE;
             }
             return KII_FALSE;
         case KII_THING_IF_STATE_ONBOARDED:
@@ -1318,8 +1336,13 @@ kii_bool_t get_firmware_version(
                         strlen(kii->kii_core.response_body),
                         fields) != KII_JSON_PARSE_SUCCESS) {
                     if (error != NULL) {
-                        error->reason =
-                          KII_THING_IF_ERROR_REASON_PARSE_RESPONSE;
+                        if (fields[0].result ==
+                                KII_JSON_FIELD_PARSE_COPY_FAILED) {
+                            error->code =
+                                KII_THING_IF_ERROR_INSUFFICIENT_ARG_BUFFER;
+                        } else {
+                            error->code = KII_THING_IF_ERROR_INVALID_PAYLOAD;
+                        }
                     }
                     return KII_FALSE;
                 }
@@ -1341,12 +1364,12 @@ kii_bool_t update_firmware_version(
     switch (kii_thing_if->state) {
         case KII_THING_IF_STATE_INITIALIZED:
             if (error != NULL) {
-                error->reason = KII_THING_IF_ERROR_REASON_NOT_ONBOARDED;
+                error->code = KII_THING_IF_ERROR_INVALID_STATE;
             }
             return KII_FALSE;
         case KII_THING_IF_STATE_STARTED:
             if (error != NULL) {
-                error->reason = KII_THING_IF_ERROR_REASON_ALREADY_STARTED;
+                error->code = KII_THING_IF_ERROR_INVALID_STATE;
             }
             return KII_FALSE;
         case KII_THING_IF_STATE_ONBOARDED:
@@ -1380,8 +1403,7 @@ kii_bool_t update_firmware_version(
                 M_KII_LOG(kii->kii_core.logger_cb(
                         "request size overflowed.\n"));
                 if (error != NULL) {
-                    error->reason =
-                        KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
+                    error->code = KII_THING_IF_ERROR_INSUFFICIENT_BUFFER;
                 }
                 return KII_FALSE;
             }
@@ -1404,12 +1426,12 @@ kii_bool_t get_thing_type(
     switch (kii_thing_if->state) {
         case KII_THING_IF_STATE_INITIALIZED:
             if (error != NULL) {
-                error->reason = KII_THING_IF_ERROR_REASON_NOT_ONBOARDED;
+                error->code = KII_THING_IF_ERROR_INVALID_STATE;
             }
             return KII_FALSE;
         case KII_THING_IF_STATE_STARTED:
             if (error != NULL) {
-                error->reason = KII_THING_IF_ERROR_REASON_ALREADY_STARTED;
+                error->code = KII_THING_IF_ERROR_INVALID_STATE;
             }
             return KII_FALSE;
         case KII_THING_IF_STATE_ONBOARDED:
@@ -1448,8 +1470,13 @@ kii_bool_t get_thing_type(
                         strlen(kii->kii_core.response_body),
                         fields) != KII_JSON_PARSE_SUCCESS) {
                     if (error != NULL) {
-                        error->reason =
-                          KII_THING_IF_ERROR_REASON_PARSE_RESPONSE;
+                        if (fields[0].result ==
+                                KII_JSON_FIELD_PARSE_COPY_FAILED) {
+                            error->code =
+                                KII_THING_IF_ERROR_INSUFFICIENT_ARG_BUFFER;
+                        } else {
+                            error->code = KII_THING_IF_ERROR_INVALID_PAYLOAD;
+                        }
                     }
                     return KII_FALSE;
                 }
@@ -1471,12 +1498,12 @@ kii_bool_t update_thing_type(
     switch (kii_thing_if->state) {
         case KII_THING_IF_STATE_INITIALIZED:
             if (error != NULL) {
-                error->reason = KII_THING_IF_ERROR_REASON_NOT_ONBOARDED;
+                error->code = KII_THING_IF_ERROR_INVALID_STATE;
             }
             return KII_FALSE;
         case KII_THING_IF_STATE_STARTED:
             if (error != NULL) {
-                error->reason = KII_THING_IF_ERROR_REASON_ALREADY_STARTED;
+                error->code = KII_THING_IF_ERROR_INVALID_STATE;
             }
             return KII_FALSE;
         case KII_THING_IF_STATE_ONBOARDED:
@@ -1510,8 +1537,7 @@ kii_bool_t update_thing_type(
                 M_KII_LOG(kii->kii_core.logger_cb(
                         "request size overflowed.\n"));
                 if (error != NULL) {
-                    error->reason =
-                        KII_THING_IF_ERROR_REASON_REQUEST_BUFFER_OVERFLOW;
+                    error->code = KII_THING_IF_ERROR_INSUFFICIENT_BUFFER;
                 }
                 return KII_FALSE;
             }
