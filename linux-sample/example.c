@@ -10,68 +10,36 @@
 
 #include <pthread.h>
 
-typedef struct prv_smartlight_t {
-    kii_json_boolean_t power;
-    int brightness;
-    int color[3];
-    int color_temperature;
-} prv_smartlight_t;
+typedef struct prv_air_conditioner_t {
+    kii_bool_t power;
+    int temperature;
+} prv_air_conditioner_t;
 
-static prv_smartlight_t m_smartlight;
+static prv_air_conditioner_t m_air_conditioner;
 static pthread_mutex_t m_mutex;
 
-static kii_json_parse_result_t prv_json_read_object(
-        const char* json,
-        size_t json_len,
-        kii_json_field_t* fields,
-        char error[EMESSAGE_SIZE + 1])
-{
-    kii_json_t kii_json;
-    kii_json_resource_t* resource_pointer = NULL;
-#ifndef KII_JSON_FIXED_TOKEN_NUM
-    kii_json_resource_t resource;
-    kii_json_token_t tokens[32];
-    resource_pointer = &resource;
-    resource.tokens = tokens;
-    resource.tokens_num = sizeof(tokens) / sizeof(tokens[0]);
-#endif
-
-    memset(&kii_json, 0, sizeof(kii_json));
-    kii_json.resource = resource_pointer;
-    kii_json.error_string_buff = error;
-    kii_json.error_string_length = EMESSAGE_SIZE + 1;
-
-    return kii_json_read_object(&kii_json, json, json_len, fields);
-}
-
-static kii_bool_t prv_get_smartlight_info(prv_smartlight_t* smartlight)
+static kii_bool_t prv_get_air_conditioner_info(
+        prv_air_conditioner_t* air_conditioner)
 {
     if (pthread_mutex_lock(&m_mutex) != 0) {
         return KII_FALSE;
     }
-    smartlight->power = m_smartlight.power;
-    smartlight->brightness = m_smartlight.brightness;
-    smartlight->color[0] = m_smartlight.color[0];
-    smartlight->color[1] = m_smartlight.color[1];
-    smartlight->color[2] = m_smartlight.color[2];
-    smartlight->color_temperature = m_smartlight.color_temperature;
+    air_conditioner->power = m_air_conditioner.power;
+    air_conditioner->temperature = m_air_conditioner.temperature;
     if (pthread_mutex_unlock(&m_mutex) != 0) {
         return KII_FALSE;
     }
     return KII_TRUE;
 }
 
-static kii_bool_t prv_set_smartlight_info(const prv_smartlight_t* smartlight)
+static kii_bool_t prv_set_air_conditioner_info(
+        const prv_air_conditioner_t* air_conditioner)
 {
     if (pthread_mutex_lock(&m_mutex) != 0) {
         return KII_FALSE;
     }
-    m_smartlight.power = smartlight->power;
-    m_smartlight.brightness = smartlight->brightness;
-    m_smartlight.color[0] = smartlight->color[0];
-    m_smartlight.color[1] = smartlight->color[1];
-    m_smartlight.color[2] = smartlight->color[2];
-    m_smartlight.color_temperature = smartlight->color_temperature;
+    m_air_conditioner.power = air_conditioner->power;
+    m_air_conditioner.temperature = air_conditioner->temperature;
     if (pthread_mutex_unlock(&m_mutex) != 0) {
         return KII_FALSE;
     }
@@ -84,7 +52,7 @@ static kii_bool_t action_handler(
         const char* action_params,
         char error[EMESSAGE_SIZE + 1])
 {
-    prv_smartlight_t smartlight;
+    prv_air_conditioner_t air_conditioner;
 
     printf("alias=%s, action name=%s, action params=%s\n",
             alias, action_name, action_params);
@@ -95,7 +63,24 @@ static kii_bool_t action_handler(
         return KII_FALSE;
     }
 
-    // TODO: implement me.
+    memset(&air_conditioner, 0, sizeof(air_conditioner));
+    if (prv_get_air_conditioner_info(&air_conditioner) == KII_FALSE) {
+        printf("fail to lock.\n");
+        strcpy(error, "fail to lock.");
+        return KII_FALSE;
+    }
+    if (strcmp(action_name, "turnPower") == 0) {
+        air_conditioner.power =
+            strcmp(action_params, "true") == 0 ? KII_TRUE : KII_FALSE;
+    }
+    if (strcmp(action_name, "setPresetTemperature") == 0) {
+        air_conditioner.temperature = atoi(action_name);
+    }
+
+    if (prv_set_air_conditioner_info(&air_conditioner) == KII_FALSE) {
+        printf("fail to unlock.\n");
+        return KII_FALSE;
+    }
     return KII_TRUE;
 }
 
@@ -103,7 +88,7 @@ static kii_bool_t state_handler(
         kii_t* kii,
         KII_THING_IF_WRITER writer)
 {
-    FILE* fp = fopen("smartlight-state.json", "r");
+    FILE* fp = fopen("air_conditioner-state.json", "r");
     if (fp != NULL) {
         char buf[256];
         kii_bool_t retval = KII_TRUE;
@@ -117,44 +102,31 @@ static kii_bool_t state_handler(
         return retval;
     } else {
         char buf[256];
-        prv_smartlight_t smartlight;
-        memset(&smartlight, 0x00, sizeof(smartlight));
-        if (prv_get_smartlight_info(&smartlight) == KII_FALSE) {
+        prv_air_conditioner_t air_conditioner;
+        memset(&air_conditioner, 0x00, sizeof(air_conditioner));
+        if (prv_get_air_conditioner_info(&air_conditioner) == KII_FALSE) {
             printf("fail to lock.\n");
+            return KII_FALSE;
+        }
+        if ((*writer)(kii, "{\"AirConditionerAlias\":") == KII_FALSE) {
             return KII_FALSE;
         }
         if ((*writer)(kii, "{\"power\":") == KII_FALSE) {
             return KII_FALSE;
         }
-        if ((*writer)(kii, smartlight.power == KII_JSON_TRUE
+        if ((*writer)(kii, air_conditioner.power == KII_JSON_TRUE
                         ? "true," : "false,") == KII_FALSE) {
             return KII_FALSE;
         }
-        if ((*writer)(kii, "\"brightness\":") == KII_FALSE) {
-            return KII_FALSE;
-        }
-
-        snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%d,",
-                smartlight.brightness);
-        if ((*writer)(kii, buf) == KII_FALSE) {
-            return KII_FALSE;
-        }
-
-        if ((*writer)(kii, "\"color\":") == KII_FALSE) {
-            return KII_FALSE;
-        }
-        snprintf(buf, sizeof(buf) / sizeof(buf[0]), "[%d,%d,%d],",
-                smartlight.color[0], smartlight.color[1], smartlight.color[2]);
-        if ((*writer)(kii, buf) == KII_FALSE) {
-            return KII_FALSE;
-        }
-
-        if ((*writer)(kii, "\"colorTemperature\":") == KII_FALSE) {
+        if ((*writer)(kii, "\"currentTemperature\":") == KII_FALSE) {
             return KII_FALSE;
         }
         snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%d}",
-                smartlight.color_temperature);
+                air_conditioner.temperature);
         if ((*writer)(kii, buf) == KII_FALSE) {
+            return KII_FALSE;
+        }
+        if ((*writer)(kii, "}") == KII_FALSE) {
             return KII_FALSE;
         }
         return KII_TRUE;
