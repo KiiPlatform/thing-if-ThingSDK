@@ -493,8 +493,8 @@ int main(int argc, char** argv)
                     firmwareVersion,
                     sizeof(firmwareVersion) / sizeof(firmwareVersion[0]),
                     &error) == KII_FALSE) {
-                printf("get_firmware_version is failed: %d\n", error.reason);
-                if (error.reason == KII_THING_IF_ERROR_REASON_HTTP) {
+                printf("get_firmware_version is failed: %d\n", error.code);
+                if (error.code == KII_THING_IF_ERROR_HTTP) {
                     printf("status code=%d, error code=%s\n",
                             error.http_status_code,
                             error.error_code);
@@ -511,8 +511,8 @@ int main(int argc, char** argv)
                     thingType,
                     sizeof(thingType) / sizeof(thingType[0]),
                     &error) == KII_FALSE) {
-                printf("get_thing_type is failed: %d\n", error.reason);
-                if (error.reason == KII_THING_IF_ERROR_REASON_HTTP) {
+                printf("get_thing_type is failed: %d\n", error.code);
+                if (error.code == KII_THING_IF_ERROR_HTTP) {
                     printf("status code=%d, error code=%s\n",
                             error.http_status_code,
                             error.error_code);
@@ -630,8 +630,8 @@ int main(int argc, char** argv)
                     &kii_thing_if,
                     firmwareVersion,
                     &error) == KII_FALSE) {
-                printf("update_firmware_version is failed: %d\n", error.reason);
-                if (error.reason == KII_THING_IF_ERROR_REASON_HTTP) {
+                printf("update_firmware_version is failed: %d\n", error.code);
+                if (error.code == KII_THING_IF_ERROR_HTTP) {
                     printf("status code=%d, error code=%s\n",
                             error.http_status_code,
                             error.error_code);
@@ -646,8 +646,8 @@ int main(int argc, char** argv)
                     &kii_thing_if,
                     thingType,
                     &error) == KII_FALSE) {
-                printf("update_thing_type is failed: %d\n", error.reason);
-                if (error.reason == KII_THING_IF_ERROR_REASON_HTTP) {
+                printf("update_thing_type is failed: %d\n", error.code);
+                if (error.code == KII_THING_IF_ERROR_HTTP) {
                     printf("status code=%d, error code=%s\n",
                             error.http_status_code,
                             error.error_code);
