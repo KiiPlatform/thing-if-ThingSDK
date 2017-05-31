@@ -594,8 +594,12 @@ static kii_bool_t prv_send_state(kii_t* kii)
         return KII_FALSE;
     }
 
-    if (kii_api_call_start(kii, "PUT", resource_path, CONTENT_TYPE_JSON,
-                    KII_TRUE) != 0) {
+    if (kii_api_call_start(
+            kii,
+            "PUT",
+            resource_path,
+            "application/vnd.kii.MultipleTraitState+json",
+            KII_TRUE) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to start api call.\n"));
         return KII_FALSE;
     }
