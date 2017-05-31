@@ -89,7 +89,7 @@ static kii_bool_t action_handler(
     printf("alias=%s, action name=%s, action params=%s\n",
             alias, action_name, action_params);
 
-    if (strcmp(alias, "AirConditionerAlias") != 0 ||
+    if (strcmp(alias, "AirConditionerAlias") != 0 &&
             strcmp(alias, "HumidityAlias") != 0) {
         snprintf(error, EMESSAGE_SIZE + 1, "invalid alias: %s", alias);
         return KII_FALSE;
@@ -168,7 +168,7 @@ static kii_bool_t custom_push_handler(
 {
     kii_bool_t ret = KII_TRUE;
     printf("custom_push_handler:\n%s\n", message);
-    if (strncmp(message, "{\"schema\"", 9) == 0) {
+    if (strncmp(message, "{\"commandID\"", 12) == 0) {
         ret = KII_FALSE;
     }
     // check no error in parsing topic.
