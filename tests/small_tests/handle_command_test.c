@@ -191,10 +191,28 @@ TEST(kiiThingIfTest, handle_command)
 
     ASSERT_STREQ(
         test_context.sended_requests[0],
-"PUT https://api-jp.kii.com/thing-if/apps/app_id/targets/thing:owenr/commands/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/action-results HTTP/1.1\r\nhost:api-jp.kii.com\r\nx-kii-appid:app_id\r\nx-kii-appkey:app_key\r\nx-kii-sdk:sn=tic;sv=0.9.6\r\ncontent-type:application/json\r\nauthorization:bearer token\r\ncontent-length:137\r\n\r\n{\"actionResults\":[{\"turnPower\":{\"succeeded\":true}},{\"setPresetTemperature\":{\"succeeded\":true}},{\"setPresetHumidity\":{\"succeeded\":true}}]}");
+        "PUT https://api-jp.kii.com/thing-if/apps/app_id/targets/thing:owenr/commands/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/action-results HTTP/1.1\r\n"
+        "host:api-jp.kii.com\r\n"
+        "x-kii-appid:app_id\r\n"
+        "x-kii-appkey:app_key\r\n"
+        "x-kii-sdk:sn=tic;sv=0.9.6\r\n"
+        "content-type:application/json\r\n"
+        "authorization:bearer token\r\n"
+        "content-length:137\r\n"
+        "\r\n"
+        "{\"actionResults\":[{\"turnPower\":{\"succeeded\":true}},{\"setPresetTemperature\":{\"succeeded\":true}},{\"setPresetHumidity\":{\"succeeded\":true}}]}");
     ASSERT_STREQ(
         test_context.sended_requests[1],
-        "PUT https://api-jp.kii.com/thing-if/apps/app_id/targets/thing:owenr/states HTTP/1.1\r\nhost:api-jp.kii.com\r\nx-kii-appid:app_id\r\nx-kii-appkey:app_key\r\nx-kii-sdk:sn=tic;sv=0.9.6\r\ncontent-type:application/vnd.kii.MultipleTraitState+json\r\nauthorization:bearer token\r\ncontent-length:14\r\n\r\n{\"power\":true}");
+        "PUT https://api-jp.kii.com/thing-if/apps/app_id/targets/thing:owenr/states HTTP/1.1\r\n"
+        "host:api-jp.kii.com\r\n"
+        "x-kii-appid:app_id\r\n"
+        "x-kii-appkey:app_key\r\n"
+        "x-kii-sdk:sn=tic;sv=0.9.6\r\n"
+        "content-type:application/vnd.kii.MultipleTraitState+json\r\n"
+        "authorization:bearer token\r\n"
+        "content-length:14\r\n"
+        "\r\n"
+        "{\"power\":true}");
     for (i = 0; i < test_context.num; ++i) {
         free(test_context.sended_requests[i]);
     }
