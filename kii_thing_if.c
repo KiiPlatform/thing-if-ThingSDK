@@ -816,7 +816,7 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
                             }
                             if (APPEND_BODY_CONST(kii, "{\"") != 0 ||
                                     APPEND_BODY(kii, name) != 0 ||
-                                    APPEND_BODY_CONST(kii, ":{") != 0 ||
+                                    APPEND_BODY_CONST(kii, "\":{") != 0 ||
                                     prv_append_key_value_bool(
                                         kii,
                                         "succeeded",
@@ -827,7 +827,7 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
                                         "errorMessage",
                                         succeeded == KII_FALSE ? error : NULL,
                                         KII_TRUE) != 0 ||
-                                    APPEND_BODY_CONST(kii, "}}\"") != 0) {
+                                    APPEND_BODY_CONST(kii, "}}") != 0) {
                                 M_KII_LOG(kii->kii_core.logger_cb(
                                         "request size overflowed.\n"));
                                 return;
