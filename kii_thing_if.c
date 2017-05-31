@@ -42,7 +42,8 @@
 #define CONTENT_TYPE_THING_ID "application/vnd.kii.OnboardingWithThingIDByThing+json"
 #define CONTENT_UPDATE_FIRMWARE_VERSION "application/vnd.kii.ThingFirmwareVersionUpdateRequest+json"
 #define CONTENT_UPDATE_THING_TYPE "application/vnd.kii.ThingTypeUpdateRequest+json"
-#define CONTENT_TYPE_JSON "application/json"
+#define CONTENT_UPDATE_STATE "application/vnd.kii.MultipleTraitState+json"
+
 
 #define THING_IF_INFO "sn=tic;sv=0.9.6"
 
@@ -594,12 +595,8 @@ static kii_bool_t prv_send_state(kii_t* kii)
         return KII_FALSE;
     }
 
-    if (kii_api_call_start(
-            kii,
-            "PUT",
-            resource_path,
-            "application/vnd.kii.MultipleTraitState+json",
-            KII_TRUE) != 0) {
+    if (kii_api_call_start(kii, "PUT", resource_path, CONTENT_UPDATE_STATE,
+                    KII_TRUE) != 0) {
         M_KII_LOG(kii->kii_core.logger_cb("fail to start api call.\n"));
         return KII_FALSE;
     }
@@ -1059,7 +1056,7 @@ static void* prv_update_status(void *sdata)
         kii->delay_ms_cb(
             ((kii_thing_if_t*)kii->app_context)->state_update_period * 1000);
 
-        if (kii_api_call_start(kii, "PUT", resource_path, CONTENT_TYPE_JSON,
+        if (kii_api_call_start(kii, "PUT", resource_path, CONTENT_UPDATE_STATE,
                         KII_TRUE) != 0) {
             M_KII_LOG(kii->kii_core.logger_cb(
                     "fail to start api call.\n"));
