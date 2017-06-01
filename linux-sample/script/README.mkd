@@ -26,22 +26,22 @@ After finished Setup, you can execute following scripts.
 #### Execute Command
 After finished Setup, you can execute following scripts.
 ```sh
-sh smart-light-command-post.sh
+sh air-conditioner-command-post.sh
 ```
 
 #### List Command
 ```sh
-sh smart-light-command-get.sh
+sh air-conditioner-command-get.sh
 ```
 
 #### Get Command with ID
 ```sh
-sh smart-light-command-get.sh -c {command-id}
+sh air-conditioner-command-get.sh -c {command-id}
 ```
 
 #### Get Thing State
 ```sh
-sh smart-light-state-get.sh
+sh air-conditioner-state-get.sh
 ```
 
 ### Notifications
