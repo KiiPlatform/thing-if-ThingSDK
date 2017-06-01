@@ -94,7 +94,7 @@ static int prv_append_key_value(
     }
 
     if (is_successor == KII_TRUE) {
-        if (kii_api_call_append_body(kii, ",", CONST_STRLEN(",") != 0)) {
+        if (kii_api_call_append_body(kii, ",", CONST_STRLEN(",")) != 0) {
             M_KII_LOG(kii->kii_core.logger_cb(
                 "request size overflowed: (%s, %s).\n", key, value));
             return -1;
