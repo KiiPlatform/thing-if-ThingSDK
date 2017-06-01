@@ -46,7 +46,7 @@ cd script
 Please open README.mkd and follow the instruciton of Setup section.
 After the setup, execute
 ```sh
-sh script/smart-light-command-post.sh
+sh script/air-conditioner-command-post.sh
 ```
 
 This script posts new command entry to server. exampleapp receives the
@@ -59,13 +59,13 @@ schema=SmartLightDemo, schema_version=1, action name=setColor, action params={"c
 schema=SmartLightDemo, schema_version=1, action name=setColorTemperature, action params={"colorTemperature":-100}
 ```
 
-If you want to check command state, you can use `script/smart-light-command-get.sh`.
+If you want to check command state, you can use `script/air-conditioner-command-get.sh`.
 
 ```sh
-sh script/smart-light-get.sh {COMMAND_ID}
+sh script/air-conditioner-get.sh {COMMAND_ID}
 ```
 
-{COMMAND_ID} can be found response of `script/smart-light-post.sh`.
+{COMMAND_ID} can be found response of `script/air-conditioner-post.sh`.
 
 ## Thing state file.
 
