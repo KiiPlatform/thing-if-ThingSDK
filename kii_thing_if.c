@@ -437,6 +437,10 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
                 value_swap = value[value_len];
                 key[key_len] = '\0';
                 value[value_len] = '\0';
+
+                /* TODO: implement me. */
+                M_KII_THING_IF_ASSERT(0);
+                /*
                 if ((*handler)(schema, schema_version, key, value, error)
                         != KII_FALSE) {
                     if (kii_api_call_append_body(kii,
@@ -491,6 +495,7 @@ static void handle_command(kii_t* kii, char* buffer, size_t buffer_size)
                 }
                 key[key_len] = key_swap;
                 value[value_len] = value_swap;
+                */
             }
             case KII_JSON_PARSE_PARTIAL_SUCCESS:
                 /* This must be end of array. */
@@ -779,8 +784,15 @@ kii_bool_t onboard_with_vendor_thing_id(
         const char* vendor_thing_id,
         const char* password,
         const char* thing_type,
-        const char* thing_properties)
+        const char* firmware_version,
+        const char* layout_position,
+        const char* thing_properties,
+        kii_thing_if_error_t* error)
 {
+    // TODO: implement me.
+    M_KII_THING_IF_ASSERT(0);
+    return KII_FALSE;
+    /*
     if (prv_onboard_with_vendor_thing_id(&kii_thing_if->command_handler,
                     vendor_thing_id, password, thing_type,
                     thing_properties) == KII_FALSE) {
@@ -798,6 +810,7 @@ kii_bool_t onboard_with_vendor_thing_id(
             prv_update_status, (void*)&kii_thing_if->state_updater);
 
     return KII_TRUE;
+    */
 }
 
 static kii_bool_t prv_onboard_with_thing_id(
@@ -871,8 +884,17 @@ static kii_bool_t prv_onboard_with_thing_id(
 kii_bool_t onboard_with_thing_id(
         kii_thing_if_t* kii_thing_if,
         const char* thing_id,
-        const char* password)
+        const char* password,
+        const char* thing_type,
+        const char* firmware_version,
+        const char* layout_position,
+        const char* thing_properties,
+        kii_thing_if_error_t* error)
 {
+    // TODO: implement me.
+    M_KII_THING_IF_ASSERT(0);
+    return KII_FALSE;
+    /*
     if (prv_onboard_with_thing_id(&kii_thing_if->command_handler, thing_id,
                     password) == KII_FALSE) {
         return KII_FALSE;
@@ -889,7 +911,7 @@ kii_bool_t onboard_with_thing_id(
             prv_update_status, (void*)&kii_thing_if->state_updater);
 
     return KII_TRUE;
-
+    */
 }
 
 kii_bool_t init_kii_thing_if_with_onboarded_thing(
