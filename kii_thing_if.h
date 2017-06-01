@@ -11,34 +11,72 @@ extern "C" {
 
 #define KII_THING_IF_TASK_NAME_STATUS_UPDATE "status_update_task"
 
+/** States of kii_thing_if_t instance. */
+typedef enum kii_thing_if_state_t {
+    /** A kii_thing_if_t instance is initialized. */
+    KII_THING_IF_STATE_INITIALIZED,
+    /** A kii_thing_if_t instance is onboarded. */
+    KII_THING_IF_STATE_ONBOARDED,
+    /** A kii_thing_if_t instance is started. */
+    KII_THING_IF_STATE_STARTED
+} kii_thing_if_state_t;
+
 /** Error reasons of thing-if ThingSDK. */
-typedef enum kii_thing_if_error_reason_t {
-    /** kii_thing_if_t instance is not onbarded. Please onboard first. */
-    KII_THING_IF_ERROR_REASON_NOT_ONBOARDED,
-    /** thing-if ThingSDK is alreday started. */
-    KII_THING_IF_ERROR_REASON_ALREADY_STARTED,
+typedef enum kii_thing_if_error_code_t {
+    /** State of kii_thing_if_t instance is invalid to use some functions. */
+    KII_THING_IF_ERROR_INVALID_STATE,
+
     /** HTTP error. */
-    KII_THING_IF_ERROR_REASON_HTTP,
+    KII_THING_IF_ERROR_HTTP,
+
     /** Socket error. */
-    KII_THING_IF_ERROR_REASON_SOCKET
-} kii_thing_if_error_reason_t;
+    KII_THING_IF_ERROR_SOCKET,
+
+    /** HTTP request/ response buffer is insufficient.
+     *
+     * You need to increase size of HTTP request/ response buffer of
+     * kii_thing_if_t::command_handler and/or
+     * kii_thing_if_t::state_updater.
+     */
+    KII_THING_IF_ERROR_INSUFFICIENT_BUFFER,
+
+    /** Size of argument buffer is insufficient.
+     *
+     * Some functions such as ::get_thing_type receives a pointer of
+     * an array.
+     * This error is raised if the length of the given array is shorter than required.
+     *
+     * Application should increase the length of the array.
+     **/
+    KII_THING_IF_ERROR_INSUFFICIENT_ARG_BUFFER,
+
+    /** Fail to parse HTTP response.
+     *
+     * Received body payload in the response is unexpected form.
+     * You might not see this error
+     * since the error is arranged for contingencies such as
+     * received broken data from the undelying network.
+     * If this error constantly happens you may need to ask for support.
+     */
+    KII_THING_IF_ERROR_INVALID_PAYLOAD
+} kii_thing_if_error_code_t;
 
 /** Error information of thing-if ThingSDK. */
 typedef struct kii_thing_if_error_t {
-    /** Error reason. */
-    kii_thing_if_error_reason_t reason;
+    /** Error code. */
+    kii_thing_if_error_code_t code;
 
     /** HTTP status code.
      *
-     * If ::kii_thing_if_error_t::reason is
-     * ::KII_THING_IF_ERROR_REASON_HTTP, this value is set. Otherwise 0.
+     * If ::kii_thing_if_error_t::code is
+     * ::KII_THING_IF_ERROR_HTTP, this value is set. Otherwise 0.
      */
     int http_status_code;
 
     /** Error code.
      *
-     * If ::kii_thing_if_error_t::reason is
-     * ::KII_THING_IF_ERROR_REASON_HTTP, this value is set. Otherwise
+     * If ::kii_thing_if_error_t::code is
+     * ::KII_THING_IF_ERROR_HTTP, this value is set. Otherwise
      * functions does not change this value.
      */
     char error_code[64];
@@ -266,6 +304,11 @@ typedef struct kii_thing_if_t {
     KII_THING_IF_CUSTOM_PUSH_HANDLER custom_push_handler;
     /** Specify the period of updating state in seconds. */
     int state_update_period;
+    /**
+     * Represent state of kii_thing_if_t instance. Application must
+     * not change this value.
+     */
+    kii_thing_if_state_t state;
 } kii_thing_if_t;
 
 /** Initialize kii_thing_if_t object.
@@ -274,6 +317,9 @@ typedef struct kii_thing_if_t {
  * onboard_with_vendor_thing_id(kii_thing_if_t*, const char*, const char*,
  * const char*, const char*) or onboard_with_thing_id(kii_thing_if_t*,
  * const char*, const char*) to onboard from thing.
+ *
+ * After this functions succeeded, kii_thing_if_t::state becomes
+ * ::KII_THING_IF_STATE_INITIALIZED.
  *
  * @param [in] kii_thing_if kii_thing_if_t object to be initialized.
  * @param [in] app_id the input of Application ID
@@ -309,6 +355,9 @@ kii_bool_t init_kii_thing_if(
  * - ::onboard_with_thing_id
  * - ::init_kii_thing_if_with_onboarded_thing
  *
+ * After this functions succeeded, kii_thing_if_t::state becomes
+ * ::KII_THING_IF_STATE_STARTED.
+ *
  * @param [in] kii_thing_if_t This SDK instance.
  * @return KII_TRUE when succeeded, KII_FALSE when failed.
  */
@@ -317,6 +366,10 @@ kii_bool_t start(kii_thing_if_t* kii_thing_if);
 /** Onboard to Thing_If Cloud with specified vendor thing ID.
  * kii_thing_if_t#command_handler and kii_thing_if_t#state_updater instances are
  * used to call api.
+ *
+ * After this functions succeeded, kii_thing_if_t::state becomes
+ * ::KII_THING_IF_STATE_ONBOARDED.
+ *
  * @param [inout] kii_thing_if This SDK instance.
  * @param [in] vendor_thing_id Vendor thing id given by thing
  * vendor. Must not be NULL and empty string.
@@ -342,8 +395,8 @@ kii_bool_t start(kii_thing_if_t* kii_thing_if);
  * @return KII_TRUE when succeeded, KII_FALSE when failed. If returned
  * value is KII_FALSE and error is not NULL, this SDK set error
  * information to the error. This function does not set
- * ::KII_THING_IF_ERROR_REASON_NOT_ONBOARDED to
- * ::kii_thing_if_error_t::reason.
+ * ::KII_THING_IF_ERROR_INVALID_STATE to
+ * ::kii_thing_if_error_t::code.
  */
 kii_bool_t onboard_with_vendor_thing_id(
         kii_thing_if_t* kii_thing_if,
@@ -358,6 +411,10 @@ kii_bool_t onboard_with_vendor_thing_id(
 /** Onboard to Thing_If Cloud with specified thing ID.
  * kii_thing_if_t#command_handler and kii_thing_if_t#state_updater instances are
  * used to call api.
+ *
+ * After this functions succeeded, kii_thing_if_t::state becomes
+ * ::KII_THING_IF_STATE_ONBOARDED.
+ *
  * @param [inout] kii_thing_if This SDK instance.
  * @param [in] thing_id thing ID issued by Kii Cloud. Must not be NULL
  * and empty string.
@@ -383,8 +440,8 @@ kii_bool_t onboard_with_vendor_thing_id(
  * @return KII_TRUE when succeeded, KII_FALSE when failed. If returned
  * value is KII_FALSE and error is not NULL, this SDK set error
  * information to the error. This function does not set
- * ::KII_THING_IF_ERROR_REASON_NOT_ONBOARDED to
- * ::kii_thing_if_error_t::reason.
+ * ::KII_THING_IF_ERROR_INVALID_STATE to
+ * ::kii_thing_if_error_t::code.
  */
 kii_bool_t onboard_with_thing_id(
         kii_thing_if_t* kii_thing_if,
@@ -407,6 +464,9 @@ kii_bool_t onboard_with_thing_id(
  *
  * kii_thing_if_t#command_handler and kii_thing_if_t#state_updater instances are
  * used to call api.
+ *
+ * After this functions succeeded, kii_thing_if_t::state becomes
+ * ::KII_THING_IF_STATE_ONBOARDED.
  *
  * @param [in] app_id the input of Application ID
  * @param [in] app_key the input of Application Key
