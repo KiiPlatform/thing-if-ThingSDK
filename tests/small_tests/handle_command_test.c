@@ -191,7 +191,7 @@ TEST(kiiThingIfTest, handle_command)
 
     ASSERT_STREQ(
         test_context.sended_requests[0],
-        "PUT https://api-jp.kii.com/thing-if/apps/app_id/targets/thing:owenr/commands/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/action-results HTTP/1.1\r\n"
+        "PUT https://api-jp.kii.com/thing-if/apps/app_id/targets/thing:owenr/commands/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/action-results HTTP/1.0\r\n"
         "host:api-jp.kii.com\r\n"
         "x-kii-appid:app_id\r\n"
         "x-kii-appkey:app_key\r\n"
@@ -203,7 +203,7 @@ TEST(kiiThingIfTest, handle_command)
         "{\"actionResults\":[{\"turnPower\":{\"succeeded\":true}},{\"setPresetTemperature\":{\"succeeded\":true}},{\"setPresetHumidity\":{\"succeeded\":true}}]}");
     ASSERT_STREQ(
         test_context.sended_requests[1],
-        "PUT https://api-jp.kii.com/thing-if/apps/app_id/targets/thing:owenr/states HTTP/1.1\r\n"
+        "PUT https://api-jp.kii.com/thing-if/apps/app_id/targets/thing:owenr/states HTTP/1.0\r\n"
         "host:api-jp.kii.com\r\n"
         "x-kii-appid:app_id\r\n"
         "x-kii-appkey:app_key\r\n"
