@@ -11,9 +11,79 @@ extern "C" {
 
 #define KII_THING_IF_TASK_NAME_STATUS_UPDATE "status_update_task"
 
+/** States of kii_thing_if_t instance. */
+typedef enum kii_thing_if_state_t {
+    /** A kii_thing_if_t instance is initialized. */
+    KII_THING_IF_STATE_INITIALIZED,
+    /** A kii_thing_if_t instance is onboarded. */
+    KII_THING_IF_STATE_ONBOARDED,
+    /** A kii_thing_if_t instance is started. */
+    KII_THING_IF_STATE_STARTED
+} kii_thing_if_state_t;
+
+/** Error reasons of thing-if ThingSDK. */
+typedef enum kii_thing_if_error_code_t {
+    /** State of kii_thing_if_t instance is invalid to use some functions. */
+    KII_THING_IF_ERROR_INVALID_STATE,
+
+    /** HTTP error. */
+    KII_THING_IF_ERROR_HTTP,
+
+    /** Socket error. */
+    KII_THING_IF_ERROR_SOCKET,
+
+    /** HTTP request/ response buffer is insufficient.
+     *
+     * You need to increase size of HTTP request/ response buffer of
+     * kii_thing_if_t::command_handler and/or
+     * kii_thing_if_t::state_updater.
+     */
+    KII_THING_IF_ERROR_INSUFFICIENT_BUFFER,
+
+    /** Size of argument buffer is insufficient.
+     *
+     * Some functions such as ::get_thing_type receives a pointer of
+     * an array.
+     * This error is raised if the length of the given array is shorter than required.
+     *
+     * Application should increase the length of the array.
+     **/
+    KII_THING_IF_ERROR_INSUFFICIENT_ARG_BUFFER,
+
+    /** Fail to parse HTTP response.
+     *
+     * Received body payload in the response is unexpected form.
+     * You might not see this error
+     * since the error is arranged for contingencies such as
+     * received broken data from the undelying network.
+     * If this error constantly happens you may need to ask for support.
+     */
+    KII_THING_IF_ERROR_INVALID_PAYLOAD
+} kii_thing_if_error_code_t;
+
+/** Error information of thing-if ThingSDK. */
+typedef struct kii_thing_if_error_t {
+    /** Error code. */
+    kii_thing_if_error_code_t code;
+
+    /** HTTP status code.
+     *
+     * If ::kii_thing_if_error_t::code is
+     * ::KII_THING_IF_ERROR_HTTP, this value is set. Otherwise 0.
+     */
+    int http_status_code;
+
+    /** Error code.
+     *
+     * If ::kii_thing_if_error_t::code is
+     * ::KII_THING_IF_ERROR_HTTP, this value is set. Otherwise
+     * functions does not change this value.
+     */
+    char error_code[64];
+} kii_thing_if_error_t;
+
 /** callback function for handling action.
- * @param [in] schema name of schema.
- * @maram [in] schema_version version of schema.
+ * @param [in] alias name of alias.
  * @param [in] action_name name of the action.
  * @param [in] action_params json object represents parameter of this action.
  * @param [out] error error message if operation is failed.(optional)
@@ -21,8 +91,7 @@ extern "C" {
  */
 typedef kii_bool_t
     (*KII_THING_IF_ACTION_HANDLER)
-        (const char* schema,
-         int schema_version,
+        (const char* alias,
          const char* action_name,
          const char* action_params,
          char error[EMESSAGE_SIZE + 1]);
@@ -235,6 +304,11 @@ typedef struct kii_thing_if_t {
     KII_THING_IF_CUSTOM_PUSH_HANDLER custom_push_handler;
     /** Specify the period of updating state in seconds. */
     int state_update_period;
+    /**
+     * Represent state of kii_thing_if_t instance. Application must
+     * not change this value.
+     */
+    kii_thing_if_state_t state;
 } kii_thing_if_t;
 
 /** Initialize kii_thing_if_t object.
@@ -243,6 +317,9 @@ typedef struct kii_thing_if_t {
  * onboard_with_vendor_thing_id(kii_thing_if_t*, const char*, const char*,
  * const char*, const char*) or onboard_with_thing_id(kii_thing_if_t*,
  * const char*, const char*) to onboard from thing.
+ *
+ * After this functions succeeded, kii_thing_if_t::state becomes
+ * ::KII_THING_IF_STATE_INITIALIZED.
  *
  * @param [in] kii_thing_if kii_thing_if_t object to be initialized.
  * @param [in] app_id the input of Application ID
@@ -268,46 +345,114 @@ kii_bool_t init_kii_thing_if(
         kii_thing_if_state_updater_resource_t* state_updater_resource,
         KII_JSON_RESOURCE_CB resource_cb);
 
+/** Start kii_thing_if_t instance.
+ *
+ * thing-if ThingSDK starts to receive command and update states with
+ * this function.
+ *
+ * This function must be called after one of following functions
+ * - ::onboard_with_vendor_thing_id,
+ * - ::onboard_with_thing_id
+ * - ::init_kii_thing_if_with_onboarded_thing
+ *
+ * After this functions succeeded, kii_thing_if_t::state becomes
+ * ::KII_THING_IF_STATE_STARTED.
+ *
+ * @param [in] kii_thing_if_t This SDK instance.
+ * @return KII_TRUE when succeeded, KII_FALSE when failed.
+ */
+kii_bool_t start(kii_thing_if_t* kii_thing_if);
+
 /** Onboard to Thing_If Cloud with specified vendor thing ID.
  * kii_thing_if_t#command_handler and kii_thing_if_t#state_updater instances are
  * used to call api.
- * @param [inout] kii_thing_if kii this SDK instance.
- * @param [in] vendor_thing_id vendor thing id given by thing vendor.
- * NonNull, NonEmpty value must be specified.
- * @param [in] password password of the thing given by thing vendor.
- * NonNull, NonEmpty value must be specified.
- * @param [in] thing_type type of the thing. If the thing is already registered,
- * this argument is ignored. If NULL the argument is ignored.
- * @param [in] thing_properties Other properties of the thing.
- * please refer to http://docs.kii.com/rest/#thing_management-register_a_thing
- * about the format.
- * If the thing is already registered, this argument is ignored.
- * If NULL the argument is ignored.
- * @return KII_TRUE when succeeded, KII_FALSE when failed.
+ *
+ * After this functions succeeded, kii_thing_if_t::state becomes
+ * ::KII_THING_IF_STATE_ONBOARDED.
+ *
+ * @param [inout] kii_thing_if This SDK instance.
+ * @param [in] vendor_thing_id Vendor thing id given by thing
+ * vendor. Must not be NULL and empty string.
+ * @param [in] password Password of the thing given by thing
+ * vendor. Must not be NULL and empty string.
+ * @param [in] thing_type Type of the thing. If the thing is already
+ * registered, this value would be ignored by Kii Cloud. If this value
+ * is NULL or empty string, this value is ignored.
+ * @param [in] firmware_version Firmware version of the thing. If the
+ * thing is already registered, this value would be ignored by Kii
+ * Cloud. If this value is NULL or empty string this value is ignored.
+ * @param [in] layout_position Layout position of the thing. Should be
+ * one of "STANDALONE", "GATEWAY" or "ENDNODE". If the thing is
+ * already registered, this value would be ignored by Kii Cloud. If
+ * this value is NULL or empty string and the thing is not registered
+ * yet, then "STANDALONE" is used as default.
+ * @param [in] thing_properties Other properties of the thing. please
+ * refer to
+ * http://docs.kii.com/rest/#thing_management-register_a_thing about
+ * the format. If the thing is already registered, this value would be
+ * ignored by Kii Cloud. If this value is NULL or empty string this
+ * value is ignored.
+ * @return KII_TRUE when succeeded, KII_FALSE when failed. If returned
+ * value is KII_FALSE and error is not NULL, this SDK set error
+ * information to the error. This function does not set
+ * ::KII_THING_IF_ERROR_INVALID_STATE to
+ * ::kii_thing_if_error_t::code.
  */
 kii_bool_t onboard_with_vendor_thing_id(
         kii_thing_if_t* kii_thing_if,
         const char* vendor_thing_id,
         const char* password,
         const char* thing_type,
-        const char* thing_properties
-        );
+        const char* firmware_version,
+        const char* layout_position,
+        const char* thing_properties,
+        kii_thing_if_error_t* error);
 
 /** Onboard to Thing_If Cloud with specified thing ID.
  * kii_thing_if_t#command_handler and kii_thing_if_t#state_updater instances are
  * used to call api.
- * @param [inout] kii_thing_if kii this SDK instance.
- * @param [in] thing_id thing id issued by Kii Cloud.
- * NonNull, NonEmpty value must be specified.
- * @param [in] password password of the thing given by thing vendor.
- * NonNull, NonEmpty value must be specified.
- * @return KII_TRUE when succeeded, KII_FALSE when failed.
+ *
+ * After this functions succeeded, kii_thing_if_t::state becomes
+ * ::KII_THING_IF_STATE_ONBOARDED.
+ *
+ * @param [inout] kii_thing_if This SDK instance.
+ * @param [in] thing_id thing ID issued by Kii Cloud. Must not be NULL
+ * and empty string.
+ * @param [in] password Password of the thing given by thing
+ * vendor. Must not be NULL and empty string.
+ * @param [in] thing_type Type of the thing. If the thing is already
+ * registered, this value would be ignored by Kii Cloud. If this value
+ * is NULL or empty string, this value is ignored.
+ * @param [in] firmware_version Firmware version of the thing. If the
+ * thing is already registered, this value would be ignored by Kii
+ * Cloud. If this value is NULL or empty string this value is ignored.
+ * @param [in] layout_position Layout position of the thing. Should be
+ * one of "STANDALONE", "GATEWAY" or "ENDNODE". If the thing is
+ * already registered, this value would be ignored by Kii Cloud. If
+ * this value is NULL or empty string and the thing is not registered
+ * yet, then "STANDALONE" is used as default.
+ * @param [in] thing_properties Other properties of the thing. please
+ * refer to
+ * http://docs.kii.com/rest/#thing_management-register_a_thing about
+ * the format. If the thing is already registered, this value would be
+ * ignored by Kii Cloud. If this value is NULL or empty string this
+ * value is ignored.
+ * @return KII_TRUE when succeeded, KII_FALSE when failed. If returned
+ * value is KII_FALSE and error is not NULL, this SDK set error
+ * information to the error. This function does not set
+ * ::KII_THING_IF_ERROR_INVALID_STATE to
+ * ::kii_thing_if_error_t::code.
  */
 kii_bool_t onboard_with_thing_id(
         kii_thing_if_t* kii_thing_if,
         const char* thing_id,
-        const char* password
-        );
+        const char* password,
+        const char* thing_type,
+        const char* firmware_version,
+        const char* layout_position,
+        const char* thing_properties,
+        kii_thing_if_error_t* error);
+
 
 /** Initialize kii_thing_if_t object with onboarded thing information.
  *
@@ -319,6 +464,9 @@ kii_bool_t onboard_with_thing_id(
  *
  * kii_thing_if_t#command_handler and kii_thing_if_t#state_updater instances are
  * used to call api.
+ *
+ * After this functions succeeded, kii_thing_if_t::state becomes
+ * ::KII_THING_IF_STATE_ONBOARDED.
  *
  * @param [in] app_id the input of Application ID
  * @param [in] app_key the input of Application Key
@@ -348,6 +496,98 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
         kii_thing_if_command_handler_resource_t* command_handler_resource,
         kii_thing_if_state_updater_resource_t* state_updater_resource,
         KII_JSON_RESOURCE_CB resource_cb);
+
+/** Upate firmware version of a thing.
+ *
+ * This function must be called between ::start and one of
+ * following functions:
+ * - ::onboard_with_vendor_thing_id,
+ * - ::onboard_with_thing_id
+ * - ::init_kii_thing_if_with_onboarded_thing
+ *
+ * @param [in] kii_thing_if_t This SDK instance.
+ * @param [in] firmware_version firmware version to update.
+ * @param [out] error Error infomation. This is optional. If NULL,
+ * error information is not set.
+ * @return KII_TRUE when succeeded, KII_FALSE when failed. If returned
+ * value is KII_FALSE and error is not NULL, this SDK set error
+ * information to the error.
+ */
+kii_bool_t update_firmware_version(
+        kii_thing_if_t* kii_thing_if,
+        const char* firmware_version,
+        kii_thing_if_error_t* error);
+
+/** Get firmware version of a thing.
+ *
+ * This function must be called between ::start and one of
+ * following functions:
+ * - ::onboard_with_vendor_thing_id,
+ * - ::onboard_with_thing_id
+ * - ::init_kii_thing_if_with_onboarded_thing
+ *
+ * @param [in] kii_thing_if_t This SDK instance.
+ * @param [out] firmware_version a buffer to copy firmware version got
+ * from Kii Cloud. This SDK makes the buffer null terminated string.
+ * @param [in] firmware_version_len length of firmware_version which
+ * is second argument of this function.
+ * @param [out] error Error infomation. This is optional. If NULL,
+ * error information is not set.
+ * @return KII_TRUE when succeeded, KII_FALSE when failed. If returned
+ * value is KII_FALSE and error is not NULL, this SDK set error
+ * information to the error.
+ */
+kii_bool_t get_firmware_version(
+        kii_thing_if_t* kii_thing_if,
+        char* firmware_version,
+        size_t firmware_version_len,
+        kii_thing_if_error_t* error);
+
+/** Upate thing type of a thing.
+ *
+ * This function must be called between ::start and one of
+ * following functions:
+ * - ::onboard_with_vendor_thing_id,
+ * - ::onboard_with_thing_id
+ * - ::init_kii_thing_if_with_onboarded_thing
+ *
+ * @param [in] kii_thing_if_t This SDK instance.
+ * @param [in] thing_type thing type to update.
+ * @param [out] error Error infomation. This is optional. If NULL,
+ * error information is not set.
+ * @return KII_TRUE when succeeded, KII_FALSE when failed. If returned
+ * value is KII_FALSE and error is not NULL, this SDK set error
+ * information to the error.
+ */
+kii_bool_t update_thing_type(
+        kii_thing_if_t* kii_thing_if,
+        const char* thing_type,
+        kii_thing_if_error_t* error);
+
+/** Get current thing type of a thing.
+ *
+ * This function must be called between ::start and one of
+ * following functions:
+ * - ::onboard_with_vendor_thing_id,
+ * - ::onboard_with_thing_id
+ * - ::init_kii_thing_if_with_onboarded_thing
+ *
+ * @param [in] kii_thing_if_t This SDK instance.
+ * @param [out] thing_type a buffer to copy thing type got
+ * from Kii Cloud. This SDK makes the buffer null terminated string.
+ * @param [in] thing_type_len length of thing_type which
+ * is second argument of this function.
+ * @param [out] error Error infomation. This is optional. If NULL,
+ * error information is not set.
+ * @return KII_TRUE when succeeded, KII_FALSE when failed. If returned
+ * value is KII_FALSE and error is not NULL, this SDK set error
+ * information to the error.
+ */
+kii_bool_t get_thing_type(
+        kii_thing_if_t* kii_thing_if,
+        char* thing_type,
+        size_t thing_type_len,
+        kii_thing_if_error_t* error);
 
 #ifdef __cplusplus
 }

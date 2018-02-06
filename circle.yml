@@ -16,6 +16,8 @@ dependencies:
 test:
   pre:
     - make
+  override:
+    - cd tests/small_tests; make run
 
 deployment:
   production:
