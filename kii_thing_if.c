@@ -45,7 +45,7 @@
 #define CONTENT_UPDATE_STATE "application/vnd.kii.MultipleTraitState+json"
 
 
-#define THING_IF_INFO "sn=tic;sv=1.0.0"
+#define THING_IF_INFO "sn=tic;sv=1.0.1"
 
 typedef enum prv_get_key_and_value_t {
     PRV_GET_KEY_AND_VALUE_SUCCESS,
