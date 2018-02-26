@@ -33,14 +33,14 @@ SOURCES += $(wildcard kii/kii-core/linux/kii_core*.c)
 SOURCES += $(wildcard kii/kii/*.c)
 SOURCES += $(wildcard kii/kii_json/src/*.c)
 SOURCES += kii/lib/jsmn/jsmn.c
-INCLUDES = -Ikii/kii-core -Ikii/kii-core/linux -Ikii/kii -Ikii/kii_json/include -Ikii/lib/jsmn -Ikii/Linux
-
+INCLUDES = -Ikii/kii-core -Ikii/kii-core/linux -Ikii/kii -Ikii/kii_json/include -Ikii/lib/jsmn -Ikii/Linux -I/usr/local/opt/openssl/include
+LDFLAGS = -L/usr/local/opt/openssl/lib
 TARGET = libkiithingifsdk.so
 
 all: linux doc
 
 linux: clean
-	gcc $(CFLAGS) $(SOURCES) kii_thing_if_environment_linux.c $(LIBS) $(INCLUDES) -o $(TARGET)
+	gcc $(CFLAGS) $(SOURCES) kii_thing_if_environment_linux.c $(LIBS) $(INCLUDES) $(LDFLAGS) -o $(TARGET)
 
 clean:
 	touch $(TARGET)

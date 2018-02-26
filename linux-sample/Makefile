@@ -30,6 +30,7 @@ LD_FLAGS = -L.
 SOURCES = $(wildcard *.c)
 TARGET = exampleapp
 INCLUDES = -I.. -I../kii/kii-core -I../kii/kii-core/linux -I../kii/kii -I../kii/kii_json/include -I../kii/lib/jsmn -I../kii/Linux -I/usr/local/opt/openssl/include/
+LDFLAGS = -L/usr/local/opt/openssl/lib
 
 
 all: clean sdk $(TARGET) $(DOCTARGET)
@@ -39,7 +40,7 @@ sdk:
 	cp ../libkiithingifsdk.so ./
 
 $(TARGET):
-	gcc $(CFLAGS) $(SOURCES) $(LIBS) $(LD_FLAGS) $(INCLUDES) -o $@
+	gcc $(CFLAGS) $(SOURCES) $(LIBS) $(LD_FLAGS) $(INCLUDES) $(LDFLAGS) -o $@
 
 clean:
 	$(MAKE) -C .. clean
