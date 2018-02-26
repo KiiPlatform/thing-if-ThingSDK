@@ -98,6 +98,7 @@ static kii_bool_t state_handler(
                 break;
             }
         }
+        printf("updating state...\n");
         fclose(fp);
         return retval;
     } else {
