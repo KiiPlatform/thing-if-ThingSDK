@@ -56,31 +56,6 @@ static kii_bool_t action_handler(
 
     printf("alias=%s, action name=%s, action params=%s\n",
             alias, action_name, action_params);
-
-    if (strcmp(alias, "AirConditionerAlias") != 0 &&
-            strcmp(alias, "HumidityAlias") != 0) {
-        snprintf(error, EMESSAGE_SIZE + 1, "invalid alias: %s", alias);
-        return KII_FALSE;
-    }
-
-    memset(&air_conditioner, 0, sizeof(air_conditioner));
-    if (prv_get_air_conditioner_info(&air_conditioner) == KII_FALSE) {
-        printf("fail to lock.\n");
-        strcpy(error, "fail to lock.");
-        return KII_FALSE;
-    }
-    if (strcmp(action_name, "turnPower") == 0) {
-        air_conditioner.power =
-            strcmp(action_params, "true") == 0 ? KII_TRUE : KII_FALSE;
-    }
-    if (strcmp(action_name, "setPresetTemperature") == 0) {
-        air_conditioner.temperature = atoi(action_name);
-    }
-
-    if (prv_set_air_conditioner_info(&air_conditioner) == KII_FALSE) {
-        printf("fail to unlock.\n");
-        return KII_FALSE;
-    }
     return KII_TRUE;
 }
 
@@ -140,7 +115,6 @@ static kii_bool_t custom_push_handler(
         size_t message_length)
 {
     kii_bool_t ret = KII_TRUE;
-    printf("custom_push_handler:\n%s\n", message);
     if (strncmp(message, "{\"commandID\"", 12) == 0) {
         ret = KII_FALSE;
     }
