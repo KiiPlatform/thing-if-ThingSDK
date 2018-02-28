@@ -9,6 +9,7 @@
 #include <stdlib.h>
 
 #include <pthread.h>
+#include <unistd.h>
 
 typedef struct prv_air_conditioner_t {
     kii_bool_t power;
@@ -635,7 +636,8 @@ int main(int argc, char** argv)
     }
 
     start(&kii_thing_if);
-    while(1){}; /* run forever. */
+    /* run forever. TODO: Convert to daemon. */
+    while(1){ sleep(1); };
 
     /*
      * This sample application keeps mutex from the start to end
