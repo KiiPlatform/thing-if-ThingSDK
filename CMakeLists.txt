@@ -1,0 +1,13 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
+PROJECT(kiithingifsdk C)
+SET(CMAKE_C_FLAGS "-Wall -pthread")
+SET(CMAKE_C_FLAGS "-DKII_PUSH_KEEP_ALIVE_INTERVAL_SECONDS=300")
+SET(CMAKE_C_FLAGS_RELEASE "-O2")
+SET(CMAKE_C_FLAGS_DEBUG "-g -DDEBUG")
+
+FILE(GLOB srcs kii/Linux/kii/*.c kii/kii-core/*.c kii/kii-core/linux/kii_core*.c kii/kii/*.c kii/kii_json/src/*.c kii/lib/jsmn/jsmn.c)
+ADD_LIBRARY(kiithingifsdk SHARED ${srcs})
+TARGET_INCLUDE_DIRECTORIES(kiithingifsdk PRIVATE kii/kii-core kii/kii-core/linux kii/kii_json/include kii/lib/jsmn kii/Linux)
+TARGET_INCLUDE_DIRECTORIES(kiithingifsdk PUBLIC ${PROJECT_SOURCE_DIR})
+FILE(GLOB srcs kii/Linux/kii/*.c kii/kii-core/*.c kii/kii-core/linux/kii_core*.c kii/kii/*.c kii/kii_json/src/*.c kii/lib/jsmn/jsmn.c)
+SET_TARGET_PROPERTIES(kiithingifsdk PROPERTIES VERSION 1.0.0 SOVERSION 1)
