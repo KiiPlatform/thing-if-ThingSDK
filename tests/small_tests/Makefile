@@ -11,7 +11,7 @@ LIBS = $(DEFAULT_LIBS) -lkiithingifsdk
 THINGIF_LIBS= $(DEFAULT_LIBS)
 LD_FLAG = -L.
 LIBTHINGIF=libkiithingifsdk.so
-INCLUDES = -I../../ -I../../kii/kii -I../../kii/kii-core -I../../kii/kii_json/include -I../../kii/lib/jsmn
+INCLUDES = -I../../ -I../../include -I../../kii/kii -I../../kii/kii-core -I../../kii/kii_json/include -I../../kii/lib/jsmn
 
 GTEST_PATH=../../kii/kii-core/gtest-1.7.0
 LIBGTEST=libgtest.a
