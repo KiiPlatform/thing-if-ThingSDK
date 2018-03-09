@@ -1,8 +1,6 @@
 #include "sys_cb_impl.h"
-
-#include <kii_core_secure_socket.h>
-#include <kii_socket_impl.h>
-#include <kii_task_impl.h>
+#include "linux-env/task_impl.h"
+#include "linux-env/secure_socket_impl.h"
 
 #include <stdio.h>
 #include <stdarg.h>

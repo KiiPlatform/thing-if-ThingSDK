@@ -1,4 +1,4 @@
-#include "kii_core_secure_socket.h"
+#include "secure_socket_impl.h"
 
 #include <sys/socket.h>
 #include <sys/types.h>
