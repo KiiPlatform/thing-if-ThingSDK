@@ -30,7 +30,7 @@ LD_FLAGS = -L.
 SOURCES = $(wildcard *.c)
 SOURCES += $(wildcard linux-env/*.c)
 TARGET = exampleapp
-INCLUDES = -I../include -I../kii/kii-core -I../kii/kii-core/linux -I../kii/kii -I../kii/kii_json/include -I../kii/lib/jsmn -I../kii/Linux -I/usr/local/opt/openssl/include/
+INCLUDES = -I../include -I../kii/kii-core -I../kii/kii -I../kii/kii_json/include -I../kii/lib/jsmn -I/usr/local/opt/openssl/include/
 
 
 all: clean sdk $(TARGET) $(DOCTARGET)
