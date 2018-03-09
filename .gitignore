@@ -9,3 +9,5 @@ gtest_main.o
 libgtest.a
 testapp
 tmp
+/build
+/build-arm

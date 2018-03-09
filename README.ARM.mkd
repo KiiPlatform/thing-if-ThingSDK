@@ -1,0 +1,38 @@
+# Cross Compiliing for ARM
+
+## Prerequisit
+
+Cross compile follwoing libraries required by SDK.
+
+- zlib (required by Open SSL)
+- Open SSL
+
+In [arm-toolchain.cmake](./arm-toolchain.cmake), it assumes they are installed in
+~/arm-local and the target architecture is armv5t.
+
+## Configure arm-toolchain.cmake
+
+Current configuration:
+
+- Architecture: armv5t
+- Compiler: arm-linux-gnueabi-gcc
+- Library search path: ~/arm-local/lib
+- Header file search path: ~/arm-local/include
+
+If you need to change build configuration, please edit arm-toolchain.cmake.
+
+## Build SDK.
+
+```sh
+mkdir build-arm
+cd build-arm
+cmake -DCMAKE_TOOLCHAIN_FILE=../arm-toolchain.cmake ../
+make
+```
+## Install SDK
+
+You can specify target directory with `DESTDIR`
+
+```
+make DESTDIR=~/arm-local install
+```
