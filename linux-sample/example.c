@@ -10,7 +10,7 @@
 
 #include <pthread.h>
 #include <unistd.h>
-#include "kii_thing_if_environment_impl.h"
+#include "sys_cb_impl.h"
 
 typedef struct prv_air_conditioner_t {
     kii_bool_t power;
