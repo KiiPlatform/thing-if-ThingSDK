@@ -27,9 +27,7 @@ override CFLAGS += $(JSON_FLAG)
 
 LIBS = -lssl -lcrypto -lpthread
 SOURCES = kii_thing_if.c
-#SOURCES += $(wildcard kii/Linux/kii_*.c)
 SOURCES += $(wildcard kii/kii-core/*.c)
-#SOURCES += $(wildcard kii/kii-core/linux/kii_core*.c)
 SOURCES += $(wildcard kii/kii/*.c)
 SOURCES += $(wildcard kii/kii_json/src/*.c)
 SOURCES += kii/lib/jsmn/jsmn.c
