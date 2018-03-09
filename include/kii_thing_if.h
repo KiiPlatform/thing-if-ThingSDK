@@ -298,19 +298,19 @@ typedef struct kii_thing_if_state_updater_resource_t {
 /**
  * System callback function pointers.
  */
-typedef struct kii_thing_if_system_callbacks_t {
-    KII_TASK_CREATE       task_create_callback;
-    KII_DELAY_MS          delay_ms_callback;
-    KII_LOGGER            log_callback;
-    KII_SOCKET_CONNECT_CB socket_connect_callback;
-    KII_SOCKET_SEND_CB    socket_send_callback;
-    KII_SOCKET_RECV_CB    socket_recv_callback;
-    KII_SOCKET_CLOSE_CB   socket_close_callback;
-    KII_SOCKET_CONNECT_CB mqtt_socket_connect_callback;
-    KII_SOCKET_SEND_CB    mqtt_socket_send_callback;
-    KII_SOCKET_RECV_CB    mqtt_socket_recv_callback;
-    KII_SOCKET_CLOSE_CB   mqtt_socket_close_callback;
-} kii_thing_if_system_callbacks_t;
+typedef struct kii_thing_if_system_cb_t {
+    KII_TASK_CREATE       task_create_cb;
+    KII_DELAY_MS          delay_ms_cb;
+    KII_LOGGER            log_cb;
+    KII_SOCKET_CONNECT_CB socket_connect_cb;
+    KII_SOCKET_SEND_CB    socket_send_cb;
+    KII_SOCKET_RECV_CB    socket_recv_cb;
+    KII_SOCKET_CLOSE_CB   socket_close_cb;
+    KII_SOCKET_CONNECT_CB mqtt_socket_connect_cb;
+    KII_SOCKET_SEND_CB    mqtt_socket_send_cb;
+    KII_SOCKET_RECV_CB    mqtt_socket_recv_cb;
+    KII_SOCKET_CLOSE_CB   mqtt_socket_close_cb;
+} kii_thing_if_system_cb_t;
 
 typedef struct kii_thing_if_t {
     kii_t command_handler;
@@ -360,7 +360,7 @@ kii_bool_t init_kii_thing_if(
         const char* app_host,
         kii_thing_if_command_handler_resource_t* command_handler_resource,
         kii_thing_if_state_updater_resource_t* state_updater_resource,
-        kii_thing_if_system_callbacks_t* system_callbacks,
+        kii_thing_if_system_cb_t* system_cb,
         KII_JSON_RESOURCE_CB resource_cb);
 
 /** Start kii_thing_if_t instance.
@@ -513,7 +513,7 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
         const char* access_token,
         kii_thing_if_command_handler_resource_t* command_handler_resource,
         kii_thing_if_state_updater_resource_t* state_updater_resource,
-        kii_thing_if_system_callbacks_t* system_callbacks,
+        kii_thing_if_system_cb_t* system_cb,
         KII_JSON_RESOURCE_CB resource_cb);
 
 /** Upate firmware version of a thing.
