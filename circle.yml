@@ -11,8 +11,9 @@ checkout:
 
 dependencies:
   override:
-    - sudo apt-get install doxygen
-    - sudo apt-get install cmake
+    - sudo apt update
+    - sudo apt install doxygen
+    - sudo apt install cmake
 
 test:
   pre:
