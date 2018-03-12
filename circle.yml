@@ -12,9 +12,8 @@ checkout:
 dependencies:
   override:
     - sudo apt-get install doxygen
-    - sudo add-apt-repository ppa:george-edison55/cmake-3.x
-    - sudo apt-get update
-    - sudo apt-get install cmake
+    - wget https://cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.sh
+    - sudo bash cmake-3.10.2-Linux-x86_64.sh --skip-license --prefi=/usr/bin
 
 test:
   pre:
