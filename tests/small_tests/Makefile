@@ -38,4 +38,4 @@ sdk:
 test: $(TARGET)
 	LD_LIBRARY_PATH=$(INSTALL_PATH)/lib ./$(TARGET)
 
-.PHONY: clean run test sdk
+.PHONY: all clean test sdk

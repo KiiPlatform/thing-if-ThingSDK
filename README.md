@@ -147,5 +147,5 @@ In RTOS, You'll specify stack size, depth and priority, etc depending on the env
 
 ```sh
 # cd tests/small_tests
-# make run
+# make test
 ```
