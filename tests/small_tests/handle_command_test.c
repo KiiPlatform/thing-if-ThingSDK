@@ -156,6 +156,20 @@ TEST(kiiThingIfTest, handle_command)
     state_updater_resource.period = 10;
     state_updater_resource.state_handler = state_handler_returning_true;
 
+    kii_thing_if_system_cb_t sys_cb;
+    sys_cb.task_create_cb = task_create_cb_impl;
+    sys_cb.delay_ms_cb = delay_ms_cb_impl;
+    sys_cb.delay_ms_cb = delay_ms_cb_impl;
+    sys_cb.log_cb = logger_cb_impl;
+    sys_cb.socket_connect_cb = socket_connect_cb_impl;
+    sys_cb.socket_send_cb = socket_send_cb_impl;
+    sys_cb.socket_recv_cb = socket_recv_cb_impl;
+    sys_cb.socket_close_cb = socket_close_cb_impl;
+    sys_cb.mqtt_socket_connect_cb = mqtt_connect_cb_impl;
+    sys_cb.mqtt_socket_send_cb = mqtt_send_cb_impl;
+    sys_cb.mqtt_socket_recv_cb = mqtt_recv_cb_impl;
+    sys_cb.mqtt_socket_close_cb = mqtt_close_cb_impl;
+
     ASSERT_EQ(
         KII_TRUE,
         init_kii_thing_if(
@@ -165,6 +179,7 @@ TEST(kiiThingIfTest, handle_command)
             "JP",
             &command_handler_resource,
             &state_updater_resource,
+            &sys_cb,
             NULL));
 
     kii_thing_if.command_handler.kii_core.http_context.

@@ -1,8 +1,9 @@
-#include "kii_thing_if_environment_test.h"
-
 #include <stdio.h>
 #include <stdarg.h>
 #include <assert.h>
+#include <kii_socket_callback.h>
+#include <kii_task_callback.h>
+#include "kii_thing_if_environment_test.h"
 
 kii_socket_code_t socket_connect_cb_impl(
         kii_socket_context_t* socket_context,

@@ -1,5 +1,4 @@
 #include "kii_thing_if.h"
-#include "kii_thing_if_environment_impl.h"
 #include "kii_hidden.h"
 
 #include <kii.h>
@@ -408,7 +407,9 @@ static kii_bool_t prv_init_kii_thing_if(
         const char* app_host,
         kii_thing_if_command_handler_resource_t* command_handler_resource,
         kii_thing_if_state_updater_resource_t* state_updater_resource,
-        KII_JSON_RESOURCE_CB resource_cb)
+        kii_thing_if_system_cb_t* system_cb,
+        KII_JSON_RESOURCE_CB resource_cb
+        )
 {
     M_KII_THING_IF_ASSERT(kii_thing_if != NULL);
     M_KII_THING_IF_ASSERT(app_id != NULL);
@@ -470,33 +471,43 @@ static kii_bool_t prv_init_kii_thing_if(
 
     /* setup command handler callbacks. */
     kii_thing_if->command_handler.kii_core.http_context.connect_cb =
-        socket_connect_cb_impl;
+        system_cb->socket_connect_cb;
     kii_thing_if->command_handler.kii_core.http_context.send_cb =
-        socket_send_cb_impl;
+        system_cb->socket_send_cb;
     kii_thing_if->command_handler.kii_core.http_context.recv_cb =
-        socket_recv_cb_impl;
+        system_cb->socket_recv_cb;
     kii_thing_if->command_handler.kii_core.http_context.close_cb =
-        socket_close_cb_impl;
-    kii_thing_if->command_handler.mqtt_socket_connect_cb = mqtt_connect_cb_impl;
-    kii_thing_if->command_handler.mqtt_socket_send_cb = mqtt_send_cb_impl;
-    kii_thing_if->command_handler.mqtt_socket_recv_cb = mqtt_recv_cb_impl;
-    kii_thing_if->command_handler.mqtt_socket_close_cb = mqtt_close_cb_impl;
-    kii_thing_if->command_handler.task_create_cb = task_create_cb_impl;
-    kii_thing_if->command_handler.delay_ms_cb = delay_ms_cb_impl;
-    kii_thing_if->command_handler.kii_core.logger_cb = logger_cb_impl;
+        system_cb->socket_close_cb;
+    kii_thing_if->command_handler.mqtt_socket_connect_cb =
+        system_cb->mqtt_socket_connect_cb;
+    kii_thing_if->command_handler.mqtt_socket_send_cb =
+        system_cb->mqtt_socket_send_cb;
+    kii_thing_if->command_handler.mqtt_socket_recv_cb =
+        system_cb->mqtt_socket_recv_cb;
+    kii_thing_if->command_handler.mqtt_socket_close_cb =
+        system_cb->mqtt_socket_close_cb;
+    kii_thing_if->command_handler.task_create_cb =
+        system_cb->task_create_cb;
+    kii_thing_if->command_handler.delay_ms_cb =
+        system_cb->delay_ms_cb;
+    kii_thing_if->command_handler.kii_core.logger_cb =
+        system_cb->log_cb;
 
     /* setup state updater callbacks. */
     kii_thing_if->state_updater.kii_core.http_context.connect_cb =
-        socket_connect_cb_impl;
+        system_cb->socket_connect_cb;
     kii_thing_if->state_updater.kii_core.http_context.send_cb =
-        socket_send_cb_impl;
+        system_cb->socket_send_cb;
     kii_thing_if->state_updater.kii_core.http_context.recv_cb =
-        socket_recv_cb_impl;
+        system_cb->socket_recv_cb;
     kii_thing_if->state_updater.kii_core.http_context.close_cb =
-        socket_close_cb_impl;
-    kii_thing_if->state_updater.task_create_cb = task_create_cb_impl;
-    kii_thing_if->state_updater.delay_ms_cb = delay_ms_cb_impl;
-    kii_thing_if->state_updater.kii_core.logger_cb = logger_cb_impl;
+        system_cb->socket_close_cb;
+    kii_thing_if->state_updater.task_create_cb =
+        system_cb->task_create_cb;
+    kii_thing_if->state_updater.delay_ms_cb =
+        system_cb->delay_ms_cb;
+    kii_thing_if->state_updater.kii_core.logger_cb =
+        system_cb->log_cb;
 
     kii_thing_if->state = KII_THING_IF_STATE_INITIALIZED;
 
@@ -510,10 +521,12 @@ kii_bool_t init_kii_thing_if(
         const char* app_host,
         kii_thing_if_command_handler_resource_t* command_handler_resource,
         kii_thing_if_state_updater_resource_t* state_updater_resource,
+        kii_thing_if_system_cb_t* system_cb,
         KII_JSON_RESOURCE_CB resource_cb)
 {
     return prv_init_kii_thing_if(kii_thing_if, app_id, app_key, app_host,
-            command_handler_resource, state_updater_resource, resource_cb);
+            command_handler_resource, state_updater_resource, system_cb,
+            resource_cb);
 }
 
 static int prv_kii_thing_if_get_key_and_value_from_json(
@@ -1242,10 +1255,12 @@ kii_bool_t init_kii_thing_if_with_onboarded_thing(
         const char* access_token,
         kii_thing_if_command_handler_resource_t* command_handler_resource,
         kii_thing_if_state_updater_resource_t* state_updater_resource,
+        kii_thing_if_system_cb_t* system_cb,
         KII_JSON_RESOURCE_CB resource_cb)
 {
     if (prv_init_kii_thing_if(kii_thing_if, app_id, app_key, app_host,
                     command_handler_resource, state_updater_resource,
+                    system_cb,
                     resource_cb) == KII_FALSE) {
         return KII_FALSE;
     }
