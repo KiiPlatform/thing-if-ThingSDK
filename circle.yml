@@ -12,9 +12,9 @@ checkout:
 dependencies:
   override:
     - sudo apt-get install doxygen
+    - sudo apt-get remove cmake
     - wget https://cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.sh
-    - bash cmake-3.10.2-Linux-x86_64.sh --skip-license --exclude-subdir
-    - sudo cp bin/cmake /usr/local/bin/
+    - sudo bash cmake-3.10.2-Linux-x86_64.sh --skip-license --exclude-subdir --prefix=/usr/local
 
 test:
   pre:
