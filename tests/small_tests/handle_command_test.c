@@ -1,7 +1,7 @@
 #include "kii_thing_if_environment_test.h"
 
 #include <kii_thing_if.h>
-#include <kii_thing_if_test.h>
+#include "kii_thing_if_test.h"
 
 #include <stdio.h>
 #include <string.h>

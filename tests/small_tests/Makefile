@@ -1,40 +1,21 @@
-ifdef DEBUG
-	override CFLAGS += -g -DDEBUG
-	override LIBTHINGIF_CFLAGS = -g -DDEBUG
-
-endif
-override CFLAGS += -Wall -pedantic -pthread -fPIC -shared
-override LIBTHINGIF_CFLAGS += -DKII_THING_IF_TEST_BUILD -DKII_PUSH_KEEP_ALIVE_INTERVAL_SECONDS=300 -DKII_JSON_FIXED_TOKEN_NUM=128
+SDK_BUILD_PATH=./build
+SDK_PREFIX=usr/local
+INSTALL_PATH=$(SDK_BUILD_PATH)/$(SDK_PREFIX)
 
 DEFAULT_LIBS = -lssl -lcrypto -lpthread
 LIBS = $(DEFAULT_LIBS) -lkiithingifsdk
 THINGIF_LIBS= $(DEFAULT_LIBS)
-LD_FLAG = -L.
-LIBTHINGIF=libkiithingifsdk.so
-INCLUDES = -I../../ -I../../include -I../../kii/kii -I../../kii/kii-core -I../../kii/kii_json/include -I../../kii/lib/jsmn
+LD_FLAG = -L$(INSTALL_PATH)/lib
+INCLUDES = -I$(INSTALL_PATH)/include
 
 GTEST_PATH=../../kii/kii-core/gtest-1.7.0
 LIBGTEST=libgtest.a
 
-THINGIF_SOURCES = ../../kii_thing_if.c
-THINGIF_SOURCES += $(wildcard ../../kii/kii-core/*.c)
-THINGIF_SOURCES += $(wildcard ../../kii/kii-core/linux/kii_core*.c)
-THINGIF_SOURCES += $(wildcard ../../kii/kii/*.c)
-THINGIF_SOURCES += $(wildcard ../../kii/kii_json/src/*.c)
-THINGIF_SOURCES += ../../kii/lib/jsmn/jsmn.c
-
-EXTRA_THINGIF_SOURCES = kii_thing_if_environment_test.c
-
-TEST_SOURCES = handle_command_test.c
+TEST_SOURCES = $(wildcard ./*.c)
 
 TARGET=testapp
 
-build: all
-
-all: clean $(LIBTHINGIF) $(LIBGTEST) $(TARGET)
-
-$(LIBTHINGIF):
-	gcc $(CFLAGS) $(LIBTHINGIF_CFLAGS) $(THINGIF_SOURCES) $(EXTRA_THINGIF_SOURCES) $(THINGIF_LIBS) $(LD_FLAG) $(INCLUDES) -o $(LIBTHINGIF)
+all: clean test
 
 $(LIBGTEST):
 	g++ -isystem $(GTEST_PATH)/include -I$(GTEST_PATH) -pthread -c $(GTEST_PATH)/src/gtest-all.cc
@@ -42,16 +23,19 @@ $(LIBGTEST):
 	ar -rv $(LIBGTEST) gtest-all.o gtest_main.o
 
 
-$(TARGET):
+$(TARGET): sdk $(LIBGTEST)
 	g++ -pthread -o $(TARGET) $(TEST_SOURCES) $(LIBS) $(LD_FLAG) $(LIBGTEST) $(INCLUDES) -I$(GTEST_PATH)/include
 
 clean:
-	touch $(LIBTHINGIF)
-	rm -rf $(LIBTHINGIF) $(LIBGTEST) doc $(TARGET) *.o
+	rm -rf $(LIBGTEST) $(TARGET) *.o
 
-test:
-	export LD_LIBRARY_PATH=. && ./$(TARGET)
+sdk:
+	touch $(SDK_BUILD_PATH)
+	rm -rf $(SDK_BUILD_PATH)
+	mkdir $(SDK_BUILD_PATH)
+	cd $(SDK_BUILD_PATH) && cmake ../../../ && make && make DESTDIR=. install
 
-run: build test
+test: $(TARGET)
+	LD_LIBRARY_PATH=$(INSTALL_PATH)/lib ./$(TARGET)
 
-.PHONY: clean
+.PHONY: clean run test sdk
