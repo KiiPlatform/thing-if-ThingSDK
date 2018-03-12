@@ -4,11 +4,13 @@ endif
 CFLAGS += -Wall -pedantic -pthread
 
 LIBS = -lssl -lcrypto -lpthread -lkiithingifsdk
-LD_FLAGS = -L../build/usr/local/lib
+# Uncomment and edit if you install sdk in custom directory.
+#LD_FLAGS = -L../build/usr/local/lib
 SOURCES = $(wildcard *.c)
 SOURCES += $(wildcard linux-env/*.c)
 TARGET = exampleapp
-INCLUDES = -I../build/usr/local/include
+# Uncomment and edit if you install sdk in custom directory.
+#INCLUDES = -I../build/usr/local/include
 INCLUDES += -I/usr/local/opt/openssl/include/
 
 all: clean $(TARGET)

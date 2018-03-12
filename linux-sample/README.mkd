@@ -1,11 +1,16 @@
 This is a sample application for thing-if SDK.
 
+## Prerequisite
+
+Build and install thing-if SDK.
+
+Please refer to [README](../README.mkd) for build and installation.
+
 ## Build
 
-When you build this sample application for the first time, you need to
-retrieve some modules required by thing-if SDK. You can find the
-way to retrieve these modules in ../README.mkd.
-
+If you installed thing-if SDK in custom directory,
+Plese edit the Makefile and adjust `INCLUDES` and `LD_FLAGS` variable
+to include the custom directory path.
 After that, execute following command:
 
 ```sh
@@ -21,11 +26,9 @@ command:
 # make DEBUG=1
 ```
 
-In debug mode, All HTTP requests and responses are logged.
-
 ## How to use
 Go to https://developer.kii.com and create app for you.
-replace EX_APP_ID, EX_APP_KEY, EX_APP_SITE with yours.
+replace `EX_APP_ID`, `EX_APP_KEY` and `EX_APP_SITE` with yours.
 
 Execute folloging command on a terminal. Hereafter This terminal
 called termianl A.
