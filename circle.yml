@@ -13,7 +13,7 @@ dependencies:
   override:
     - sudo apt-get install doxygen
     - wget https://cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.sh
-    - sudo bash cmake-3.10.2-Linux-x86_64.sh --skip-license --prefi=/usr/bin
+    - sudo bash cmake-3.10.2-Linux-x86_64.sh --skip-license --prefix=/usr/bin
 
 test:
   pre:
