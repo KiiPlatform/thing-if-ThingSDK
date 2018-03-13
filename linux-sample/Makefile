@@ -1,52 +1,38 @@
+SDK_BUILD_PATH=./build
+SDK_PREFIX=usr/local
+INSTALL_PATH=$(BUILD_DIR)/$(SDK_PREFIX)
+
+CMAKE_BUILD_TYPE = RELEASE
 ifdef DEBUG
 CFLAGS += -g -DDEBUG
+CMAKE_BUILD_TYPE = DEBUG
 endif
+
 CFLAGS += -Wall -pedantic -pthread
 
-ifndef KEEP_ALIVE_INTERVAL
-	override CFLAGS += -DKII_PUSH_KEEP_ALIVE_INTERVAL_SECONDS=300
-else
-	override CFLAGS += -DKII_PUSH_KEEP_ALIVE_INTERVAL_SECONDS=$(KEEP_ALIVE_INTERVAL)
-endif
-
-ifdef KII_MQTT_USE_PORT_TCP
-	override CFLAGS += -DKII_MQTT_USE_PORT_TCP=$(KII_MQTT_USE_PORT_TCP)
-endif
-
-ifndef FIXED_JSON_TOKEN_NUM
-	JSON_FLAG = -DKII_JSON_FIXED_TOKEN_NUM=128
-else
-	JSON_FLAG = -DKII_JSON_FIXED_TOKEN_NUM=$(FIXED_JSON_TOKEN_NUM)
-endif
-
-ifdef FLEXIBLE_JSON_TOKEN
-	JSON_FLAG =
-endif
-
-override CFLAGS += $(JSON_FLAG)
-
 LIBS = -lssl -lcrypto -lpthread -lkiithingifsdk
-LD_FLAGS = -L.
+LD_FLAGS = -L$(INSTALL_PATH)/lib
 SOURCES = $(wildcard *.c)
 SOURCES += $(wildcard linux-env/*.c)
 TARGET = exampleapp
-INCLUDES = -I../include -I../kii/kii-core -I../kii/kii -I../kii/kii_json/include -I../kii/lib/jsmn -I/usr/local/opt/openssl/include/
+INCLUDES = -I$(INSTALL_PATH)/include
+INCLUDES += -I/usr/local/opt/openssl/include/
 
-
-all: clean sdk $(TARGET) $(DOCTARGET)
+all: clean $(TARGET)
 
 sdk:
-	$(MAKE) -C .. linux "CFLAGS+=$(CFLAGS)"
-	cp ../libkiithingifsdk.so ./
+	touch $(SDK_BUILD_PATH)
+	rm -rf $(SDK_BUILD_PATH)
+	mkdir $(SDK_BUILD_PATH)
+	cd $(SDK_BUILD_PATH) && cmake -DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE) ../../ && make && make DESTDIR=$(SDK_BUILD_PATH) install
 
-$(TARGET):
+$(TARGET): sdk
 	gcc $(CFLAGS) $(SOURCES) $(LIBS) $(LD_FLAGS) $(INCLUDES) -o $@
 
 clean:
-	$(MAKE) -C .. clean
-	rm -f libkiithingifsdk.so
 	touch $(TARGET)
 	rm $(TARGET)
-	rm -rf $(DOCTARGET)
+	touch $(SDK_BUILD_PATH)
+	rm -rf $(SDK_BUILD_PATH)
 
-.PHONY: all clean copy
+.PHONY: all clean sdk

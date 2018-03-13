@@ -20,120 +20,132 @@ These commands retrieve required modules for this SDK.
 ## Build
 
 ```sh
-# make
+$ mkdir build
+$ cd build
+$ make
 ```
 
-This makes libkiithingifsdk.so.
+### Install
 
-## Debug Build
+After the build, you can install SDK libraries by following commands.
+(Assume current directory is build you've created on build.)
+
 ```sh
-# make DEBUG=1
+$ make install
 ```
 
-Standard build for debugging.
+Or if you want to change install location:
 
-- KII\_PUSH\_KEEP\_ALIVE\_INTERVAL\_SECONDS is set to 300 seconds.
-- KII\_JSON\_FIXED\_TOKEN\_NUM is set to 128.
-- Debug option (-g) and Debug log enabled.
-
-
-## Configure KII\_PUSH\_KEEP\_ALIVE\_INTERVAL\_SECONDS
-
-KII\_PUSH\_KEEP\_ALIVE\_INTERVAL\_SECONDS macro is used to manage the Keep Alive
-Time Interval in MQTT.
-By default it is set to 300 seconds in the Makefile.
-To override the value, we provides `KEEP_ALIVE_INTERVAL` variable.
-
-```
-# make KEEP_ALIVE_INTERVAL=600
+```sh
+$ make DESTDIR={path to install} install
 ```
 
+By specifying `DESTDIR`, libraries and headers are installed in {path to install}/usr/local/lib and {path to install}/usr/local/include respectively.
+
+
+### Build Configuration
+
+#### Debug Build
+If you need to enable -g option and debug log output, following command will generate the debug build.
+
+```sh
+$ mkdir build
+$ cd build
+$ cmake -DCMAKE_BUILD_TYPE=DEBUG ../
+$ make
+```
+
+#### Configure MQTT keep-alive interval
+
+Edit CMakeLists.txt and change following line.
+
+```
+SET(CMAKE_C_FLAGS "-DKII_PUSH_KEEP_ALIVE_INTERVAL_SECONDS=300")
+```
+
+Unit is seconds and by default it is set to 300 seconds.
 If 0 is specified, turn off the keep alive mechanism defined in MQTT.
 Setting short period will increase the load of MQTT broker when there is a lot
 of connected devices.
 For details, please refer to the [MQTT spec](http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc385349238).
 
-## Configure KII\_JSON\_FIXED\_TOKEN\_NUM
+#### Configure memory used by JSON parser.
 
-KII\_JSON\_FIXED\_TOKEN\_NUM  macro is used to manage amount memory used to
+Edit CMakeLists.txt and change following line.
+
+```
+SET(CMAKE_C_FLAGS "-DKII_JSON_FIXED_TOKEN_NUM=128")
+```
+
+The number indicates amounts of memory used to
 parse JSON when received it from server.
 Memory is allocated on stack.
-By default it is set to 128 in the Makefile.
-To override the value, we provides `FIXED_JSON_TOKEN_NUM` variable.
-
-```
-# make FIXED_JSON_TOKEN_NUM=256
-```
-
+By default it is set to 128.
 Size of memory allocated by this can be calculated as following.
+
 ```c
 sizeof(kii_json_token_t) * KII_JSON_FIXED_TOKEN_NUM
 ```
-## Dynamic memory allocation for JSON parsing
-If you prefer to dynamica allocation than fixed memory allocation by
-KII\_JSON\_FIXED\_TOKEN\_NUM, You will build sdk with FLEXIBLE\_JSON\_TOKEN
-variable.
 
-```
-# make FLEXIBLE_JSON_TOKEN=1
-```
+#### Dynamic memory allocation for JSON parsing
+If you prefer to dynamic allocation than fixed memory allocation,
+Edit CMakeLists.txt and remove the line specifies `KII_JSON_FIXED_TOKEN_NUM`.
 
-In this case, you need to implement KII\_JSON\_RESOURCE\_CB function and set the
-pointer in kii\_t struct.
+In this case, you need to implement `KII_JSON_RESOURCE_CB` function and set the
+pointer in `kii_t` struct.
 
-If both KII\_JSON\_FIXED\_TOKEN\_NUM and FLEXIBLE\_JSON\_TOKEN are specified,
-KII\_JSON\_FIXED\_TOKEN\_NUM is ignored.
-
-## Connect MQTT server using non-secure connection.
+#### Connect MQTT server using non-secure connection.
 By default SDK connect to a MQTT broker using secure connection(tls).
-If you need to use non-secure connection(tcp) , please set KII\_MQTT\_USE\_PORT\_TCP macro.
+If you need to use non-secure connection(tcp),
+Edit CMakeLists.txt and enable following line.
+(By removing # in the head.)
 
 ```
-# make KII_MQTT_USE_PORT_TCP=1
-```
-
-## Combination of variables
-Only KII\_JSON\_FIXED\_TOKEN\_NUM and FLEXIBLE\_JSON\_TOKEN is exclusive.
-DEBUG, KEEP\_ALIVE\_INTERVAL, KII\_MQTT\_USE\_PORT\_TCP and either KII\_JSON\_FIXED\_TOKEN\_NUM or FLEXIBLE\_JSON\_TOKEN
-can be combined.
-
-ex.)
-
-```
-# make DEBUG=1 KEEP_ALIVE_INTERVAL=3600 KII_MQTT_USE_PORT_TCP=1 FLEXIBLE_JSON_TOKEN=1
+SET(CMAKE_C_FLAGS "-DKII_MQTT_USE_PORT_TCP=1")
 ```
 
 ## How to use
-After the build finished, API Documentation is created under ./doc/html/index.html
 
-## Sample
-linux-sample shows how to implement the client application works in the Thing.
+### Sample
+[linux-sample](./linux-sample) shows how to implement the client application works in the Thing.
 
-## Environment implementations
+### Environment implementations
 
-This SDK requests creating three tasks by task_create_cb_impl callback.  
+SDK requires application to implement callback functions.
+
+#### Socket callback functions:
+
+To communucate with server, socket API implmementation is required.
+Please refer to [linux-sample/sys\_cb\_impl.h](./linux-sample/sys_cb_impl.h)
+and [linux-sample/sys\_cb\_linux.c](./linux-sample/sys_cb_linux.c)
+
+Actual implementations are in [linux-env](./linux-sample/linux-env)
+directory.
+
+#### Task callback functions:
+
+To handle tasks asynchronusly, task implementation is required.
+`pthread` live up to expectation in linux environment and `task` does in RTOS environments.
 
 List of task name symbols.
 
-- KII\_THING\_IF\_TASK\_NAME\_UPDATE\_STATUS
+- `KII_THING_IF_TASK_NAME_UPDATE_STATUS`
 
   The task of sending onboarded status.
 
-- KII\_TASK\_NAME\_RECV\_MSG
+- `KII_TASK_NAME_RECV_MSG`
 
   The task of receiving push messages.
 
-- KII\_TASK\_NAME\_PING\_REQ
+- `KII_TASK_NAME_PING_REQ`
 
   The task of sending ping request.
 
-You'll specify stack size, depth and priority, etc depending on the environment.
-Please check samples for reference.
-For example, [Ti CC3200 environment implementation](./cc3200-sample/freertos_thingsdk_demo/kii_thing_if_environment_cc3200.c).
+In RTOS, You'll specify stack size, depth and priority, etc depending on the environment.
 
 ## Execute tests
 
 ```sh
 # cd tests/small_tests
-# make run
+# make test
 ```

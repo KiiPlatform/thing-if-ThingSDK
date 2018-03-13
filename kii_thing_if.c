@@ -1567,11 +1567,11 @@ kii_bool_t update_thing_type(
     }
 }
 
-#ifdef KII_THING_IF_TEST_BUILD
-
+/**
+ * This function is for testing purpose.
+ * Not visible from applications since the function is not declared in public headers.
+ */
 void test_handle_command(kii_t* kii, char* buffer, size_t buffer_size)
 {
     handle_command(kii, buffer, buffer_size);
 }
-
-#endif /* KII_THING_IF_TEST_BUILD */
