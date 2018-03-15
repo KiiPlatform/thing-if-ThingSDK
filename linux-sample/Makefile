@@ -1,6 +1,6 @@
 SDK_BUILD_PATH=./build
 SDK_PREFIX=usr/local
-INSTALL_PATH=$(BUILD_DIR)/$(SDK_PREFIX)
+INSTALL_PATH=$(SDK_BUILD_PATH)/$(SDK_PREFIX)
 
 CMAKE_BUILD_TYPE = RELEASE
 ifdef DEBUG
@@ -24,7 +24,7 @@ sdk:
 	touch $(SDK_BUILD_PATH)
 	rm -rf $(SDK_BUILD_PATH)
 	mkdir $(SDK_BUILD_PATH)
-	cd $(SDK_BUILD_PATH) && cmake -DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE) ../../ && make && make DESTDIR=$(SDK_BUILD_PATH) install
+	cd $(SDK_BUILD_PATH) && cmake -DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE) ../../ && make && make DESTDIR=. install
 
 $(TARGET): sdk
 	gcc $(CFLAGS) $(SOURCES) $(LIBS) $(LD_FLAGS) $(INCLUDES) -o $@
