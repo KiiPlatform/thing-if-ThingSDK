@@ -6,7 +6,11 @@ DEFAULT_LIBS = -lssl -lcrypto -lpthread
 LIBS = $(DEFAULT_LIBS) -lkiithingifsdk
 THINGIF_LIBS= $(DEFAULT_LIBS)
 LD_FLAG = -L$(INSTALL_PATH)/lib
+# Mac using homebrew
+LD_FLAG += -L/usr/local/opt/openssl/lib
 INCLUDES = -I$(INSTALL_PATH)/include
+# Mac using homebrew
+INCLUDES += -I/usr/local/opt/openssl/include
 
 GTEST_PATH=../../kii/kii-core/gtest-1.7.0
 LIBGTEST=libgtest.a
