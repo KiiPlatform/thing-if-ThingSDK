@@ -22,6 +22,7 @@ These commands retrieve required modules for this SDK.
 ```sh
 $ mkdir build
 $ cd build
+$ cmake ../
 $ make
 ```
 
