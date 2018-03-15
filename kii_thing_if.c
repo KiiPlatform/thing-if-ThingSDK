@@ -644,7 +644,7 @@ static prv_get_key_and_value_t get_key_and_value_at_index(
     item[0].field_copy.string = NULL;
     item[0].result = KII_JSON_FIELD_PARSE_SUCCESS;
     item[1].path = NULL;
-    sprintf(index_str, "/[%lu]", index);
+    sprintf(index_str, "/[%lu]", (unsigned long)index);
 
     switch (prv_kii_thing_if_json_read_object(
                 kii,
