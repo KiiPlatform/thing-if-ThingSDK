@@ -12,10 +12,13 @@ CFLAGS += -Wall -pedantic -pthread
 
 LIBS = -lssl -lcrypto -lpthread -lkiithingifsdk
 LD_FLAGS = -L$(INSTALL_PATH)/lib
+# On Mac using homebrew.
+LD_FLAGS += -L/usr/local/opt/openssl/lib
 SOURCES = $(wildcard *.c)
 SOURCES += $(wildcard linux-env/*.c)
 TARGET = exampleapp
 INCLUDES = -I$(INSTALL_PATH)/include
+# On Mac using homebrew.
 INCLUDES += -I/usr/local/opt/openssl/include/
 
 all: clean $(TARGET)
