@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['error_5fcode',['error_code',['../structkii__thing__if__error__t.html#a075273fe28ba894fdd187c28e24786bf',1,'kii_thing_if_error_t']]]
+  ['delay_5fms_5fcb',['delay_ms_cb',['../structkii__thing__if__system__cb__t.html#a4f12b7ab2d30bec7381dbd309bcad14c',1,'kii_thing_if_system_cb_t']]]
 ];

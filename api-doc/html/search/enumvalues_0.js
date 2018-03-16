@@ -1,5 +1,14 @@
 var searchData=
 [
+  ['kii_5fhttp_5ferror_5finsufficient_5fbuffer',['KII_HTTP_ERROR_INSUFFICIENT_BUFFER',['../kii__socket__callback_8h.html#aa87a35e9bca98f3152e2cc21a785d557aa9c9968a4a99a188752e3e178af11e57',1,'kii_socket_callback.h']]],
+  ['kii_5fhttp_5ferror_5finvalid_5fresponse',['KII_HTTP_ERROR_INVALID_RESPONSE',['../kii__socket__callback_8h.html#aa87a35e9bca98f3152e2cc21a785d557ab88b33d76729f21ef5b72a44d1dabd69',1,'kii_socket_callback.h']]],
+  ['kii_5fhttp_5ferror_5fnone',['KII_HTTP_ERROR_NONE',['../kii__socket__callback_8h.html#aa87a35e9bca98f3152e2cc21a785d557a18425825f77fe46ee38ba3efbea61586',1,'kii_socket_callback.h']]],
+  ['kii_5fhttp_5ferror_5fsocket',['KII_HTTP_ERROR_SOCKET',['../kii__socket__callback_8h.html#aa87a35e9bca98f3152e2cc21a785d557a743d5f599a6137c824e32ade4cc5d9b8',1,'kii_socket_callback.h']]],
+  ['kii_5fsocketc_5fagain',['KII_SOCKETC_AGAIN',['../kii__socket__callback_8h.html#a95b388269576d075bb8d285cc712ffc3a9d34323b5d3e47457cd5fdd0b647e4c2',1,'kii_socket_callback.h']]],
+  ['kii_5fsocketc_5ffail',['KII_SOCKETC_FAIL',['../kii__socket__callback_8h.html#a95b388269576d075bb8d285cc712ffc3adda80e42335cc8fdb4f1d063ba229209',1,'kii_socket_callback.h']]],
+  ['kii_5fsocketc_5fok',['KII_SOCKETC_OK',['../kii__socket__callback_8h.html#a95b388269576d075bb8d285cc712ffc3aebfa41c1053b5a661616f29133c1f3a4',1,'kii_socket_callback.h']]],
+  ['kii_5ftaskc_5ffail',['KII_TASKC_FAIL',['../kii__task__callback_8h.html#a8cb8ae6e0e48ea307aa8481d5e85feb0a873e2f05f00364dfdebc066aae79a298',1,'kii_task_callback.h']]],
+  ['kii_5ftaskc_5fok',['KII_TASKC_OK',['../kii__task__callback_8h.html#a8cb8ae6e0e48ea307aa8481d5e85feb0ae483ba1734319b97e8a925f8f66006be',1,'kii_task_callback.h']]],
   ['kii_5fthing_5fif_5ferror_5fhttp',['KII_THING_IF_ERROR_HTTP',['../kii__thing__if_8h.html#a9ec7e6180de7c943c802ab0e1e7aca40a95e5a2394aca7b3de5da7b7989249ee0',1,'kii_thing_if.h']]],
   ['kii_5fthing_5fif_5ferror_5finsufficient_5farg_5fbuffer',['KII_THING_IF_ERROR_INSUFFICIENT_ARG_BUFFER',['../kii__thing__if_8h.html#a9ec7e6180de7c943c802ab0e1e7aca40a2d9a43658d37993217575a8c78b521eb',1,'kii_thing_if.h']]],
   ['kii_5fthing_5fif_5ferror_5finsufficient_5fbuffer',['KII_THING_IF_ERROR_INSUFFICIENT_BUFFER',['../kii__thing__if_8h.html#a9ec7e6180de7c943c802ab0e1e7aca40a15b5f071c905210ca99cbe5d4f409f48',1,'kii_thing_if.h']]],

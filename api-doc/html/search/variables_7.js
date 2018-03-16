@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['state',['state',['../structkii__thing__if__t.html#abd30f9320add18623218f35d9c5c9355',1,'kii_thing_if_t']]],
-  ['state_5fhandler',['state_handler',['../structkii__thing__if__command__handler__resource__t.html#a861c087c549ec402ee374bb111f9575d',1,'kii_thing_if_command_handler_resource_t::state_handler()'],['../structkii__thing__if__state__updater__resource__t.html#a700766cfc47373ec8ae5054294effc7c',1,'kii_thing_if_state_updater_resource_t::state_handler()']]],
-  ['state_5fhandler_5ffor_5fcommand_5freaction',['state_handler_for_command_reaction',['../structkii__thing__if__t.html#af2ba105486309077b1c5b31353d14010',1,'kii_thing_if_t']]],
-  ['state_5fhandler_5ffor_5fperiod',['state_handler_for_period',['../structkii__thing__if__t.html#a2304274f70f9b1113b9a13fda687bf82',1,'kii_thing_if_t']]],
-  ['state_5fupdate_5fperiod',['state_update_period',['../structkii__thing__if__t.html#a65b8a8e6fcb3208b6fa70090032433fb',1,'kii_thing_if_t']]],
-  ['state_5fupdater',['state_updater',['../structkii__thing__if__t.html#a9fc2ee6f5e5b0ff33dd908537c2515ee',1,'kii_thing_if_t']]]
+  ['mqtt_5fbuffer',['mqtt_buffer',['../structkii__thing__if__command__handler__resource__t.html#a55ac18791184cdd3017e17aa33b2f145',1,'kii_thing_if_command_handler_resource_t']]],
+  ['mqtt_5fbuffer_5fsize',['mqtt_buffer_size',['../structkii__thing__if__command__handler__resource__t.html#a963747dbc3b1922968683ffd0043e399',1,'kii_thing_if_command_handler_resource_t']]],
+  ['mqtt_5fsocket_5fclose_5fcb',['mqtt_socket_close_cb',['../structkii__thing__if__system__cb__t.html#a5cd1aaefa5d290ac1f19c4e69ad8b23e',1,'kii_thing_if_system_cb_t']]],
+  ['mqtt_5fsocket_5fconnect_5fcb',['mqtt_socket_connect_cb',['../structkii__thing__if__system__cb__t.html#af08557895af72035a54ff50e471beb3e',1,'kii_thing_if_system_cb_t']]],
+  ['mqtt_5fsocket_5frecv_5fcb',['mqtt_socket_recv_cb',['../structkii__thing__if__system__cb__t.html#a4974f201b8226cc0a5723c9d228a5e6e',1,'kii_thing_if_system_cb_t']]],
+  ['mqtt_5fsocket_5fsend_5fcb',['mqtt_socket_send_cb',['../structkii__thing__if__system__cb__t.html#af5abf111dce0e6b2a69834e255d15fa1',1,'kii_thing_if_system_cb_t']]]
 ];

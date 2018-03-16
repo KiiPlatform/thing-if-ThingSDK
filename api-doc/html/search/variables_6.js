@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['period',['period',['../structkii__thing__if__state__updater__resource__t.html#a81bb9f9957a9383328951d84d031e7a2',1,'kii_thing_if_state_updater_resource_t']]]
+  ['log_5fcb',['log_cb',['../structkii__thing__if__system__cb__t.html#ab21de089aeb3214291a2514f93e046b3',1,'kii_thing_if_system_cb_t']]]
 ];

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['delay_5fms_5fcb_5fimpl',['delay_ms_cb_impl',['../kii__thing__if__environment__impl_8h.html#accad6504432dead8edab022c93480daf',1,'kii_thing_if_environment_impl.h']]]
+  ['get_5ffirmware_5fversion',['get_firmware_version',['../kii__thing__if_8h.html#a151021f4006e5dcf63757aad90fb6138',1,'kii_thing_if.h']]],
+  ['get_5fthing_5ftype',['get_thing_type',['../kii__thing__if_8h.html#acfedcedd3edbe60dd3b8c84e2cfc4e6d',1,'kii_thing_if.h']]]
 ];

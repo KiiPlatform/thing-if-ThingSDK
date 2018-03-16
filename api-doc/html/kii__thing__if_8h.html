@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>thing-if SDK: kii_thing_if.h File Reference</title>
+<title>thing-if SDK: include/kii_thing_if.h File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -77,6 +77,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li>  </ul>
+</div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
@@ -100,6 +104,8 @@ Data Structures</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkii__thing__if__command__handler__resource__t.html">kii_thing_if_command_handler_resource_t</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkii__thing__if__state__updater__resource__t.html">kii_thing_if_state_updater_resource_t</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkii__thing__if__system__cb__t.html">kii_thing_if_system_cb_t</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkii__thing__if__t.html">kii_thing_if_t</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -134,6 +140,9 @@ Typedefs</h2></td></tr>
 <tr class="memitem:af8d4493927ac3ece4225af0b84863625"><td class="memItemLeft" align="right" valign="top">typedef struct <br class="typebreak"/>
 <a class="el" href="structkii__thing__if__state__updater__resource__t.html">kii_thing_if_state_updater_resource_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kii__thing__if_8h.html#af8d4493927ac3ece4225af0b84863625">kii_thing_if_state_updater_resource_t</a></td></tr>
 <tr class="separator:af8d4493927ac3ece4225af0b84863625"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a668c6f6265e24a81ee5dfd456576c53d"><td class="memItemLeft" align="right" valign="top">typedef struct <br class="typebreak"/>
+<a class="el" href="structkii__thing__if__system__cb__t.html">kii_thing_if_system_cb_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kii__thing__if_8h.html#a668c6f6265e24a81ee5dfd456576c53d">kii_thing_if_system_cb_t</a></td></tr>
+<tr class="separator:a668c6f6265e24a81ee5dfd456576c53d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac6c8c3dded3493acca81cfeb87e2480"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structkii__thing__if__t.html">kii_thing_if_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kii__thing__if_8h.html#aac6c8c3dded3493acca81cfeb87e2480">kii_thing_if_t</a></td></tr>
 <tr class="separator:aac6c8c3dded3493acca81cfeb87e2480"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -158,16 +167,16 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a93b07877c04d3710f578ef549dd32bf0"><td class="memItemLeft" align="right" valign="top">kii_bool_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kii__thing__if_8h.html#a93b07877c04d3710f578ef549dd32bf0">init_kii_thing_if</a> (<a class="el" href="structkii__thing__if__t.html">kii_thing_if_t</a> *kii_thing_if, const char *app_id, const char *app_key, const char *app_host, <a class="el" href="structkii__thing__if__command__handler__resource__t.html">kii_thing_if_command_handler_resource_t</a> *command_handler_resource, <a class="el" href="structkii__thing__if__state__updater__resource__t.html">kii_thing_if_state_updater_resource_t</a> *state_updater_resource, KII_JSON_RESOURCE_CB resource_cb)</td></tr>
-<tr class="separator:a93b07877c04d3710f578ef549dd32bf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f95e7075266c027db498546244cdb2d"><td class="memItemLeft" align="right" valign="top">kii_bool_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kii__thing__if_8h.html#a7f95e7075266c027db498546244cdb2d">init_kii_thing_if</a> (<a class="el" href="structkii__thing__if__t.html">kii_thing_if_t</a> *kii_thing_if, const char *app_id, const char *app_key, const char *app_host, <a class="el" href="structkii__thing__if__command__handler__resource__t.html">kii_thing_if_command_handler_resource_t</a> *command_handler_resource, <a class="el" href="structkii__thing__if__state__updater__resource__t.html">kii_thing_if_state_updater_resource_t</a> *state_updater_resource, <a class="el" href="structkii__thing__if__system__cb__t.html">kii_thing_if_system_cb_t</a> *system_cb, KII_JSON_RESOURCE_CB resource_cb)</td></tr>
+<tr class="separator:a7f95e7075266c027db498546244cdb2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a86bf92b5e6d9b66fb578d089f4c0f4"><td class="memItemLeft" align="right" valign="top">kii_bool_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kii__thing__if_8h.html#a0a86bf92b5e6d9b66fb578d089f4c0f4">start</a> (<a class="el" href="structkii__thing__if__t.html">kii_thing_if_t</a> *kii_thing_if)</td></tr>
 <tr class="separator:a0a86bf92b5e6d9b66fb578d089f4c0f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a38f9d2c0cad2db25334006577dc176b0"><td class="memItemLeft" align="right" valign="top">kii_bool_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kii__thing__if_8h.html#a38f9d2c0cad2db25334006577dc176b0">onboard_with_vendor_thing_id</a> (<a class="el" href="structkii__thing__if__t.html">kii_thing_if_t</a> *kii_thing_if, const char *vendor_thing_id, const char *password, const char *thing_type, const char *firmware_version, const char *layout_position, const char *thing_properties, <a class="el" href="structkii__thing__if__error__t.html">kii_thing_if_error_t</a> *error)</td></tr>
 <tr class="separator:a38f9d2c0cad2db25334006577dc176b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d4a033a09fe286f7ed63ca17d4edd36"><td class="memItemLeft" align="right" valign="top">kii_bool_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kii__thing__if_8h.html#a1d4a033a09fe286f7ed63ca17d4edd36">onboard_with_thing_id</a> (<a class="el" href="structkii__thing__if__t.html">kii_thing_if_t</a> *kii_thing_if, const char *thing_id, const char *password, const char *thing_type, const char *firmware_version, const char *layout_position, const char *thing_properties, <a class="el" href="structkii__thing__if__error__t.html">kii_thing_if_error_t</a> *error)</td></tr>
 <tr class="separator:a1d4a033a09fe286f7ed63ca17d4edd36"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af8fabf339c66d35e7046ae445fa95cd9"><td class="memItemLeft" align="right" valign="top">kii_bool_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kii__thing__if_8h.html#af8fabf339c66d35e7046ae445fa95cd9">init_kii_thing_if_with_onboarded_thing</a> (<a class="el" href="structkii__thing__if__t.html">kii_thing_if_t</a> *kii_thing_if, const char *app_id, const char *app_key, const char *app_host, const char *thing_id, const char *access_token, <a class="el" href="structkii__thing__if__command__handler__resource__t.html">kii_thing_if_command_handler_resource_t</a> *command_handler_resource, <a class="el" href="structkii__thing__if__state__updater__resource__t.html">kii_thing_if_state_updater_resource_t</a> *state_updater_resource, KII_JSON_RESOURCE_CB resource_cb)</td></tr>
-<tr class="separator:af8fabf339c66d35e7046ae445fa95cd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa71f4f48928fe8f5c9e9eb612ec0b3e"><td class="memItemLeft" align="right" valign="top">kii_bool_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kii__thing__if_8h.html#afa71f4f48928fe8f5c9e9eb612ec0b3e">init_kii_thing_if_with_onboarded_thing</a> (<a class="el" href="structkii__thing__if__t.html">kii_thing_if_t</a> *kii_thing_if, const char *app_id, const char *app_key, const char *app_host, const char *thing_id, const char *access_token, <a class="el" href="structkii__thing__if__command__handler__resource__t.html">kii_thing_if_command_handler_resource_t</a> *command_handler_resource, <a class="el" href="structkii__thing__if__state__updater__resource__t.html">kii_thing_if_state_updater_resource_t</a> *state_updater_resource, <a class="el" href="structkii__thing__if__system__cb__t.html">kii_thing_if_system_cb_t</a> *system_cb, KII_JSON_RESOURCE_CB resource_cb)</td></tr>
+<tr class="separator:afa71f4f48928fe8f5c9e9eb612ec0b3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a656cf717ef6898edc178cfa2ab309d9d"><td class="memItemLeft" align="right" valign="top">kii_bool_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kii__thing__if_8h.html#a656cf717ef6898edc178cfa2ab309d9d">update_firmware_version</a> (<a class="el" href="structkii__thing__if__t.html">kii_thing_if_t</a> *kii_thing_if, const char *firmware_version, <a class="el" href="structkii__thing__if__error__t.html">kii_thing_if_error_t</a> *error)</td></tr>
 <tr class="separator:a656cf717ef6898edc178cfa2ab309d9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a151021f4006e5dcf63757aad90fb6138"><td class="memItemLeft" align="right" valign="top">kii_bool_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kii__thing__if_8h.html#a151021f4006e5dcf63757aad90fb6138">get_firmware_version</a> (<a class="el" href="structkii__thing__if__t.html">kii_thing_if_t</a> *kii_thing_if, char *firmware_version, size_t firmware_version_len, <a class="el" href="structkii__thing__if__error__t.html">kii_thing_if_error_t</a> *error)</td></tr>
@@ -402,6 +411,19 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a668c6f6265e24a81ee5dfd456576c53d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structkii__thing__if__system__cb__t.html">kii_thing_if_system_cb_t</a>  <a class="el" href="structkii__thing__if__system__cb__t.html">kii_thing_if_system_cb_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>System callback function pointers. </p>
+
+</div>
+</div>
 <a class="anchor" id="aac6c8c3dded3493acca81cfeb87e2480"></a>
 <div class="memitem">
 <div class="memproto">
@@ -539,7 +561,7 @@ Functions</h2></td></tr>
 <ul>
 <li><a class="el" href="kii__thing__if_8h.html#a38f9d2c0cad2db25334006577dc176b0">onboard_with_vendor_thing_id</a>,</li>
 <li><a class="el" href="kii__thing__if_8h.html#a1d4a033a09fe286f7ed63ca17d4edd36">onboard_with_thing_id</a></li>
-<li><a class="el" href="kii__thing__if_8h.html#af8fabf339c66d35e7046ae445fa95cd9">init_kii_thing_if_with_onboarded_thing</a></li>
+<li><a class="el" href="kii__thing__if_8h.html#afa71f4f48928fe8f5c9e9eb612ec0b3e">init_kii_thing_if_with_onboarded_thing</a></li>
 </ul>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -594,7 +616,7 @@ Functions</h2></td></tr>
 <ul>
 <li><a class="el" href="kii__thing__if_8h.html#a38f9d2c0cad2db25334006577dc176b0">onboard_with_vendor_thing_id</a>,</li>
 <li><a class="el" href="kii__thing__if_8h.html#a1d4a033a09fe286f7ed63ca17d4edd36">onboard_with_thing_id</a></li>
-<li><a class="el" href="kii__thing__if_8h.html#af8fabf339c66d35e7046ae445fa95cd9">init_kii_thing_if_with_onboarded_thing</a></li>
+<li><a class="el" href="kii__thing__if_8h.html#afa71f4f48928fe8f5c9e9eb612ec0b3e">init_kii_thing_if_with_onboarded_thing</a></li>
 </ul>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -609,7 +631,7 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a93b07877c04d3710f578ef549dd32bf0"></a>
+<a class="anchor" id="a7f95e7075266c027db498546244cdb2d"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -652,6 +674,12 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="structkii__thing__if__system__cb__t.html">kii_thing_if_system_cb_t</a> *&#160;</td>
+          <td class="paramname"><em>system_cb</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">KII_JSON_RESOURCE_CB&#160;</td>
           <td class="paramname"><em>resource_cb</em>&#160;</td>
         </tr>
@@ -681,7 +709,7 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="af8fabf339c66d35e7046ae445fa95cd9"></a>
+<a class="anchor" id="afa71f4f48928fe8f5c9e9eb612ec0b3e"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -732,6 +760,12 @@ Functions</h2></td></tr>
           <td></td>
           <td class="paramtype"><a class="el" href="structkii__thing__if__state__updater__resource__t.html">kii_thing_if_state_updater_resource_t</a> *&#160;</td>
           <td class="paramname"><em>state_updater_resource</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structkii__thing__if__system__cb__t.html">kii_thing_if_system_cb_t</a> *&#160;</td>
+          <td class="paramname"><em>system_cb</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -940,7 +974,7 @@ Functions</h2></td></tr>
 <ul>
 <li><a class="el" href="kii__thing__if_8h.html#a38f9d2c0cad2db25334006577dc176b0">onboard_with_vendor_thing_id</a>,</li>
 <li><a class="el" href="kii__thing__if_8h.html#a1d4a033a09fe286f7ed63ca17d4edd36">onboard_with_thing_id</a></li>
-<li><a class="el" href="kii__thing__if_8h.html#af8fabf339c66d35e7046ae445fa95cd9">init_kii_thing_if_with_onboarded_thing</a></li>
+<li><a class="el" href="kii__thing__if_8h.html#afa71f4f48928fe8f5c9e9eb612ec0b3e">init_kii_thing_if_with_onboarded_thing</a></li>
 </ul>
 <p>After this functions succeeded, <a class="el" href="structkii__thing__if__t.html#abd30f9320add18623218f35d9c5c9355">kii_thing_if_t::state</a> becomes <a class="el" href="kii__thing__if_8h.html#aabb1d9fec38394d0b2aca0270366a41da11ae937d4ae09fc4564f9674c88351bd">KII_THING_IF_STATE_STARTED</a>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -987,7 +1021,7 @@ Functions</h2></td></tr>
 <ul>
 <li><a class="el" href="kii__thing__if_8h.html#a38f9d2c0cad2db25334006577dc176b0">onboard_with_vendor_thing_id</a>,</li>
 <li><a class="el" href="kii__thing__if_8h.html#a1d4a033a09fe286f7ed63ca17d4edd36">onboard_with_thing_id</a></li>
-<li><a class="el" href="kii__thing__if_8h.html#af8fabf339c66d35e7046ae445fa95cd9">init_kii_thing_if_with_onboarded_thing</a></li>
+<li><a class="el" href="kii__thing__if_8h.html#afa71f4f48928fe8f5c9e9eb612ec0b3e">init_kii_thing_if_with_onboarded_thing</a></li>
 </ul>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -1035,7 +1069,7 @@ Functions</h2></td></tr>
 <ul>
 <li><a class="el" href="kii__thing__if_8h.html#a38f9d2c0cad2db25334006577dc176b0">onboard_with_vendor_thing_id</a>,</li>
 <li><a class="el" href="kii__thing__if_8h.html#a1d4a033a09fe286f7ed63ca17d4edd36">onboard_with_thing_id</a></li>
-<li><a class="el" href="kii__thing__if_8h.html#af8fabf339c66d35e7046ae445fa95cd9">init_kii_thing_if_with_onboarded_thing</a></li>
+<li><a class="el" href="kii__thing__if_8h.html#afa71f4f48928fe8f5c9e9eb612ec0b3e">init_kii_thing_if_with_onboarded_thing</a></li>
 </ul>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -1052,7 +1086,7 @@ Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Feb 8 2018 10:53:56 for thing-if SDK by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Mar 16 2018 02:28:43 for thing-if SDK by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

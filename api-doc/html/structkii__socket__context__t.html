@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>thing-if SDK: kii_thing_if_state_updater_resource_t Struct Reference</title>
+<title>thing-if SDK: kii_socket_context_t Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -83,82 +83,63 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div class="summary">
 <a href="#pub-attribs">Data Fields</a>  </div>
   <div class="headertitle">
-<div class="title">kii_thing_if_state_updater_resource_t Struct Reference</div>  </div>
+<div class="title">kii_socket_context_t Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p><code>#include &lt;<a class="el" href="kii__thing__if_8h_source.html">kii_thing_if.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="kii__socket__callback_8h_source.html">kii_socket_callback.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
-<tr class="memitem:ab2cf009148da7ccd3203f82cb8aa8f63"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkii__thing__if__state__updater__resource__t.html#ab2cf009148da7ccd3203f82cb8aa8f63">buffer</a></td></tr>
-<tr class="separator:ab2cf009148da7ccd3203f82cb8aa8f63"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0545a33717df025261d0cb69c7055fa4"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkii__thing__if__state__updater__resource__t.html#a0545a33717df025261d0cb69c7055fa4">buffer_size</a></td></tr>
-<tr class="separator:a0545a33717df025261d0cb69c7055fa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a81bb9f9957a9383328951d84d031e7a2"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkii__thing__if__state__updater__resource__t.html#a81bb9f9957a9383328951d84d031e7a2">period</a></td></tr>
-<tr class="separator:a81bb9f9957a9383328951d84d031e7a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a700766cfc47373ec8ae5054294effc7c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kii__thing__if_8h.html#af60b389f725ebf3a0be22a502dd8d7f9">KII_THING_IF_STATE_HANDLER</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkii__thing__if__state__updater__resource__t.html#a700766cfc47373ec8ae5054294effc7c">state_handler</a></td></tr>
-<tr class="separator:a700766cfc47373ec8ae5054294effc7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d3c880a164cb895a60cae704d413427"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkii__socket__context__t.html#a5d3c880a164cb895a60cae704d413427">app_context</a></td></tr>
+<tr class="separator:a5d3c880a164cb895a60cae704d413427"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8820b13f4eb500e40067558ef4e379b9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkii__socket__context__t.html#a8820b13f4eb500e40067558ef4e379b9">socket</a></td></tr>
+<tr class="separator:a8820b13f4eb500e40067558ef4e379b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a460f21073942791f5665acc599b3caae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kii__socket__callback_8h.html#aa87a35e9bca98f3152e2cc21a785d557">kii_http_error_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkii__socket__context__t.html#a460f21073942791f5665acc599b3caae">http_error</a></td></tr>
+<tr class="separator:a460f21073942791f5665acc599b3caae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Resource for state updater. Invocation of <a class="el" href="structkii__thing__if__state__updater__resource__t.html#a700766cfc47373ec8ae5054294effc7c">state_handler</a> callback inside this struct is serialized since it called from single task/thraed.</p>
-<p>However, <a class="el" href="structkii__thing__if__state__updater__resource__t.html#a700766cfc47373ec8ae5054294effc7c">state_handler</a> and callbacks inside <a class="el" href="structkii__thing__if__command__handler__resource__t.html">kii_thing_if_command_handler_resource_t</a> would be invoked from different task/thread. That means the invocation could be concurrent.</p>
-<p>If you share the resources(memory, file, etc.) among the callbacks called concurrently, be aware for it and avoid deadlock when you implement synchronization for the resources. </p>
-</div><h2 class="groupheader">Field Documentation</h2>
-<a class="anchor" id="ab2cf009148da7ccd3203f82cb8aa8f63"></a>
+<h2 class="groupheader">Field Documentation</h2>
+<a class="anchor" id="a5d3c880a164cb895a60cae704d413427"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char* kii_thing_if_state_updater_resource_t::buffer</td>
+          <td class="memname">void* kii_socket_context_t::app_context</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>HTTP request and response buffer for state updater. </p>
+<p>Application specific context object. Used by socket callback implementations. </p>
 
 </div>
 </div>
-<a class="anchor" id="a0545a33717df025261d0cb69c7055fa4"></a>
+<a class="anchor" id="a460f21073942791f5665acc599b3caae"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">size_t kii_thing_if_state_updater_resource_t::buffer_size</td>
+          <td class="memname"><a class="el" href="kii__socket__callback_8h.html#aa87a35e9bca98f3152e2cc21a785d557">kii_http_error_t</a> kii_socket_context_t::http_error</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>HTTP request and response buffer size for state updater. </p>
+<p>HTTP client error. </p>
 
 </div>
 </div>
-<a class="anchor" id="a81bb9f9957a9383328951d84d031e7a2"></a>
+<a class="anchor" id="a8820b13f4eb500e40067558ef4e379b9"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int kii_thing_if_state_updater_resource_t::period</td>
+          <td class="memname">int kii_socket_context_t::socket</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>the period of updating state in seconds. </p>
-
-</div>
-</div>
-<a class="anchor" id="a700766cfc47373ec8ae5054294effc7c"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="kii__thing__if_8h.html#af60b389f725ebf3a0be22a502dd8d7f9">KII_THING_IF_STATE_HANDLER</a> kii_thing_if_state_updater_resource_t::state_handler</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>callback function to write thing state. called in every <a class="el" href="structkii__thing__if__state__updater__resource__t.html#a81bb9f9957a9383328951d84d031e7a2">period</a>. </p>
+<p>Application specific socket. Used by socket callback implementations. </p>
 
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li>include/<a class="el" href="kii__thing__if_8h_source.html">kii_thing_if.h</a></li>
+<li>kii/kii-core/<a class="el" href="kii__socket__callback_8h_source.html">kii_socket_callback.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

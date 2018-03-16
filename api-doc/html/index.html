@@ -91,78 +91,64 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>```</p>
 <p>These commands retrieve required modules for this SDK.</p>
 <h2>Build</h2>
-<p>```sh </p>
-<h1>make</h1>
-<p>```</p>
-<p>This makes libkiithingifsdk.so.</p>
-<h2>Debug Build</h2>
-<p>```sh </p>
-<h1>make DEBUG=1</h1>
-<p>```</p>
-<p>Standard build for debugging.</p>
-<ul>
-<li>KII_PUSH_KEEP_ALIVE_INTERVAL_SECONDS is set to 300 seconds.</li>
-<li>KII_JSON_FIXED_TOKEN_NUM is set to 128.</li>
-<li>Debug option (-g) and Debug log enabled.</li>
-</ul>
-<h2>Configure KII_PUSH_KEEP_ALIVE_INTERVAL_SECONDS</h2>
-<p>KII_PUSH_KEEP_ALIVE_INTERVAL_SECONDS macro is used to manage the Keep Alive Time Interval in MQTT. By default it is set to 300 seconds in the Makefile. To override the value, we provides <code>KEEP_ALIVE_INTERVAL</code> variable.</p>
-<p>``` </p>
-<h1>make KEEP_ALIVE_INTERVAL=600</h1>
-<p>```</p>
-<p>If 0 is specified, turn off the keep alive mechanism defined in MQTT. Setting short period will increase the load of MQTT broker when there is a lot of connected devices. For details, please refer to the <a href="http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc385349238">MQTT spec</a>.</p>
-<h2>Configure KII_JSON_FIXED_TOKEN_NUM</h2>
-<p>KII_JSON_FIXED_TOKEN_NUM macro is used to manage amount memory used to parse JSON when received it from server. Memory is allocated on stack. By default it is set to 128 in the Makefile. To override the value, we provides <code>FIXED_JSON_TOKEN_NUM</code> variable.</p>
-<p>``` </p>
-<h1>make FIXED_JSON_TOKEN_NUM=256</h1>
-<p>```</p>
-<p>Size of memory allocated by this can be calculated as following. ```c sizeof(kii_json_token_t) * KII_JSON_FIXED_TOKEN_NUM ``` </p>
-<h2>Dynamic memory allocation for JSON parsing</h2>
-<p>If you prefer to dynamica allocation than fixed memory allocation by KII_JSON_FIXED_TOKEN_NUM, You will build sdk with FLEXIBLE_JSON_TOKEN variable.</p>
-<p>``` </p>
-<h1>make FLEXIBLE_JSON_TOKEN=1</h1>
-<p>```</p>
-<p>In this case, you need to implement KII_JSON_RESOURCE_CB function and set the pointer in kii_t struct.</p>
-<p>If both KII_JSON_FIXED_TOKEN_NUM and FLEXIBLE_JSON_TOKEN are specified, KII_JSON_FIXED_TOKEN_NUM is ignored.</p>
-<h2>Connect MQTT server using non-secure connection.</h2>
-<p>By default SDK connect to a MQTT broker using secure connection(tls). If you need to use non-secure connection(tcp) , please set KII_MQTT_USE_PORT_TCP macro.</p>
-<p>``` </p>
-<h1>make KII_MQTT_USE_PORT_TCP=1</h1>
-<p>```</p>
-<h2>Combination of variables</h2>
-<p>Only KII_JSON_FIXED_TOKEN_NUM and FLEXIBLE_JSON_TOKEN is exclusive. DEBUG, KEEP_ALIVE_INTERVAL, KII_MQTT_USE_PORT_TCP and either KII_JSON_FIXED_TOKEN_NUM or FLEXIBLE_JSON_TOKEN can be combined.</p>
-<p>ex.)</p>
-<p>``` </p>
-<h1>make DEBUG=1 KEEP_ALIVE_INTERVAL=3600 KII_MQTT_USE_PORT_TCP=1 FLEXIBLE_JSON_TOKEN=1</h1>
-<p>```</p>
+<p>```sh $ mkdir build $ cd build $ cmake ../ $ make ```</p>
+<h3>Install</h3>
+<p>After the build, you can install SDK libraries by following commands. (Assume current directory is build you've created on build.)</p>
+<p>```sh $ make install ```</p>
+<p>Or if you want to change install location:</p>
+<p>```sh $ make DESTDIR={path to install} install ```</p>
+<p>By specifying <code>DESTDIR</code>, libraries and headers are installed in {path to install}/usr/local/lib and {path to install}/usr/local/include respectively.</p>
+<h3>Build Configuration</h3>
+<h4>Debug Build</h4>
+<p>If you need to enable -g option and debug log output, following command will generate the debug build.</p>
+<p>```sh $ mkdir build $ cd build $ cmake -DCMAKE_BUILD_TYPE=DEBUG ../ $ make ```</p>
+<h4>Configure MQTT keep-alive interval</h4>
+<p>Edit CMakeLists.txt and change following line.</p>
+<p>``` SET(CMAKE_C_FLAGS "-DKII_PUSH_KEEP_ALIVE_INTERVAL_SECONDS=300") ```</p>
+<p>Unit is seconds and by default it is set to 300 seconds. If 0 is specified, turn off the keep alive mechanism defined in MQTT. Setting short period will increase the load of MQTT broker when there is a lot of connected devices. For details, please refer to the <a href="http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc385349238">MQTT spec</a>.</p>
+<h4>Configure memory used by JSON parser.</h4>
+<p>Edit CMakeLists.txt and change following line.</p>
+<p>``` SET(CMAKE_C_FLAGS "-DKII_JSON_FIXED_TOKEN_NUM=128") ```</p>
+<p>The number indicates amounts of memory used to parse JSON when received it from server. Memory is allocated on stack. By default it is set to 128. Size of memory allocated by this can be calculated as following.</p>
+<p>```c sizeof(kii_json_token_t) * KII_JSON_FIXED_TOKEN_NUM ```</p>
+<h4>Dynamic memory allocation for JSON parsing</h4>
+<p>If you prefer to dynamic allocation than fixed memory allocation, Edit CMakeLists.txt and remove the line specifies <code>KII_JSON_FIXED_TOKEN_NUM</code>.</p>
+<p>In this case, you need to implement <code>KII_JSON_RESOURCE_CB</code> function and set the pointer in <code>kii_t</code> struct.</p>
+<h4>Connect MQTT server using non-secure connection.</h4>
+<p>By default SDK connect to a MQTT broker using secure connection(tls). If you need to use non-secure connection(tcp), Edit CMakeLists.txt and enable following line. (By removing # in the head.)</p>
+<p>``` SET(CMAKE_C_FLAGS "-DKII_MQTT_USE_PORT_TCP=1") ```</p>
 <h2>How to use</h2>
-<p>After the build finished, API Documentation is created under ./doc/html/index.html</p>
-<h2>Sample</h2>
-<p>linux-sample shows how to implement the client application works in the Thing.</p>
-<h2>Environment implementations</h2>
-<p>This SDK requests creating three tasks by task_create_cb_impl callback.</p>
+<h3>Sample</h3>
+<p><a href="./linux-sample">linux-sample</a> shows how to implement the client application works in the Thing.</p>
+<h3>Environment implementations</h3>
+<p>SDK requires application to implement callback functions.</p>
+<h4>Socket callback functions:</h4>
+<p>To communucate with server, socket API implmementation is required. Please refer to <a href="./linux-sample/sys_cb_impl.h">linux-sample/sys\_cb\_impl.h</a> and <a href="./linux-sample/sys_cb_linux.c">linux-sample/sys\_cb\_linux.c</a></p>
+<p>Actual implementations are in <a href="./linux-sample/linux-env">linux-env</a> directory.</p>
+<h4>Task callback functions:</h4>
+<p>To handle tasks asynchronusly, task implementation is required. <code>pthread</code> live up to expectation in linux environment and <code>task</code> does in RTOS environments.</p>
 <p>List of task name symbols.</p>
 <ul>
-<li><p class="startli">KII_THING_IF_TASK_NAME_UPDATE_STATUS</p>
+<li><p class="startli"><code>KII_THING_IF_TASK_NAME_UPDATE_STATUS</code></p>
 <p class="startli">The task of sending onboarded status.</p>
 </li>
-<li><p class="startli">KII_TASK_NAME_RECV_MSG</p>
+<li><p class="startli"><code>KII_TASK_NAME_RECV_MSG</code></p>
 <p class="startli">The task of receiving push messages.</p>
 </li>
-<li><p class="startli">KII_TASK_NAME_PING_REQ</p>
+<li><p class="startli"><code>KII_TASK_NAME_PING_REQ</code></p>
 <p class="startli">The task of sending ping request.</p>
 </li>
 </ul>
-<p>You'll specify stack size, depth and priority, etc depending on the environment. Please check samples for reference. For example, <a href="./cc3200-sample/freertos_thingsdk_demo/kii_thing_if_environment_cc3200.c">Ti CC3200 environment implementation</a>.</p>
+<p>In RTOS, You'll specify stack size, depth and priority, etc depending on the environment.</p>
 <h2>Execute tests</h2>
 <p>```sh </p>
 <h1>cd tests/small_tests</h1>
-<h1>make run</h1>
+<h1>make test</h1>
 <p>``` </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Feb 8 2018 10:53:56 for thing-if SDK by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Mar 16 2018 02:28:43 for thing-if SDK by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

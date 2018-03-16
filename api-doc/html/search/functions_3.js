@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['logger_5fcb_5fimpl',['logger_cb_impl',['../kii__thing__if__environment__impl_8h.html#a8a964959030944fdb5a1200613b0caef',1,'kii_thing_if_environment_impl.h']]]
+  ['start',['start',['../kii__thing__if_8h.html#a0a86bf92b5e6d9b66fb578d089f4c0f4',1,'kii_thing_if.h']]]
 ];

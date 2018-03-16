@@ -1,5 +1,16 @@
 var searchData=
 [
+  ['kii_5fdelay_5fms',['KII_DELAY_MS',['../kii__task__callback_8h.html#a102c2ff15e4ed87edf49c03a857e1826',1,'kii_task_callback.h']]],
+  ['kii_5fhttp_5ferror_5ft',['kii_http_error_t',['../kii__socket__callback_8h.html#a72c59c09f89f495172274843cac61f75',1,'kii_socket_callback.h']]],
+  ['kii_5fsocket_5fclose_5fcb',['KII_SOCKET_CLOSE_CB',['../kii__socket__callback_8h.html#ae06009324c853ac619a817d4c90412e0',1,'kii_socket_callback.h']]],
+  ['kii_5fsocket_5fcode_5ft',['kii_socket_code_t',['../kii__socket__callback_8h.html#af67ed44a1e6b2de07d8c778e245ad5f4',1,'kii_socket_callback.h']]],
+  ['kii_5fsocket_5fconnect_5fcb',['KII_SOCKET_CONNECT_CB',['../kii__socket__callback_8h.html#a120569cff79838512cecb57d469ef1dc',1,'kii_socket_callback.h']]],
+  ['kii_5fsocket_5fcontext_5ft',['kii_socket_context_t',['../kii__socket__callback_8h.html#abb7acfb91272ee02125eb93ccf2ca74b',1,'kii_socket_callback.h']]],
+  ['kii_5fsocket_5frecv_5fcb',['KII_SOCKET_RECV_CB',['../kii__socket__callback_8h.html#a1267f401b12475d9858b549496a12c56',1,'kii_socket_callback.h']]],
+  ['kii_5fsocket_5fsend_5fcb',['KII_SOCKET_SEND_CB',['../kii__socket__callback_8h.html#abfe417de168f1f4b78119e39856a4cc8',1,'kii_socket_callback.h']]],
+  ['kii_5ftask_5fcode_5ft',['kii_task_code_t',['../kii__task__callback_8h.html#af0756d7430683b706bfa7679c0ebfc23',1,'kii_task_callback.h']]],
+  ['kii_5ftask_5fcreate',['KII_TASK_CREATE',['../kii__task__callback_8h.html#a55445c05899ccc3117a486835c450d11',1,'kii_task_callback.h']]],
+  ['kii_5ftask_5fentry',['KII_TASK_ENTRY',['../kii__task__callback_8h.html#a30d0afbc319b70ac2674b7d68e4aa081',1,'kii_task_callback.h']]],
   ['kii_5fthing_5fif_5faction_5fhandler',['KII_THING_IF_ACTION_HANDLER',['../kii__thing__if_8h.html#a2734f6ac951ea84aa987c270daf4100d',1,'kii_thing_if.h']]],
   ['kii_5fthing_5fif_5fcommand_5fhandler_5fresource_5ft',['kii_thing_if_command_handler_resource_t',['../kii__thing__if_8h.html#ad75164fda1373ff006c19028db6f9016',1,'kii_thing_if.h']]],
   ['kii_5fthing_5fif_5fcustom_5fpush_5fhandler',['KII_THING_IF_CUSTOM_PUSH_HANDLER',['../kii__thing__if_8h.html#a77884b6c4cc31bb1c4722d034aeb34c9',1,'kii_thing_if.h']]],
@@ -8,6 +19,7 @@ var searchData=
   ['kii_5fthing_5fif_5fstate_5fhandler',['KII_THING_IF_STATE_HANDLER',['../kii__thing__if_8h.html#af60b389f725ebf3a0be22a502dd8d7f9',1,'kii_thing_if.h']]],
   ['kii_5fthing_5fif_5fstate_5ft',['kii_thing_if_state_t',['../kii__thing__if_8h.html#afa4e3027b5db25eecf8f039d0e59e525',1,'kii_thing_if.h']]],
   ['kii_5fthing_5fif_5fstate_5fupdater_5fresource_5ft',['kii_thing_if_state_updater_resource_t',['../kii__thing__if_8h.html#af8d4493927ac3ece4225af0b84863625',1,'kii_thing_if.h']]],
+  ['kii_5fthing_5fif_5fsystem_5fcb_5ft',['kii_thing_if_system_cb_t',['../kii__thing__if_8h.html#a668c6f6265e24a81ee5dfd456576c53d',1,'kii_thing_if.h']]],
   ['kii_5fthing_5fif_5ft',['kii_thing_if_t',['../kii__thing__if_8h.html#aac6c8c3dded3493acca81cfeb87e2480',1,'kii_thing_if.h']]],
   ['kii_5fthing_5fif_5fwriter',['KII_THING_IF_WRITER',['../kii__thing__if_8h.html#adcc841ee6d601d1ba62d8e1a9d9bff31',1,'kii_thing_if.h']]]
 ];
