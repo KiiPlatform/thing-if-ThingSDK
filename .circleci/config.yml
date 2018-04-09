@@ -7,7 +7,10 @@ jobs:
       - checkout
       - run:
           name: install dependencies
-          command: sudo apt update && sudo apt install doxygen && echo y | sudo apt install cmake3
+          command: |
+            sudo apt update
+            sudo apt install doxygen
+            echo y | sudo apt install cmake3
       - run: git submodule sync
       - run: git submodule update --init
       - run: cd kii; git submodule sync
@@ -28,7 +31,10 @@ jobs:
       - checkout
       - run:
           name: install dependencies
-          command: sudo apt update && sudo apt install doxygen && echo y | sudo apt install cmake3
+          command: |
+            sudo apt update
+            sudo apt install doxygen
+            echo y | sudo apt install cmake3
       - restore_cache:
           key: submodules-{{ .Revision }}
       - run: cd tests/small_tests; make test
