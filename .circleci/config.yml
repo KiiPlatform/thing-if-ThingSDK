@@ -1,0 +1,74 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: buildpack-deps:trusty
+    steps:
+      - checkout
+      - run:
+          name: install dependencies
+          command: sudo apt update && sudo apt install doxygen && echo y | sudo apt install cmake3
+      - run: git submodule sync
+      - run: git submodule update --init
+      - run: cd kii; git submodule sync
+      - run: cd kii; git submodule update --init
+      - run: make
+      - save_cache:
+          key: submodules-{{ .Revision }}
+          paths:
+            - kii
+      - save_cache:
+          key: api-doc-{{ .Revision }}
+          paths:
+            - doc
+  test:
+    docker:
+      - image: buildpack-deps:trusty
+    steps:
+      - checkout
+      - run:
+          name: install dependencies
+          command: sudo apt update && sudo apt install doxygen && echo y | sudo apt install cmake3
+      - restore_cache:
+          key: submodules-{{ .Revision }}
+      - run: cd tests/small_tests; make test
+
+  deployment:
+    docker:
+      - image: buildpack-deps:trusty
+    steps:
+      - checkout
+      - restore_cache:
+          key: api-doc-{{ .Revision }}
+      - run: bash circleci_scripts/release_doc.sh
+
+workflows:
+  version: 2
+  build_test:
+    jobs:
+      - build:
+          filters:
+            tags:
+              ignore: /.*/
+      - test:
+          requires:
+            - build
+          filters:
+            tags:
+              ignore: /.*/
+  build_deploy:
+    jobs:
+      - build:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /.*/
+      - deployment:
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v[0-9]+(\.[0-9]+){0,2}((-.*)?)?$/
