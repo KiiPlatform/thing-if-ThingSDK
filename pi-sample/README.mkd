@@ -1,0 +1,84 @@
+This is a sample application for thing-if SDK.
+
+## Prerequisite
+
+Build and install thing-if SDK.
+
+Please refer to [README](../README.mkd) for build and installation.
+
+## Build
+
+If you installed thing-if SDK in custom directory,
+Plese edit the Makefile and adjust `INCLUDES` and `LD_FLAGS` variable
+to include the custom directory path.
+After that, execute following command:
+
+```sh
+# make
+```
+
+This makes exampleapp.
+
+If you want to build exampleapp with debug mode. Execute following
+command:
+
+```sh
+# make DEBUG=1
+```
+
+## How to use
+Go to https://developer.kii.com and create app for you.
+replace `EX_APP_ID`, `EX_APP_KEY` and `EX_APP_SITE` with yours.
+
+Execute folloging command on a terminal. Hereafter This terminal
+called termianl A.
+
+```sh
+# ./exampleapp onboard --vendor-thing-id={vendor-thing-id} --password={password}
+```
+
+After succeeded, go to https://developer.kii.com and check Thing Console.
+There should be a thing created with specified vendor thing ID in the command above.
+Please note thing id displayed here.
+
+After that, open another terminal, and execute following command in
+the another terminal. Hereafter This terminal called termianl B.
+```sh
+cd script
+```
+Please open README.mkd and follow the instruciton of Setup section.
+After the setup, execute
+```sh
+sh script/air-conditioner-command-post.sh
+```
+
+This script posts new command entry to server. exampleapp receives the
+command entry and show followings on the terminal A.
+
+```sh
+schema=SmartLightDemo, schema_version=1, action name=turnPower, action params={"power":true}
+schema=SmartLightDemo, schema_version=1, action name=setBrightness, action params={"brightness":3000}
+schema=SmartLightDemo, schema_version=1, action name=setColor, action params={"color":[0,128,255]}
+schema=SmartLightDemo, schema_version=1, action name=setColorTemperature, action params={"colorTemperature":-100}
+```
+
+If you want to check command state, you can use `script/air-conditioner-command-get.sh`.
+
+```sh
+sh script/air-conditioner-get.sh {COMMAND_ID}
+```
+
+{COMMAND_ID} can be found response of `script/air-conditioner-post.sh`.
+
+## Thing state file.
+
+This sample application sends thing state every 60 seconds. The
+sending thing state is described in `smartlight-state.json`. Content
+of this file is send to server. If you want to change thing state to
+server, You can edit this file.
+
+If `smartlight-state.json` does not exist, exampleapp sends last
+received command contents as thing state.
+
+If you want to change period of sending thing state to server, you can
+edit `EX_STATE_UPDATE_PERIOD` in `example.h`.
