@@ -8,9 +8,9 @@
 
 void initLEDPins() {
     wiringPiSetupGpio(); // Initializes wiringPi using the Broadcom GPIO pin numbers
-    softPwmCreate (BLUE_LED, 0, 100); // BCM 13 as output to Blue LED
-    softPwmCreate (RED_LED, 0, 100); // BCM 19 as output to Red LED
-    softPwmCreate (GREEN_LED, 0, 100); // BCM 26 as output to Green LED
+    softPwmCreate (BLUE_LED, 0, 100);
+    softPwmCreate (RED_LED, 0, 100);
+    softPwmCreate (GREEN_LED, 0, 100);
 }
 
 void turnOnLED(int red, int green, int blue) {
@@ -24,7 +24,7 @@ void turnOffLED() {
     softPwmWrite (GREEN_LED, 0);
 }
 
-int readDS18B20Temparature(const char *deviceId)
+int readDS18B20Temparature()
 {
     int fd;
     char *fileName;
@@ -33,7 +33,7 @@ int readDS18B20Temparature(const char *deviceId)
     if ((fileName = malloc(strlen(W1_PREFIX) + strlen(W1_POSTFIX) + strlen(deviceId) + 1)) == NULL)
         return -9999;
 
-    sprintf(fileName, "%s%s%s", W1_PREFIX, deviceId, W1_POSTFIX);
+    sprintf(fileName, "%s%s%s", W1_PREFIX, W1_FILE_NAME, W1_POSTFIX);
     fd = open(fileName, O_RDONLY);
     free(fileName);
     if (fd < 0)

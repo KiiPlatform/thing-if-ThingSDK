@@ -28,7 +28,7 @@ static kii_bool_t prv_get_air_conditioner_info(
         return KII_FALSE;
     }
     air_conditioner->power = m_air_conditioner.power;
-    int temp = readDS18B20Temparature("0416925607ff");
+    int temp = readDS18B20Temparature();
     if (temp <= -9996) {
         printf("failed to read temperature, code: %d\n", temp);
         return KII_FALSE;
@@ -111,7 +111,7 @@ static kii_bool_t state_handler(
     snprintf(
         buf,
         sizeof(buf) / sizeof(buf[0]),
-        "{\"AirConditionerAlias\":{\"power\":%s\"currentTemperature\":%d}}",
+        "{\"AirConditionerAlias\":{\"power\":%s\"currentTemperature\":%.1f}}",
         (int)air_conditioner.power == (int)KII_JSON_TRUE ? "true," : "false,",
         air_conditioner.temperature
     );
