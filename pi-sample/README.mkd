@@ -1,4 +1,68 @@
-This is a sample application for thing-if SDK.
+This is a sample application for thing-if SDK running on Raspberry Pi.
+This sample updates temperature from sensor to kii cloud, and waiting command to turn on/off led.
+## Used Hardware
+- Raspberry Pi Zero W Rev 1.1 (confirmed)
+- One Wire Digital Temperature Sensor - [DS18B20](http://osoyoo.com/2017/05/27/ds18b20-temperature-sensor/)
+- [full color RGB LED](http://osoyoo.com/2015/03/24/rgb-color-module-project/)
+
+Note that for the used sensor/led, you can use alternative ones.
+
+## Setup Pi
+You should be already installed linux OS image to SD card of your Raspberry Pi. It is not the scope about how to prepare a SD card.
+Login to console of your Pi, and execute the following steps.
+
+### install the necessary development package to compile source code
+- install build-essential
+  ```
+  sudo apt-get install build-essential
+  ```
+- install libssl
+  ```
+  sudo apt-get install libssl-dev
+  ```
+- install cmake
+  ```
+  sudo apt-get install cmake
+  ```
+  the version of `cmake` is required to be at least `3.5`. So if the version of cmake in your OS is lower than it. You should consider to build cmake from source. You can try the following script to build cmake from source:
+
+  ```
+    - sudo apt-get remove cmake
+    - wget https://cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.sh
+    - sudo bash cmake-3.10.2-Linux-x86_64.sh --skip-license --exclude-subdir --prefix=/usr/local
+
+  ```
+- install wiringpi, library for gpio control
+  ```
+  sudo apt-get purge wiringpi
+  ```
+
+### setup and connect 1-wire digital temperature sensor
+Please check [this tutorial](https://www.waveshare.com/wiki/Raspberry_Pi_Tutorial_Series:_1-Wire_DS18B20_Sensor) to setup Pi.
+- Make sure signal pin of sensor connect to [GPIO BCM 4 pin of Pi](https://www.raspberrypi.org/documentation/usage/gpio/)
+- Make sure GROUND pin of sensor connect to any GROUND pins of Pi
+- Make sure VCC pin of sensor connect to any 5V pins of Pi
+
+#### change source code to connected sensor
+Once 1-wire temperature sensor detected by Pi, there is a directory created to present this sensor.
+You can check by
+
+```
+>$ ls /sys/bus/w1/devices
+28-0416925607ff  w1_bus_master1
+```
+As above output, there is `28-***`. It is connceted DS18B20 sensor. Change `W1_FILE_NAME` in `pi_control.h` with the actual value in your Pi.
+Please note that, if there are more than one DS18B20 sensors connected to Pi. There are more than one that kind of folder existing.
+
+## connect full color led
+- Connect GROUND pin of led to any GROUND pin of Pi.
+- Connect RED/GREEN/BLUE pins to any GPIO BCM pin of pi.
+  In the sample, BLUE pin connect to GPIO BCM 13, RED pin connect to 19, and GREEN pin connect to 26
+
+If you connect RED/GREEN/BLUE to different pins, you need to change the following defines in `pi_control.h`.
+- BLUE_LED
+- RED_LED
+- GREEN_LED
 
 ## Prerequisite
 
@@ -27,58 +91,13 @@ command:
 ```
 
 ## How to use
-Go to https://developer.kii.com and create app for you.
-replace `EX_APP_ID`, `EX_APP_KEY` and `EX_APP_SITE` with yours.
 
-Execute folloging command on a terminal. Hereafter This terminal
-called termianl A.
+### onboard with the same vendor thing id setting in `example.h`
+Onboard with the following values:
+- thing-type: MyAirConditioner
+- firmware-version: v1
 
+### start up thing
 ```sh
 # ./exampleapp onboard --vendor-thing-id={vendor-thing-id} --password={password}
 ```
-
-After succeeded, go to https://developer.kii.com and check Thing Console.
-There should be a thing created with specified vendor thing ID in the command above.
-Please note thing id displayed here.
-
-After that, open another terminal, and execute following command in
-the another terminal. Hereafter This terminal called termianl B.
-```sh
-cd script
-```
-Please open README.mkd and follow the instruciton of Setup section.
-After the setup, execute
-```sh
-sh script/air-conditioner-command-post.sh
-```
-
-This script posts new command entry to server. exampleapp receives the
-command entry and show followings on the terminal A.
-
-```sh
-schema=SmartLightDemo, schema_version=1, action name=turnPower, action params={"power":true}
-schema=SmartLightDemo, schema_version=1, action name=setBrightness, action params={"brightness":3000}
-schema=SmartLightDemo, schema_version=1, action name=setColor, action params={"color":[0,128,255]}
-schema=SmartLightDemo, schema_version=1, action name=setColorTemperature, action params={"colorTemperature":-100}
-```
-
-If you want to check command state, you can use `script/air-conditioner-command-get.sh`.
-
-```sh
-sh script/air-conditioner-get.sh {COMMAND_ID}
-```
-
-{COMMAND_ID} can be found response of `script/air-conditioner-post.sh`.
-
-## Thing state file.
-
-This sample application sends thing state every 60 seconds. The
-sending thing state is described in `smartlight-state.json`. Content
-of this file is send to server. If you want to change thing state to
-server, You can edit this file.
-
-If `smartlight-state.json` does not exist, exampleapp sends last
-received command contents as thing state.
-
-If you want to change period of sending thing state to server, you can
-edit `EX_STATE_UPDATE_PERIOD` in `example.h`.
