@@ -1,10 +1,14 @@
 #include "pi_control.h"
 #include <wiringPi.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
+#include <unistd.h>
+#include <ctype.h>
+#include <softPwm.h>
 
 void initLEDPins() {
     wiringPiSetupGpio(); // Initializes wiringPi using the Broadcom GPIO pin numbers
@@ -30,7 +34,7 @@ int readDS18B20Temparature()
     char *fileName;
 
     // Allocate space for the filename
-    if ((fileName = malloc(strlen(W1_PREFIX) + strlen(W1_POSTFIX) + strlen(deviceId) + 1)) == NULL)
+    if ((fileName = malloc(strlen(W1_PREFIX) + strlen(W1_POSTFIX) + strlen(W1_FILE_NAME) + 1)) == NULL)
         return -9999;
 
     sprintf(fileName, "%s%s%s", W1_PREFIX, W1_FILE_NAME, W1_POSTFIX);

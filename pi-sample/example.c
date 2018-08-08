@@ -15,7 +15,7 @@
 
 typedef struct prv_air_conditioner_t {
     kii_bool_t power;
-    int temperature;
+    float temperature;
 } prv_air_conditioner_t;
 
 static prv_air_conditioner_t m_air_conditioner;
@@ -85,9 +85,6 @@ static kii_bool_t action_handler(
             turnOffLED();
         }
     }
-    if (strcmp(action_name, "setPresetTemperature") == 0) {
-        air_conditioner.temperature = atoi(action_name);
-    }
 
     if (prv_set_air_conditioner_info(&air_conditioner) == KII_FALSE) {
         printf("fail to unlock.\n");
@@ -120,23 +117,6 @@ static kii_bool_t state_handler(
         return KII_FALSE;
     }
     return KII_TRUE;
-}
-
-static kii_bool_t custom_push_handler(
-        kii_t *kii,
-        const char* message,
-        size_t message_length)
-{
-    kii_bool_t ret = KII_TRUE;
-    printf("custom_push_handler:\n%s\n", message);
-    if (strncmp(message, "{\"commandID\"", 12) == 0) {
-        ret = KII_FALSE;
-    }
-    // check no error in parsing topic.
-    if (strncmp(message, "{\"Item\":\"CheckNoError\"", 22) == 0) {
-        ret = KII_FALSE;
-    }
-    return KII_FALSE;
 }
 
 static void print_help() {
@@ -191,7 +171,6 @@ int main(int argc, char** argv)
         sizeof(mqtt_buff) / sizeof(mqtt_buff[0]);
     command_handler_resource.action_handler = action_handler;
     command_handler_resource.state_handler = state_handler;
-    command_handler_resource.custom_push_handler = custom_push_handler;
 
     state_updater_resource.buffer = state_updater_buff;
     state_updater_resource.buffer_size =
