@@ -15,7 +15,7 @@
 
 typedef struct prv_air_conditioner_t {
     kii_bool_t power;
-    float temperature;
+    int temperature;
 } prv_air_conditioner_t;
 
 static prv_air_conditioner_t m_air_conditioner;
@@ -108,11 +108,10 @@ static kii_bool_t state_handler(
     snprintf(
         buf,
         sizeof(buf) / sizeof(buf[0]),
-        "{\"AirConditionerAlias\":{\"power\":%s\"currentTemperature\":%.1f}}",
+        "{\"AirConditionerAlias\":{\"power\":%s\"currentTemperature\":%d}}",
         (int)air_conditioner.power == (int)KII_JSON_TRUE ? "true," : "false,",
         air_conditioner.temperature
     );
-
     if ((*writer)(kii, buf) == KII_FALSE) {
         return KII_FALSE;
     }
