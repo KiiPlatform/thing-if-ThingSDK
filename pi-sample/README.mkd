@@ -14,15 +14,15 @@ Login to console of your Pi, and execute the following steps.
 ### install the necessary development package to compile source code
 - install build-essential
   ```
-  sudo apt-get install build-essential
+  # sudo apt-get install build-essential
   ```
 - install libssl
   ```
-  sudo apt-get install libssl-dev
+  # sudo apt-get install libssl-dev
   ```
 - install cmake
   ```
-  sudo apt-get install cmake
+  # sudo apt-get install cmake
   ```
   the version of `cmake` is required to be at least `3.5`. So if the version of cmake in your OS is lower than it. You should consider to build cmake from source. You can try the following script to build cmake from source:
 
@@ -34,7 +34,7 @@ Login to console of your Pi, and execute the following steps.
   ```
 - install wiringpi, library for gpio control
   ```
-  sudo apt-get purge wiringpi
+  # sudo apt-get purge wiringpi
   ```
 
 ### setup and connect 1-wire digital temperature sensor
@@ -48,7 +48,7 @@ Once 1-wire temperature sensor detected by Pi, there is a directory created to p
 You can check by
 
 ```
->$ ls /sys/bus/w1/devices
+# ls /sys/bus/w1/devices
 28-0416925607ff  w1_bus_master1
 ```
 As above output, there is `28-***`. It is connceted DS18B20 sensor. Change `W1_FILE_NAME` in `pi_control.h` with the actual value in your Pi.
@@ -64,13 +64,11 @@ If you connect RED/GREEN/BLUE to different pins, you need to change the followin
 - RED_LED
 - GREEN_LED
 
-## Prerequisite
+## Build sample
 
 Build and install thing-if SDK.
 
 Please refer to [README](../README.mkd) for build and installation.
-
-## Build
 
 If you installed thing-if SDK in custom directory,
 Plese edit the Makefile and adjust `INCLUDES` and `LD_FLAGS` variable
