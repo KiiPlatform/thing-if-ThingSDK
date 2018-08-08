@@ -17,7 +17,7 @@ const char EX_APP_SITE[] = "api.kii.com";
 #define EX_COMMAND_HANDLER_BUFF_SIZE 4096
 #define EX_STATE_UPDATER_BUFF_SIZE 4096
 #define EX_MQTT_BUFF_SIZE 2048
-#define EX_STATE_UPDATE_PERIOD 60
+#define EX_STATE_UPDATE_PERIOD 10
 
 #ifdef __cplusplus
 }

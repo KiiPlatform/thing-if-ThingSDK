@@ -28,7 +28,12 @@ static kii_bool_t prv_get_air_conditioner_info(
         return KII_FALSE;
     }
     air_conditioner->power = m_air_conditioner.power;
-    air_conditioner->temperature = m_air_conditioner.temperature;
+    int temp = readDS18B20Temparature("0416925607ff");
+    if (temp <= -9996) {
+        printf("failed to read temperature, code: %d\n", temp);
+        return KII_FALSE;
+    }
+    air_conditioner->temperature = temp/10.0;
     if (pthread_mutex_unlock(&m_mutex) != 0) {
         return KII_FALSE;
     }
@@ -42,7 +47,6 @@ static kii_bool_t prv_set_air_conditioner_info(
         return KII_FALSE;
     }
     m_air_conditioner.power = air_conditioner->power;
-    m_air_conditioner.temperature = air_conditioner->temperature;
     if (pthread_mutex_unlock(&m_mutex) != 0) {
         return KII_FALSE;
     }
@@ -96,49 +100,26 @@ static kii_bool_t state_handler(
         kii_t* kii,
         KII_THING_IF_WRITER writer)
 {
-    FILE* fp = fopen("air_conditioner-state.json", "r");
-    if (fp != NULL) {
-        char buf[256];
-        kii_bool_t retval = KII_TRUE;
-        while (fgets(buf, sizeof(buf) / sizeof(buf[0]), fp) != NULL) {
-            if ((*writer)(kii, buf) == KII_FALSE) {
-                retval = KII_FALSE;
-                break;
-            }
-        }
-        fclose(fp);
-        return retval;
-    } else {
-        char buf[256];
-        prv_air_conditioner_t air_conditioner;
-        memset(&air_conditioner, 0x00, sizeof(air_conditioner));
-        if (prv_get_air_conditioner_info(&air_conditioner) == KII_FALSE) {
-            printf("fail to lock.\n");
-            return KII_FALSE;
-        }
-        if ((*writer)(kii, "{\"AirConditionerAlias\":") == KII_FALSE) {
-            return KII_FALSE;
-        }
-        if ((*writer)(kii, "{\"power\":") == KII_FALSE) {
-            return KII_FALSE;
-        }
-        if ((*writer)(kii, (int)air_conditioner.power == (int)KII_JSON_TRUE
-                        ? "true," : "false,") == KII_FALSE) {
-            return KII_FALSE;
-        }
-        if ((*writer)(kii, "\"currentTemperature\":") == KII_FALSE) {
-            return KII_FALSE;
-        }
-        snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%d}",
-                air_conditioner.temperature);
-        if ((*writer)(kii, buf) == KII_FALSE) {
-            return KII_FALSE;
-        }
-        if ((*writer)(kii, "}") == KII_FALSE) {
-            return KII_FALSE;
-        }
-        return KII_TRUE;
+    char buf[256];
+    prv_air_conditioner_t air_conditioner;
+    memset(&air_conditioner, 0x00, sizeof(air_conditioner));
+    if (prv_get_air_conditioner_info(&air_conditioner) == KII_FALSE) {
+        printf("fail to lock.\n");
+        return KII_FALSE;
     }
+
+    snprintf(
+        buf,
+        sizeof(buf) / sizeof(buf[0]),
+        "{\"AirConditionerAlias\":{\"power\":%s\"currentTemperature\":%d}}",
+        (int)air_conditioner.power == (int)KII_JSON_TRUE ? "true," : "false,",
+        air_conditioner.temperature
+    );
+
+    if ((*writer)(kii, buf) == KII_FALSE) {
+        return KII_FALSE;
+    }
+    return KII_TRUE;
 }
 
 static kii_bool_t custom_push_handler(
