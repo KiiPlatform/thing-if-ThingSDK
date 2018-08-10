@@ -12,9 +12,9 @@
 
 void initLEDPins() {
     wiringPiSetupGpio(); // Initializes wiringPi using the Broadcom GPIO pin numbers
-    softPwmCreate (BLUE_LED, 0, 100);
-    softPwmCreate (RED_LED, 0, 100);
-    softPwmCreate (GREEN_LED, 0, 100);
+    softPwmCreate (BLUE_LED, 0, 255);
+    softPwmCreate (RED_LED, 0, 255);
+    softPwmCreate (GREEN_LED, 0, 255);
 }
 
 void turnOnLED(int red, int green, int blue) {
@@ -82,10 +82,6 @@ int readDS18B20Temparature()
         temp = temp * 10 + (*p - '0');
         ++p;
     }
-
-    // We know it returns temp * 1000, but we only really want temp * 10, so
-    //	do a bit of rounding...
-    temp = (temp + 50) / 100;
 
     close(fd);
     return temp * sign;

@@ -33,7 +33,7 @@ static kii_bool_t prv_get_air_conditioner_info(
         printf("failed to read temperature, code: %d\n", temp);
         return KII_FALSE;
     }
-    air_conditioner->temperature = temp/10.0;
+    air_conditioner->temperature = temp/1000;
     if (pthread_mutex_unlock(&m_mutex) != 0) {
         return KII_FALSE;
     }
