@@ -1,4 +1,4 @@
 [submodule "kii"]
 	path = kii
 	url = git@github.com:KiiPlatform/KiiThingSDK-Embedded.git
-	branch = develop
+	branch = master
